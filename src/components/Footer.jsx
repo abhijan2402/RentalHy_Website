@@ -1,6 +1,7 @@
 import { FaFacebook, FaLinkedin, FaInstagram } from "react-icons/fa";
 import { FaSquareXTwitter } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
+import logo from "../assets/clogo.png";
 
 export default function Footer() {
   const navigate = useNavigate();
@@ -10,7 +11,9 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10">
         {/* Company Info */}
         <div>
-          <h1 className="text-2xl font-bold mb-4">Stay Properties</h1>
+          <div className="cursor-pointer mb-4" onClick={() => navigate("/home")}>
+            <img src={logo} alt="Logo" className="h-14 w-28" />
+          </div>
           <p className="text-sm mb-4">
             Helping you discover, buy, and rent premium properties across the
             city. Trusted by thousands for our transparency, local expertise,

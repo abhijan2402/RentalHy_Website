@@ -4,6 +4,8 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { propertyData } from "../../utils/propertydata";
 import { useNavigate } from "react-router-dom";
+import { FaMapMarkerAlt, FaPlus } from "react-icons/fa";
+import AddPropertyModal from "./AddPropertyModal";
 
 const sliderSettings = {
   dots: true,
@@ -17,6 +19,7 @@ const sliderSettings = {
 
 export default function PropertyList() {
   const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("");
 
@@ -48,7 +51,8 @@ export default function PropertyList() {
   return (
     <div className="flex-1 bg-gray-50 min-h-screen px-2 py-6">
       {/* Search and Sort */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-6 items-center">
+      <div className="flex flex-col sm:flex-row gap-3 mb-6 items-center w-full">
+        {/* Search */}
         <input
           type="text"
           placeholder="Search by title or location..."
@@ -56,6 +60,8 @@ export default function PropertyList() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
+
+        {/* Sort */}
         <select
           className="border border-gray-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-600 outline-none"
           value={sort}
@@ -67,6 +73,22 @@ export default function PropertyList() {
           <option value="newest">Newest First</option>
           <option value="oldest">Oldest First</option>
         </select>
+
+        {/* Add Button */}
+        <button
+          onClick={() => setShowModal(true)}
+          className="sm:ml-auto flex items-center gap-2 bg-[#7C0902] text-white px-4 py-2 rounded-lg shadow hover:bg-[#600601] transition-colors"
+        >
+          <FaPlus /> Add Property
+        </button>
+
+        {/* Modal */}
+        {showModal && (
+          <AddPropertyModal
+            showModal={showModal}
+            onClose={() => setShowModal(false)}
+          />
+        )}
       </div>
 
       {/* Property List */}
@@ -88,7 +110,8 @@ export default function PropertyList() {
                   />
                 ))}
               </Slider>
-              <span className="absolute top-2 left-2 bg-white/80 text-xs px-3 py-1 rounded shadow font-bold text-gray-700">
+              <span className="absolute top-2 left-2 bg-white/80 text-xs px-3 py-1 rounded shadow font-bold text-gray-700 flex items-center gap-1">
+                <FaMapMarkerAlt className="text-red-500" />
                 {property.location}
               </span>
             </div>
@@ -113,15 +136,28 @@ export default function PropertyList() {
                     : `₹${property.price.toLocaleString()}`}
                 </span>
               </div>
-              <p className="text-xs text-gray-400 mb-2">
-                Posted: {property.date}
-              </p>
-              <a
-                onClick={() => navigate(`/propertydetails/${property.id}`)}
-                className="mt-auto text-center cursor-pointer bg-[#7C0902] text-white px-5 py-2 rounded-lg font-semibold text-sm shadow hover:bg-[#600601] transition-colors"
-              >
-                View Details
-              </a>
+              <div className="flex justify-between">
+                <p className="text-xs text-gray-400 mb-2">
+                  Posted: {property.date}
+                </p>
+                <p className="text-xs text-[#7C0902] mb-2">
+                  {property.status === true ? " Verified" : null}
+                </p>
+              </div>
+              <div className="flex justify-between">
+                <a
+                  onClick={() => navigate(`/propertydetails/${property.id}`)}
+                  className="mt-auto text-center cursor-pointer bg-[#7C0902] text-white px-5 py-2 rounded-lg font-semibold text-sm shadow hover:bg-[#600601] transition-colors"
+                >
+                  View Details
+                </a>
+                <a
+                  onClick={() => navigate(`/wishlist`)}
+                  className="mt-auto text-center cursor-pointer border border-[#7C0902] bg-[#7c080200] text-black px-5 py-2 rounded-lg font-semibold text-sm shadow hover:bg-[#600601a2] hover:text-white transition-colors"
+                >
+                  Add Whislist
+                </a>
+              </div>
             </div>
           </div>
         ))}

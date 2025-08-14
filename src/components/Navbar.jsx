@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FaUserCircle, FaHeart } from "react-icons/fa";
 import { useAuth } from "../contexts/AuthContext";
+import logo from "../assets/clogo.png";
 
 export default function Navbar() {
   const { user } = useAuth();
@@ -14,7 +15,7 @@ export default function Navbar() {
   const path = !user ? "/" : "/home";
   const navItems = [
     { name: "Home", path: path },
-    { name: "Properties", path: "/property" },
+    { name: "Convention Hall", path: "/property" },
     { name: "About Us", path: "/about" },
     { name: "Support", path: "/support" },
   ];
@@ -46,12 +47,8 @@ export default function Navbar() {
         className="fixed top-0 left-0 w-full z-50 bg-white shadow-md"
       >
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          {/* Logo */}
-          <div
-            className="text-2xl font-bold cursor-pointer text-black"
-            onClick={() => navigate("/home")}
-          >
-            MyLogo
+          <div className="cursor-pointer" onClick={() => navigate("/home")}>
+            <img src={logo} alt="Logo" className="h-14 w-auto" />
           </div>
 
           {/* Nav Items */}

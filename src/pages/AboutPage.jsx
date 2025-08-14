@@ -44,7 +44,7 @@ export default function AboutPage() {
             About Us
           </h1>
           <p className="text-gray-700 text-lg mb-6 leading-relaxed">
-            At PropertyPro, we believe finding your dream property should be
+            At TO-LET INDIA, we believe finding your dream property should be
             simple, transparent, and stress-free. Our platform connects buyers,
             renters, and owners with trusted agents and verified listings,
             combining industry expertise with cutting-edge technology. From

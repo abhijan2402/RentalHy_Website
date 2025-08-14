@@ -5,6 +5,7 @@ export const propertyData = [
     location: "Mumbai, Maharashtra",
     price: 15000,
     features: ["2 Beds", "2 Baths", "Balcony"],
+    status: true,
     images: [
       "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd",
       "https://images.unsplash.com/photo-1507089947368-19c1da9775ae",
@@ -34,6 +35,7 @@ export const propertyData = [
     location: "Bangalore, Karnataka",
     price: 25000,
     features: ["3 Beds", "3 Baths", "Private Garden"],
+    status: false,
     images: [
       "https://images.unsplash.com/photo-1460518451285-97b6aa326961",
       "https://images.unsplash.com/photo-1523217582562-09d0def993a6",
@@ -63,6 +65,7 @@ export const propertyData = [
     location: "Chicago, Illinois",
     price: 2500000,
     features: ["4 Beds", "3 Baths", "Rooftop Terrace"],
+    status: true,
     images: [
       "https://images.unsplash.com/photo-1560185127-6ed189bf02f4",
       "https://images.unsplash.com/photo-1519985176271-adb1088fa94c",

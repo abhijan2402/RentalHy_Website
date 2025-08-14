@@ -30,9 +30,11 @@ export default function PropertyDetails({ property }) {
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       {/* Title */}
-      <h1 className="text-3xl font-bold text-gray-900 mb-2">
-        {property.title}
-      </h1>
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          {property.title}
+        </h1>
+      </div>
       <p className="text-gray-500 mb-4">{property.location}</p>
 
       {/* Price */}
@@ -45,7 +47,7 @@ export default function PropertyDetails({ property }) {
       </div>
 
       {/* Image Slider */}
-      <div className="mb-6">
+      <div className="mb-6 relative">
         <Slider {...sliderSettings}>
           {property.images.map((img, idx) => (
             <img
@@ -57,6 +59,9 @@ export default function PropertyDetails({ property }) {
             />
           ))}
         </Slider>
+        <span className="absolute top-2 right-4 bg-white/80 text-xs px-3 py-1 rounded shadow font-bold text-[#7C0902]">
+          {property.status === true ? " Verified" : null}
+        </span>
       </div>
 
       {/* Description */}

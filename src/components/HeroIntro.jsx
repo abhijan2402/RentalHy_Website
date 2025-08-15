@@ -23,7 +23,7 @@ const HeroIntro = () => {
   };
 
   return (
-    <section className="min-h-screen flex flex-col md:flex-row items-center justify-between px-6 md:px-20 py-16 bg-gradient-to-br from-white via-gray-50 to-gray-100">
+    <section className="min-h-screen flex flex-col md:flex-row items-center justify-between px-6 md:px-20 py-10 bg-gradient-to-br from-white via-gray-50 to-gray-100">
       {/* Text Section */}
       <motion.div
         className="max-w-xl mb-12 md:mb-0"

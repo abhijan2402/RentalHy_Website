@@ -15,6 +15,7 @@ import SupportPage from "../pages/SupportPage";
 import AboutPage from "../pages/AboutPage";
 import PropertyDetailsPage from "../pages/PropertyDetailsPage";
 import Wishlist from "../pages/Wishlist";
+import ProfilePage from "../pages/ProfilePage";
 
 export default function AppRoutes() {
   return (
@@ -25,6 +26,7 @@ export default function AppRoutes() {
         <Route path="/property" element={<Property />} />
         <Route path="/propertydetails/:id" element={<PropertyDetailsPage />} />
         <Route path="/wishlist" element={<Wishlist />} />
+        <Route path="/profile" element={<ProfilePage />} />
         <Route path="/support" element={<SupportPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />

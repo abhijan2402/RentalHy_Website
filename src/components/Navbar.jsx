@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { FaUserCircle, FaHeart } from "react-icons/fa";
 import { useAuth } from "../contexts/AuthContext";
 import logo from "../assets/clogo.png";
+import { BiHeart } from "react-icons/bi";
 
 export default function Navbar() {
   const { user } = useAuth();
@@ -14,7 +15,7 @@ export default function Navbar() {
 
   const path = !user ? "/" : "/home";
   const navItems = [
-    { name: "Home", path: path },
+    { name: "Home", path: "/home" },
     { name: "Convention Hall", path: "/property" },
     { name: "About Us", path: "/about" },
     { name: "Support", path: "/support" },
@@ -73,22 +74,32 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-4">
             <button
               onClick={() => navigate("/wishlist")}
-              className="relative px-4 py-2 bg-white border border-[#7C0902] text-[#7C0902] rounded-md font-medium hover:bg-[#7C0902] hover:text-white transition duration-300"
+              className="relative p-2 rounded-full border border-[#7C0902] text-[#7C0902] hover:bg-[#7C0902] hover:text-white transition duration-300"
             >
-              Wishlist
+              {/* Heart Icon */}
+              <BiHeart className="w-6 h-6" />
+
+              {/* Badge */}
               {wishlistCount > 0 && (
                 <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
                   {wishlistCount}
                 </span>
               )}
             </button>
-
-            {user && (
-              <FaUserCircle
-                className="text-2xl cursor-pointer text-black"
+            <button
+              onClick={() => navigate("/profile")}
+              className="relative p-2 rounded-full border border-[#7C0902] text-[#7C0902] hover:bg-[#7C0902] hover:text-white transition duration-300"
+            >
+              <FaUserCircle className="w-6 h-6" />
+            </button>
+            {/* {user && (
+              <button
                 onClick={() => navigate("/profile")}
-              />
-            )}
+                className="relative p-2 rounded-full border border-[#7C0902] text-[#7C0902] hover:bg-[#7C0902] hover:text-white transition duration-300"
+              >
+                <FaUserCircle className="w-6 h-6" />
+              </button>
+            )} */}
           </div>
 
           {/* Mobile Menu Button */}

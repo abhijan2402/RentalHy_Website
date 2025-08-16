@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { Link } from "react-router-dom";
-
+import logo from "../../assets/clogo.png";
 export default function Signin() {
   const { login } = useAuth();
   const [form, setForm] = useState({ email: "", password: "" });
@@ -95,14 +95,14 @@ export default function Signin() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-[#000]/50 to-black/80" />
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white p-10">
-          {/* <img
-            src="/logo.png"
+          <img
+            src={logo}
             alt="Logo"
             className="h-16 md:h-20 mb-4 drop-shadow-xl"
             style={{ objectFit: "contain" }}
-          /> */}
+          />
           <h1 className="text-3xl md:text-5xl font-extrabold mb-4 drop-shadow-lg">
-            Welcome toTO-LET INDIA
+            Welcome to TO-LET INDIA
           </h1>
           <p className="max-w-md text-lg md:text-xl font-medium drop-shadow-md">
             Sign in to access your saved properties, personalized

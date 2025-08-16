@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { Link } from "react-router-dom";
+import logo from "../../assets/clogo.png";
 
 export default function Signup() {
   const { signup } = useAuth();
@@ -95,12 +96,12 @@ export default function Signup() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-[#000]/50 to-black/80" />
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white p-10">
-          {/* <img
-            src="/logo.png"
+          <img
+            src={logo}
             alt="Logo"
             className="h-16 md:h-20 mb-4 drop-shadow-xl"
             style={{ objectFit: "contain" }}
-          /> */}
+          />
           <h1 className="text-3xl md:text-5xl font-extrabold mb-4 drop-shadow-lg">
             Become a Member
           </h1>

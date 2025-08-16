@@ -49,46 +49,47 @@ export default function PropertyList() {
     });
 
   return (
-    <div className="flex-1 bg-gray-50 min-h-screen px-2 py-6">
+    <div className="flex-1 bg-gray-50 min-h-screen px-2">
       {/* Search and Sort */}
       <div className="flex flex-col sm:flex-row gap-3 mb-6 items-center w-full">
         {/* Search */}
         <input
           type="text"
           placeholder="Search by title or location..."
-          className="flex-1 border border-gray-300 rounded px-4 py-2 text-sm focus:ring-2 focus:ring-blue-600 outline-none"
+          className="w-full sm:flex-1 border border-gray-300 rounded px-4 py-2 text-sm focus:ring-1 focus:ring-[#7C0902]  outline-none"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
 
-        {/* Sort */}
-        <select
-          className="border border-gray-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-600 outline-none"
-          value={sort}
-          onChange={(e) => setSort(e.target.value)}
-        >
-          <option value="">Sort by</option>
-          <option value="low-high">Price: Low to High</option>
-          <option value="high-low">Price: High to Low</option>
-          <option value="newest">Newest First</option>
-          <option value="oldest">Oldest First</option>
-        </select>
+        <div className="relative w-full sm:w-auto">
+          <select
+            className="w-full appearance-none border border-gray-300 rounded-lg px-4 py-2 text-sm text-gray-700 bg-white focus:ring-1 focus:ring-[#7C0902] focus:border-[#7C0902] outline-none pr-8"
+            value={sort}
+            onChange={(e) => setSort(e.target.value)}
+          >
+            <option value="">Sort by</option>
+            <option value="low-high">Price: Low to High</option>
+            <option value="high-low">Price: High to Low</option>
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+          </select>
 
-        {/* Add Button */}
-        <button
-          onClick={() => setShowModal(true)}
-          className="sm:ml-auto flex items-center gap-2 bg-[#7C0902] text-white px-4 py-2 rounded-lg shadow hover:bg-[#600601] transition-colors"
-        >
-          <FaPlus /> Add Property
-        </button>
-
-        {/* Modal */}
-        {showModal && (
-          <AddPropertyModal
-            showModal={showModal}
-            onClose={() => setShowModal(false)}
-          />
-        )}
+          {/* Custom dropdown icon */}
+          <svg
+            className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        </div>
       </div>
 
       {/* Property List */}
@@ -155,13 +156,30 @@ export default function PropertyList() {
                   onClick={() => navigate(`/wishlist`)}
                   className="mt-auto text-center cursor-pointer border border-[#7C0902] bg-[#7c080200] text-black px-5 py-2 rounded-lg font-semibold text-sm shadow hover:bg-[#600601a2] hover:text-white transition-colors"
                 >
-                  Add Whislist
+                  Add Wishlist
                 </a>
               </div>
             </div>
           </div>
         ))}
       </div>
+
+      {/* Floating Add Button */}
+      <button
+        onClick={() => setShowModal(true)}
+        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-[#7C0902] text-white px-5 py-3 rounded-full shadow-lg hover:bg-[#600601] transition-colors animate-bounce"
+      >
+        <FaPlus className="text-lg" />
+        <span className="">Post Property</span>
+      </button>
+
+      {/* Modal */}
+      {showModal && (
+        <AddPropertyModal
+          showModal={showModal}
+          onClose={() => setShowModal(false)}
+        />
+      )}
     </div>
   );
 }

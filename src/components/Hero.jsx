@@ -24,7 +24,7 @@ export default function Hero() {
   return (
     <section
       id="Home"
-      className="relative min-h-[75vh] sm:min-h-[85vh] md:min-h-[92vh] flex items-center justify-center flex-col px-4 text-center pt-28 bg-cover bg-center overflow-hidden"
+      className="relative min-h-[65vh] flex items-center justify-center flex-col px-4 text-center pt-28 bg-cover bg-center overflow-hidden"
     >
       {/* Background Image Slider */}
       {images.map((img, i) => (
@@ -63,7 +63,7 @@ export default function Hero() {
         </motion.p>
 
         {/* Buttons */}
-        {!user && (
+        {/* {!user && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -83,7 +83,7 @@ export default function Hero() {
               Login
             </button>
           </motion.div>
-        )}
+        )} */}
       </div>
     </section>
   );

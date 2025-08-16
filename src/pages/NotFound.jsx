@@ -41,7 +41,7 @@ export default function NotFound() {
           transition={{ type: "spring", stiffness: 300 }}
         >
           <Link
-            to={path}
+            to={"/home"}
             className="inline-block bg-[#7C0902] hover:bg-[#7c080288] text-white px-6 py-3 rounded-lg text-sm sm:text-base transition-all duration-300"
           >
             Go back to Home

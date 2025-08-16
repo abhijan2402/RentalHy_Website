@@ -114,14 +114,14 @@ export default function PropertyFilters() {
   return (
     <>
       {/* Mobile open filters btn */}
-      <div className="md:hidden flex justify-end mb-2">
+      <div className="md:hidden flex justify-end">
         <button
           onClick={() => setMobileOpen(true)}
-          className="flex items-center gap-2"
+          className="flex items-center justify-center gap-2 w-full"
           style={{
             backgroundColor: PRIMARY_COLOR,
             color: "white",
-            padding: "8px 16px",
+            padding: "12px 16px",
             borderRadius: "6px",
           }}
         >
@@ -132,10 +132,12 @@ export default function PropertyFilters() {
       {/* Sidebar */}
       <aside
         className={`
-          bg-white shadow-lg rounded-lg p-4 w-full md:w-72 space-y-4
-          md:block
-          ${mobileOpen ? "block" : "hidden"}
-          fixed md:relative top-0 left-0 h-full z-80 overflow-y-auto
+            bg-white shadow-lg p-4 space-y-4
+    md:w-72 w-full
+    h-full overflow-y-auto
+    transition-all duration-300
+    ${mobileOpen ? "fixed inset-0 z-[9999]" : "hidden"}
+    md:block md:relative md:z-auto
         `}
       >
         {/* Header with Reset & Close */}
@@ -171,7 +173,7 @@ export default function PropertyFilters() {
                 checked={filters.bhk.includes(bhk)}
                 onChange={() => handleCheckboxChange("bhk", bhk)}
               />
-              {bhk} BHK
+              {`${bhk} ${bhk >= 4 ? "BHK+" : "BHK"}`}
             </label>
           ))}
         </FilterSection>
@@ -182,7 +184,7 @@ export default function PropertyFilters() {
           open={sections.propertyType}
           setOpen={(v) => setSections((p) => ({ ...p, propertyType: v }))}
         >
-          {["Apartment", "Villa", "Independent House"].map((type) => (
+          {["Apartment", "Flat", "Villa"].map((type) => (
             <label key={type} className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -271,7 +273,7 @@ export default function PropertyFilters() {
           open={sections.availability}
           setOpen={(v) => setSections((p) => ({ ...p, availability: v }))}
         >
-          {["Immediate", "Within 1 Month", "Within 3 Months"].map((status) => (
+          {["Ready to Move", "Under Construction"].map((status) => (
             <label key={status} className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -289,16 +291,18 @@ export default function PropertyFilters() {
           open={sections.bathrooms}
           setOpen={(v) => setSections((p) => ({ ...p, bathrooms: v }))}
         >
-          {[1, 2, 3, 4].map((count) => (
-            <label key={count} className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={filters.bathrooms.includes(count)}
-                onChange={() => handleCheckboxChange("bathrooms", count)}
-              />
-              {count}
-            </label>
-          ))}
+          <div className="flex flex-row justify-between">
+            {[1, 2, 3, 4].map((count) => (
+              <label key={count} className="flex items-center  gap-2">
+                <input
+                  type="checkbox"
+                  checked={filters.bathrooms.includes(count)}
+                  onChange={() => handleCheckboxChange("bathrooms", count)}
+                />
+                {`${count} ${count >= 4 ? "+" : ""}`}
+              </label>
+            ))}
+          </div>
         </FilterSection>
 
         {/* Parking Available For */}
@@ -325,7 +329,16 @@ export default function PropertyFilters() {
           open={sections.facing}
           setOpen={(v) => setSections((p) => ({ ...p, facing: v }))}
         >
-          {["East", "West", "North", "South"].map((dir) => (
+          {[
+            "East",
+            "West",
+            "North",
+            "South",
+            "North-East",
+            "North-West",
+            "South-East",
+            "South-West",
+          ].map((dir) => (
             <label key={dir} className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -343,7 +356,7 @@ export default function PropertyFilters() {
           open={sections.advance}
           setOpen={(v) => setSections((p) => ({ ...p, advance: v }))}
         >
-          {["1 Month", "2 Months", "3 Months"].map((adv) => (
+          {["1 Month", "2 Months", "3 Months+"].map((adv) => (
             <label key={adv} className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -361,7 +374,7 @@ export default function PropertyFilters() {
           open={sections.tenant}
           setOpen={(v) => setSections((p) => ({ ...p, tenant: v }))}
         >
-          {["Family", "Bachelors", "Any"].map((tenant) => (
+          {["Family", "Bachelors Male", "Bachelors female"].map((tenant) => (
             <label key={tenant} className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -377,7 +390,7 @@ export default function PropertyFilters() {
       {/* Mobile overlay */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 bg-black opacity-30 z-40 md:hidden"
+          className="fixed inset-0 bg-black opacity-30 z-[9998] md:hidden"
           onClick={() => setMobileOpen(false)}
         />
       )}

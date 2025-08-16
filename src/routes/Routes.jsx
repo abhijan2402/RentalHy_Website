@@ -22,7 +22,7 @@ export default function AppRoutes() {
     <Routes>
       {/* Public Routes */}
       <Route element={<MainLayout />}>
-        <Route path="/" element={<Landing />} />
+        <Route path="/home" element={<Home />} />
         <Route path="/property" element={<Property />} />
         <Route path="/propertydetails/:id" element={<PropertyDetailsPage />} />
         <Route path="/wishlist" element={<Wishlist />} />
@@ -39,14 +39,14 @@ export default function AppRoutes() {
 
       {/* Protected Routes */}
       <Route element={<MainLayout />}>
-        <Route
+        {/* <Route
           path="/home"
           element={
             <ProtectedRoute>
               <Home />
             </ProtectedRoute>
           }
-        />
+        /> */}
       </Route>
 
       <Route path="*" element={<NotFound />} />

@@ -116,7 +116,7 @@ export default function PropertFilterSlider() {
     switch (tab) {
       case "BHK":
         return [1, 2, 3, 4].map((bhk) => (
-          <label key={bhk} className="flex items-center gap-2">
+          <label key={bhk} className="flex text-black items-center gap-2">
             <input
               type="checkbox"
               checked={filters.bhk.includes(bhk)}
@@ -128,7 +128,7 @@ export default function PropertFilterSlider() {
 
       case "Property Type":
         return ["Apartment", "Flat", "Villa"].map((type) => (
-          <label key={type} className="flex items-center gap-2">
+          <label key={type} className="flex  text-black items-center gap-2">
             <input
               type="checkbox"
               checked={filters.propertyType.includes(type)}
@@ -148,7 +148,7 @@ export default function PropertFilterSlider() {
               onChange={(e) =>
                 handleInputChange("roomSize", "min", e.target.value)
               }
-              className="w-1/2 border p-1 rounded"
+              className="w-1/2 border text-black p-1 rounded"
             />
             <input
               type="number"
@@ -157,7 +157,7 @@ export default function PropertFilterSlider() {
               onChange={(e) =>
                 handleInputChange("roomSize", "max", e.target.value)
               }
-              className="w-1/2 border p-1 rounded"
+              className="w-1/2 border text-black p-1 rounded"
             />
           </div>
         );
@@ -179,7 +179,7 @@ export default function PropertFilterSlider() {
               ]}
             />
             <div className="flex justify-between text-sm mt-2">
-              <span>₹{filters.priceRange[0]}</span>
+              <span className="text-black">₹{filters.priceRange[0]}</span>
               <span>₹{filters.priceRange}</span>
             </div>
           </>
@@ -187,7 +187,7 @@ export default function PropertFilterSlider() {
 
       case "Furnishing":
         return ["Furnished", "Semi-Furnished", "Unfurnished"].map((status) => (
-          <label key={status} className="flex items-center gap-2">
+          <label key={status} className="flex text-black items-center gap-2">
             <input
               type="checkbox"
               checked={filters.furnishing.includes(status)}
@@ -199,7 +199,7 @@ export default function PropertFilterSlider() {
 
       case "Availability":
         return ["Ready to Move", "Under Construction"].map((status) => (
-          <label key={status} className="flex items-center gap-2">
+          <label key={status} className="flex text-black items-center gap-2">
             <input
               type="checkbox"
               checked={filters.availability.includes(status)}
@@ -211,7 +211,7 @@ export default function PropertFilterSlider() {
 
       case "Bathrooms":
         return [1, 2, 3, 4].map((count) => (
-          <label key={count} className="flex items-center gap-2">
+          <label key={count} className="flex  text-black items-center gap-2">
             <input
               type="checkbox"
               checked={filters.bathrooms.includes(count)}
@@ -223,7 +223,7 @@ export default function PropertFilterSlider() {
 
       case "Parking":
         return ["Car", "Bike", "Both", "None"].map((opt) => (
-          <label key={opt} className="flex items-center gap-2">
+          <label key={opt} className="flex text-black items-center gap-2">
             <input
               type="checkbox"
               checked={filters.parking.includes(opt)}
@@ -244,7 +244,7 @@ export default function PropertFilterSlider() {
           "South-East",
           "South-West",
         ].map((dir) => (
-          <label key={dir} className="flex items-center gap-2">
+          <label key={dir} className="flex text-black items-center gap-2">
             <input
               type="checkbox"
               checked={filters.facing.includes(dir)}
@@ -256,7 +256,7 @@ export default function PropertFilterSlider() {
 
       case "Advance":
         return ["1 Month", "2 Months", "3 Months+"].map((adv) => (
-          <label key={adv} className="flex items-center gap-2">
+          <label key={adv} className="flex text-black items-center gap-2">
             <input
               type="checkbox"
               checked={filters.advance.includes(adv)}
@@ -269,7 +269,7 @@ export default function PropertFilterSlider() {
       case "Tenant":
         return ["Family", "Bachelors Male", "Bachelors Female"].map(
           (tenant) => (
-            <label key={tenant} className="flex items-center gap-2">
+            <label key={tenant} className="flex text-black items-center gap-2">
               <input
                 type="checkbox"
                 checked={filters.tenant.includes(tenant)}
@@ -339,7 +339,7 @@ export default function PropertFilterSlider() {
                 >
                   <FiRefreshCw size={18} color={PRIMARY_COLOR} />
                 </button>
-                <button onClick={() => setActiveTab(null)}>
+                <button className="text-black" onClick={() => setActiveTab(null)}>
                   <FiX size={20} />
                 </button>
               </div>

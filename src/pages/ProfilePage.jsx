@@ -5,6 +5,7 @@ import {
   EditOutlined,
   MailOutlined,
   PhoneOutlined,
+  LogoutOutlined,
 } from "@ant-design/icons";
 import { Form, Input, Button, Modal, Tooltip } from "antd";
 import { FaHome, FaHeart, FaEye } from "react-icons/fa";
@@ -20,12 +21,19 @@ export default function ProfilePage() {
     avatar:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSTNjkaQHLXfokbl1GiKnXl6v7GNgnG8rb3JA&s",
   };
+
   // Edit form submit
   const handleEditSubmit = (values) => {
     // Save user profile update logic here
     setEditOpen(false);
   };
-  //  onClick={() => setEditOpen(true)}
+
+  // Logout handler
+  const handleLogout = () => {
+    // Implement your logout logic here, e.g., clearing auth tokens, redirecting, etc.
+    console.log("User logged out");
+  };
+
   return (
     <div className="max-w-4xl mx-auto mt-[120px] p-6">
       <motion.div
@@ -33,17 +41,31 @@ export default function ProfilePage() {
         animate={{ opacity: 1, y: 0 }}
         className="relative bg-white rounded-xl shadow-lg p-6 flex items-center gap-6 max-w-full mx-auto"
       >
-        {/* Edit button at top-right */}
-        <Tooltip title="Edit Profile" placement="topRight">
-          <Button
-            type="text"
-            icon={<EditOutlined style={{ fontSize: 18, color: "#7C0902" }} />}
-            onClick={() => setEditOpen(true)}
-            className="absolute top-4 right-4 p-1 hover:bg-[#7C0902] hover:text-white rounded-full transition"
-          >
-            Edit
-          </Button>
-        </Tooltip>
+        <div className="absolute top-4 right-4 flex gap-4">
+          <Tooltip title="Edit Profile" placement="topRight">
+            <Button
+              type="text"
+              icon={<EditOutlined style={{ fontSize: 18, color: "#7C0902" }} />}
+              onClick={() => setEditOpen(true)}
+              className="p-1 hover:bg-[#7C0902] hover:text-white rounded-full transition"
+            >
+              Edit
+            </Button>
+          </Tooltip>
+
+          <Tooltip title="Logout" placement="topRight">
+            <Button
+              type="text"
+              icon={
+                <LogoutOutlined style={{ fontSize: 18, color: "#7C0902" }} />
+              }
+              onClick={handleLogout}
+              className="p-1 hover:bg-[#7C0902] hover:text-white rounded-full transition"
+            >
+              Logout
+            </Button>
+          </Tooltip>
+        </div>
 
         {/* Avatar */}
         <div className="flex-shrink-0">

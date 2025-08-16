@@ -127,12 +127,12 @@ export default function PropertyList() {
                 {property.location}
               </span>
               <button
-                className="absolute bottom-3 right-3 bg-white rounded-full border border-[#7C0902] p-2 shadow-md flex items-center justify-center transition hover:bg-[#FFEDF0] hover:border-[#E11D48] group"
+                className="absolute bottom-3 right-3 bg-[#7C0902] rounded-full border border-[#7C0902] p-2 shadow-md flex items-center justify-center transition hover:bg-[#FFEDF0] hover:border-[#E11D48] group"
                 // onClick={handleWishlistToggle} // Optional: handle add/remove action
                 aria-label="Add to wishlist"
               >
                 <FaHeart
-                  className="text-[#E11D48] text-lg transition-transform duration-150 group-hover:scale-110"
+                  className="text-white text-lg hover:text-red-500 transition-transform duration-150 group-hover:scale-110"
                   // You can add conditional coloring for "active" state
                 />
               </button>

@@ -10,6 +10,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { BiHomeAlt2 } from "react-icons/bi";
 import { HiHome } from "react-icons/hi2";
 import PropertFilterSlider from "./PropertFilterSlider";
+import Pagination from "../Pagination";
 
 const sliderSettings = {
   dots: true,
@@ -32,6 +33,8 @@ export default function PropertyList() {
   const [search, setSearch] = useState("");
   const [searchKeyword, setSearchKeyword] = useState(""); // triggered search
   const [sort, setSort] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(8);
 
   // Normalize prices for sorting
   const normalizedProperties = propertyData.map((p) => ({
@@ -71,6 +74,15 @@ export default function PropertyList() {
       setSearchKeyword("");
     }
   }
+
+  // Pagination Methods
+  const totalItems = sortedProperties.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+  // Calculate items for current page
+  const startIdx = (currentPage - 1) * itemsPerPage;
+  const endIdx = currentPage * itemsPerPage;
+  const pageProperties = sortedProperties.slice(startIdx, endIdx);
 
   return (
     <div className="flex-1 bg-gray-50 min-h-screen px-2">
@@ -134,7 +146,7 @@ export default function PropertyList() {
 
       {/* Property List */}
       <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-        {sortedProperties.map((property) => (
+        {pageProperties.map((property) => (
           <div
             key={property.id}
             className="bg-white border rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow flex flex-col"
@@ -222,7 +234,13 @@ export default function PropertyList() {
           </div>
         ))}
       </div>
-
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={(page) => {
+          if (page >= 1 && page <= totalPages) setCurrentPage(page);
+        }}
+      />
       {/* Floating Add Button */}
       <button
         onClick={() => (!user ? navigate("/signin") : setShowModal(true))}

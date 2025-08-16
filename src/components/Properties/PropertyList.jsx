@@ -28,10 +28,12 @@ export default function PropertyList() {
   const wishlist = !user ? "/signin" : "/wishlist";
 
   const [showModal, setShowModal] = useState(false);
+
   const [search, setSearch] = useState("");
+  const [searchKeyword, setSearchKeyword] = useState(""); // triggered search
   const [sort, setSort] = useState("");
 
-  // Parse all prices to numbers for sorting/comparison
+  // Normalize prices for sorting
   const normalizedProperties = propertyData.map((p) => ({
     ...p,
     numPrice:
@@ -40,11 +42,12 @@ export default function PropertyList() {
         : Number(p.price),
   }));
 
+  // Triggered filtering
   const sortedProperties = [...normalizedProperties]
     .filter(
       (p) =>
-        p.title.toLowerCase().includes(search.toLowerCase()) ||
-        p.location.toLowerCase().includes(search.toLowerCase())
+        p.title.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+        p.location.toLowerCase().includes(searchKeyword.toLowerCase())
     )
     .sort((a, b) => {
       if (sort === "low-high") return a.numPrice - b.numPrice;
@@ -56,19 +59,46 @@ export default function PropertyList() {
       return 0;
     });
 
+  // Handler toggles
+  const isSearching = searchKeyword !== "";
+
+  function handleButton() {
+    if (!isSearching && search.trim() !== "") {
+      setSearchKeyword(search);
+    } else {
+      // Reset
+      setSearch("");
+      setSearchKeyword("");
+    }
+  }
+
   return (
     <div className="flex-1 bg-gray-50 min-h-screen px-2">
       {/* Search and Sort */}
       <div className="flex flex-col sm:flex-row gap-3 mb-2 items-center w-full">
         {/* Search */}
-        <input
-          type="text"
-          placeholder="Search by title or location..."
-          className="w-full sm:flex-1 border border-gray-300 rounded px-4 py-2 text-sm focus:ring-1 focus:ring-[#7C0902]  outline-none"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-
+        {/* Search with dynamic button inside */}
+        <div className="relative w-full sm:flex-1">
+          <input
+            type="text"
+            placeholder="Search by title or location..."
+            className="w-full border border-gray-300 rounded px-4 py-2 text-sm pr-20 focus:ring-1 focus:ring-[#7C0902] outline-none"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleButton();
+            }}
+          />
+          <button
+            onClick={handleButton}
+            className={`absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1 rounded 
+            ${isSearching ? "bg-gray-400" : "bg-[#7C0902]"}
+            text-white text-sm font-medium`}
+          >
+            {isSearching ? "Reset" : "Search"}
+          </button>
+        </div>
+        {/* Sorting */}
         <div className="relative w-full sm:w-auto">
           <select
             className="w-full appearance-none border border-gray-300 rounded-lg px-4 py-2 text-sm text-gray-700 bg-white focus:ring-1 focus:ring-[#7C0902] focus:border-[#7C0902] outline-none pr-8"
@@ -81,7 +111,6 @@ export default function PropertyList() {
             <option value="newest">Newest First</option>
             <option value="oldest">Oldest First</option>
           </select>
-
           {/* Custom dropdown icon */}
           <svg
             className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
@@ -119,6 +148,11 @@ export default function PropertyList() {
                     alt={property.title}
                     className="w-full h-56 object-cover"
                     draggable="false"
+                    onClick={() =>
+                      !user
+                        ? navigate("/signin")
+                        : navigate(`/propertydetails/${property.id}`)
+                    }
                   />
                 ))}
               </Slider>

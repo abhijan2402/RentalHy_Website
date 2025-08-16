@@ -32,7 +32,7 @@ export default function PropertiesPage() {
               borderRadius: "6px",
             }}
           >
-            <MdFilterList size={20} /> Open Filters
+            <MdFilterList size={20} /> Filters
           </button>
         </div>
       </div>

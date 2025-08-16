@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { FaMapMarkerAlt } from "react-icons/fa";
 
 export default function PropertyDetails({ property }) {
   const [showMore, setShowMore] = useState(false);
@@ -59,9 +60,15 @@ export default function PropertyDetails({ property }) {
             />
           ))}
         </Slider>
-        <span className="absolute top-2 right-4 bg-white/80 text-xs px-3 py-1 rounded shadow font-bold text-[#7C0902]">
-          {property.status === true ? " Verified" : null}
+        <span className="absolute top-2 left-2 bg-white/80 text-xs px-3 py-1 rounded shadow font-bold text-gray-700 flex items-center gap-1">
+          <FaMapMarkerAlt className="text-red-500" />
+          {property.location}
         </span>
+        {property.status === true ? (
+          <span className="absolute top-2 right-4 bg-white/80 text-xs px-3 py-1 rounded shadow font-bold text-[#7C0902]">
+            {property.status === true ? " Verified" : null}
+          </span>
+        ) : null}
       </div>
 
       {/* Description */}

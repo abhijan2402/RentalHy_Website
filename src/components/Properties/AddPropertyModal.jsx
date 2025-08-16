@@ -8,6 +8,7 @@ import {
   Upload,
   Button,
   message,
+  Radio,
 } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 
@@ -22,6 +23,8 @@ const normFile = (e) => {
 };
 
 const AddPropertyModal = ({ showModal, onClose }) => {
+  const horizontalScrollClass =
+    "flex gap-2 overflow-x-auto flex-nowrap md:overflow-x-visible md:flex-wrap";
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
 
@@ -32,7 +35,7 @@ const AddPropertyModal = ({ showModal, onClose }) => {
       return Upload.LIST_IGNORE;
     }
     if (fileList.length >= 5) {
-      message.error("You can upload up to 5 images only!");
+      message.error("You can upload up to 10 images only!");
       return Upload.LIST_IGNORE;
     }
     return true;
@@ -71,7 +74,7 @@ const AddPropertyModal = ({ showModal, onClose }) => {
       open={showModal}
       onCancel={onClose}
       onOk={() => form.submit()}
-      okText="Save Property"
+      okText="Upload Property"
       okButtonProps={{
         style: { backgroundColor: "#7C0902", borderColor: "#7C0902" },
       }}
@@ -140,10 +143,7 @@ const AddPropertyModal = ({ showModal, onClose }) => {
         <Form.Item
           label="Area (sq ft)"
           name="area"
-          rules={[
-            { required: true, message: "Please enter area" },
-            { type: "number", min: 0, message: "Area must be positive" },
-          ]}
+          rules={[{ type: "number", min: 0, message: "Area must be positive" }]}
         >
           <InputNumber
             style={{ width: "100%" }}
@@ -157,93 +157,117 @@ const AddPropertyModal = ({ showModal, onClose }) => {
           name="bhk"
           rules={[{ required: true, message: "Please select BHK" }]}
         >
-          <Select placeholder="Select BHK">
-            <Option value="1RK">1RK</Option>
-            <Option value="1BHK">1BHK</Option>
-            <Option value="2BHK">2BHK</Option>
-            <Option value="3BHK">3BHK</Option>
-            <Option value="4BHK+">4BHK+</Option>
-          </Select>
+          <Radio.Group
+            optionType="button"
+            buttonStyle="solid"
+            className="w-full flex-row-scroll"
+          >
+            <Radio.Button value="1RK">1RK</Radio.Button>
+            <Radio.Button value="1BHK">1BHK</Radio.Button>
+            <Radio.Button value="2BHK">2BHK</Radio.Button>
+            <Radio.Button value="3BHK">3BHK</Radio.Button>
+            <Radio.Button value="4BHK+">4BHK</Radio.Button>
+            <Radio.Button value="4BHK+">5BHK+</Radio.Button>
+          </Radio.Group>
         </Form.Item>
 
+        {/* Property Type */}
         <Form.Item
           label="Property Type"
           name="type"
           rules={[{ required: true, message: "Please select property type" }]}
         >
-          <Select placeholder="Select property type">
-            <Option value="Apartment">Apartment</Option>
-            <Option value="Flat">Flat</Option>
-            <Option value="Villa">Villa</Option>
-          </Select>
+          <Radio.Group className={horizontalScrollClass}>
+            {["Apartment", "Flat", "Villa"].map((opt) => (
+              <Radio.Button key={opt} value={opt}>
+                {opt}
+              </Radio.Button>
+            ))}
+          </Radio.Group>
         </Form.Item>
 
-        {/* Add optional selects with no required */}
+        {/* Furnishing Status */}
         <Form.Item label="Furnishing Status" name="furnishing">
-          <Select placeholder="Select furnishing status" allowClear>
-            <Option value="Furnished">Furnished</Option>
-            <Option value="Semi-furnished">Semi-furnished</Option>
-            <Option value="Unfurnished">Unfurnished</Option>
-          </Select>
+          <Radio.Group className={horizontalScrollClass}>
+            {["Furnished", "Semi-furnished", "Unfurnished"].map((opt) => (
+              <Radio.Button key={opt} value={opt}>
+                {opt}
+              </Radio.Button>
+            ))}
+          </Radio.Group>
         </Form.Item>
 
+        {/* Bathrooms */}
         <Form.Item label="Bathrooms" name="bathrooms">
-          <Select placeholder="Select bathrooms" allowClear>
-            <Option value="1">1</Option>
-            <Option value="2">2</Option>
-            <Option value="3">3</Option>
-            <Option value="4+">4+</Option>
-          </Select>
+          <Radio.Group className={horizontalScrollClass}>
+            {["1", "2", "3", "4+"].map((opt) => (
+              <Radio.Button key={opt} value={opt}>
+                {opt}
+              </Radio.Button>
+            ))}
+          </Radio.Group>
         </Form.Item>
 
+        {/* Availability */}
         <Form.Item label="Availability" name="availability">
-          <Select placeholder="Select availability" allowClear>
-            <Option value="Ready to move">Ready to move</Option>
-            <Option value="Under Construction">Under Construction</Option>
-          </Select>
+          <Radio.Group className={horizontalScrollClass}>
+            {["Ready to move", "Under Construction"].map((opt) => (
+              <Radio.Button key={opt} value={opt}>
+                {opt}
+              </Radio.Button>
+            ))}
+          </Radio.Group>
         </Form.Item>
 
+        {/* Parking Available */}
         <Form.Item label="Parking Available" name="parking">
-          <Select placeholder="Select parking availability" allowClear>
-            <Option value="Bike">Bike</Option>
-            <Option value="Car">Car</Option>
-            <Option value="Both">Both</Option>
-            <Option value="None">None</Option>
-          </Select>
+          <Radio.Group className={horizontalScrollClass}>
+            {["Bike", "Car", "Both", "None"].map((opt) => (
+              <Radio.Button key={opt} value={opt}>
+                {opt}
+              </Radio.Button>
+            ))}
+          </Radio.Group>
         </Form.Item>
 
+        {/* Facing */}
         <Form.Item label="Facing" name="facing">
-          <Select placeholder="Select facing direction" allowClear>
-            <Option value="North">North</Option>
-            <Option value="East">East</Option>
-            <Option value="West">West</Option>
-            <Option value="South">South</Option>
-            <Option value="NE">NE</Option>
-            <Option value="NW">NW</Option>
-            <Option value="SE">SE</Option>
-            <Option value="SW">SW</Option>
-          </Select>
+          <Radio.Group className={horizontalScrollClass}>
+            {["North", "East", "West", "South", "NE", "NW", "SE", "SW"].map(
+              (opt) => (
+                <Radio.Button key={opt} value={opt}>
+                  {opt}
+                </Radio.Button>
+              )
+            )}
+          </Radio.Group>
         </Form.Item>
 
+        {/* Advance */}
         <Form.Item label="Advance" name="advance">
-          <Select placeholder="Select advance" allowClear>
-            <Option value="1 Month">1 Month</Option>
-            <Option value="2 Months">2 Months</Option>
-            <Option value="3+ Months">3+ Months</Option>
-          </Select>
+          <Radio.Group className={horizontalScrollClass}>
+            {["1 Month", "2 Months", "3+ Months"].map((opt) => (
+              <Radio.Button key={opt} value={opt}>
+                {opt}
+              </Radio.Button>
+            ))}
+          </Radio.Group>
         </Form.Item>
 
+        {/* Preferred Tenant */}
         <Form.Item label="Preferred Tenant" name="tenant">
-          <Select placeholder="Select preferred tenant" allowClear>
-            <Option value="Family">Family</Option>
-            <Option value="Bachelors Male">Bachelors Male</Option>
-            <Option value="Bachelors Female">Bachelors Female</Option>
-          </Select>
+          <Radio.Group className={horizontalScrollClass}>
+            {["Family", "Bachelors Male", "Bachelors Female"].map((opt) => (
+              <Radio.Button key={opt} value={opt}>
+                {opt}
+              </Radio.Button>
+            ))}
+          </Radio.Group>
         </Form.Item>
 
         {/* Images Upload */}
         <Form.Item
-          label="Property Images (1-5)"
+          label="Property Images (1-10)"
           name="images"
           valuePropName="fileList"
           getValueFromEvent={normFile}
@@ -254,9 +278,9 @@ const AddPropertyModal = ({ showModal, onClose }) => {
             },
             {
               validator: (_, value) =>
-                value && value.length > 5
+                value && value.length > 10
                   ? Promise.reject(
-                      new Error("You can upload up to 5 images only.")
+                      new Error("You can upload up to 10 images only.")
                     )
                   : Promise.resolve(),
             },
@@ -268,10 +292,10 @@ const AddPropertyModal = ({ showModal, onClose }) => {
             beforeUpload={handleBeforeUpload}
             onChange={handleChange}
             fileList={fileList}
-            maxCount={5}
+            maxCount={10}
             accept="image/*"
           >
-            {fileList.length >= 5 ? null : (
+            {fileList.length >= 10 ? null : (
               <div>
                 <PlusOutlined />
                 <div style={{ marginTop: 8 }}>Upload</div>

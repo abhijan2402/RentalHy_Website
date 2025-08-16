@@ -29,8 +29,12 @@ export default function Navbar() {
     const currentItem = navItems.find(
       (item) => item.path === location.pathname
     );
-    if (currentItem) setActive(currentItem.name);
-  }, [location.pathname]);
+    if (currentItem) {
+      setActive(currentItem.name);
+    } else {
+      setActive(null); // No active if route not in navItems
+    }
+  }, [location.pathname, navItems]);
 
   const handleClick = (item) => {
     setActive(item.name);

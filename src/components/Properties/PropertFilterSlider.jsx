@@ -9,7 +9,7 @@ const PRIMARY_COLOR = "#7C0902";
 const tabs = [
   "BHK",
   "Property Type",
-  "Room Size",
+  "Tenant Type",
   "Price",
   "Furnishing",
   "Availability",
@@ -17,7 +17,7 @@ const tabs = [
   "Parking",
   "Facing",
   "Advance",
-  "Tenant",
+  "Room Size",
 ];
 
 export default function PropertFilterSlider() {
@@ -141,24 +141,35 @@ export default function PropertFilterSlider() {
       case "Room Size":
         return (
           <div className="flex gap-2">
-            <input
-              type="number"
-              value={filters.roomSize.min}
-              placeholder="Min"
-              onChange={(e) =>
-                handleInputChange("roomSize", "min", e.target.value)
-              }
-              className="w-1/2 border text-black p-1 rounded"
-            />
-            <input
-              type="number"
-              value={filters.roomSize.max}
-              placeholder="Max"
-              onChange={(e) =>
-                handleInputChange("roomSize", "max", e.target.value)
-              }
-              className="w-1/2 border text-black p-1 rounded"
-            />
+            <div className="relative w-1/2">
+              <input
+                type="number"
+                value={filters.roomSize.min}
+                placeholder="Min"
+                onChange={(e) =>
+                  handleInputChange("roomSize", "min", e.target.value)
+                }
+                className="w-full border text-black p-1 rounded pr-10"
+              />
+              <span className="absolute top-1/2 right-2 -translate-y-1/2 text-gray-600 text-sm pointer-events-none">
+                sq.ft
+              </span>
+            </div>
+
+            <div className="relative w-1/2">
+              <input
+                type="number"
+                value={filters.roomSize.max}
+                placeholder="Max"
+                onChange={(e) =>
+                  handleInputChange("roomSize", "max", e.target.value)
+                }
+                className="w-full border text-black p-1 rounded pr-10"
+              />
+              <span className="absolute top-1/2 right-2 -translate-y-1/2 text-gray-600 text-sm pointer-events-none">
+                sq.ft
+              </span>
+            </div>
           </div>
         );
 
@@ -266,7 +277,7 @@ export default function PropertFilterSlider() {
           </label>
         ));
 
-      case "Tenant":
+      case "Tenant Type":
         return ["Family", "Bachelors Male", "Bachelors Female"].map(
           (tenant) => (
             <label key={tenant} className="flex text-black items-center gap-2">
@@ -327,9 +338,10 @@ export default function PropertFilterSlider() {
 
       {/* 📌 Modal (same for Desktop & Mobile) */}
       {activeTab && (
-        <div className="fixed inset-0  bg-black bg-opacity-40 flex items-center justify-center md:items-center md:justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center md:items-center md:justify-center z-50">
           {/* Card Modal in desktop, Bottom Sheet in mobile */}
-          <div className="bg-white w-full md:w-1/2 md:max-w-lg rounded-t-lg md:rounded-lg p-4 max-h-[80%] overflow-y-auto absolute bottom-0 md:relative">
+          <div className="bg-white w-full md:w-1/2 md:max-w-lg rounded-t-lg md:rounded-lg p-4 max-h-[80%] overflow-y-auto absolute bottom-0 md:relative flex flex-col">
+            {/* Header */}
             <div className="flex justify-between items-center border-b pb-2 mb-2">
               <h2 className="text-lg text-[#7C0902] font-semibold">
                 {activeTab}
@@ -349,7 +361,33 @@ export default function PropertFilterSlider() {
                 </button>
               </div>
             </div>
-            <div className="space-y-2">{renderFilterContent(activeTab)}</div>
+
+            {/* Filter Content */}
+            <div className="space-y-2 flex-grow overflow-y-auto">
+              {renderFilterContent(activeTab)}
+            </div>
+
+            {/* Footer with Cancel & OK buttons */}
+            <div className="mt-4 pt-2 border-t flex justify-end gap-3">
+              <button
+                className="px-4 py-1 text-[14px] text-red-600 border border-red-600 rounded hover:bg-red-100 transition"
+                onClick={() => {
+                  resetCategory(activeTab);
+                  setActiveTab(null);
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 bg-[#7C0902] text-[14px] text-white rounded hover:bg-[#a01002] transition"
+                onClick={() => {
+                  // Apply filters logic (if needed, may be automatic on change)
+                  setActiveTab(null);
+                }}
+              >
+                OK
+              </button>
+            </div>
           </div>
         </div>
       )}

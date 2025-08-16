@@ -18,7 +18,7 @@ export default function Signup() {
       <div className="w-full md:w-1/2 flex flex-col justify-center px-8 py-12 max-w-xl mx-auto">
         {/* Breadcrumb */}
         <nav className="mb-8 flex items-center text-sm text-gray-500 space-x-1">
-          <Link to="/" className="hover:text-[#7C0902]">
+          <Link to="/home" className="hover:text-[#7C0902]">
             Home
           </Link>
           <span>/</span>

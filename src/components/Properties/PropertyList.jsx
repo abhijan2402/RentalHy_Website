@@ -6,6 +6,7 @@ import { propertyData } from "../../utils/propertydata";
 import { useNavigate } from "react-router-dom";
 import { FaMapMarkerAlt, FaPlus } from "react-icons/fa";
 import AddPropertyModal from "./AddPropertyModal";
+import { useAuth } from "../../contexts/AuthContext";
 
 const sliderSettings = {
   dots: true,
@@ -19,6 +20,10 @@ const sliderSettings = {
 
 export default function PropertyList() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const wishlist = !user ? "/signin" : "/wishlist";
+
   const [showModal, setShowModal] = useState(false);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("");
@@ -147,13 +152,17 @@ export default function PropertyList() {
               </div>
               <div className="flex justify-between">
                 <a
-                  onClick={() => navigate(`/propertydetails/${property.id}`)}
+                  onClick={() =>
+                    !user
+                      ? navigate("/signin")
+                      : navigate(`/propertydetails/${property.id}`)
+                  }
                   className="mt-auto text-center cursor-pointer bg-[#7C0902] text-white px-5 py-2 rounded-lg font-semibold text-sm shadow hover:bg-[#600601] transition-colors"
                 >
                   View Details
                 </a>
                 <a
-                  onClick={() => navigate(`/wishlist`)}
+                  onClick={() => navigate(wishlist)}
                   className="mt-auto text-center cursor-pointer border border-[#7C0902] bg-[#7c080200] text-black px-5 py-2 rounded-lg font-semibold text-sm shadow hover:bg-[#600601a2] hover:text-white transition-colors"
                 >
                   Add Wishlist
@@ -166,7 +175,7 @@ export default function PropertyList() {
 
       {/* Floating Add Button */}
       <button
-        onClick={() => setShowModal(true)}
+        onClick={() => (!user ? navigate("/signin") : setShowModal(true))}
         className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-[#7C0902] text-white px-5 py-3 rounded-full shadow-lg hover:bg-[#600601] transition-colors animate-bounce"
       >
         <FaPlus className="text-lg" />

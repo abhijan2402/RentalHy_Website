@@ -10,7 +10,7 @@ export default function Breadcrumb({ propertyTitle }) {
   return (
     <nav className="max-w-6xl mx-auto flex items-center text-sm text-gray-600 mb-6">
       {/* Home */}
-      <Link to={path} className="flex items-center hover:text-[#7C0902]">
+      <Link to={"/home"} className="flex items-center hover:text-[#7C0902]">
         <FaHome className="mr-1" /> Home
       </Link>
 

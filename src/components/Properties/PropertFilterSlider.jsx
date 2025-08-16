@@ -331,7 +331,9 @@ export default function PropertFilterSlider() {
           {/* Card Modal in desktop, Bottom Sheet in mobile */}
           <div className="bg-white w-full md:w-1/2 md:max-w-lg rounded-t-lg md:rounded-lg p-4 max-h-[80%] overflow-y-auto absolute bottom-0 md:relative">
             <div className="flex justify-between items-center border-b pb-2 mb-2">
-              <h2 className="text-lg font-semibold">{activeTab}</h2>
+              <h2 className="text-lg text-[#7C0902] font-semibold">
+                {activeTab}
+              </h2>
               <div className="flex items-center gap-2">
                 <button
                   className="text-sm text-red-600"
@@ -339,7 +341,10 @@ export default function PropertFilterSlider() {
                 >
                   <FiRefreshCw size={18} color={PRIMARY_COLOR} />
                 </button>
-                <button className="text-black" onClick={() => setActiveTab(null)}>
+                <button
+                  className="text-black"
+                  onClick={() => setActiveTab(null)}
+                >
                   <FiX size={20} />
                 </button>
               </div>

@@ -141,7 +141,7 @@ export default function PropertyFilters({ isOpen, onClose }) {
             setOpen={(v) => setSections((p) => ({ ...p, bhk: v }))}
           >
             {[1, 2, 3, 4].map((bhk) => (
-              <label key={bhk} className="flex items-center gap-2">
+              <label key={bhk} className="flex  text-black items-center gap-2">
                 <input
                   type="checkbox"
                   checked={filters.bhk.includes(bhk)}
@@ -157,7 +157,7 @@ export default function PropertyFilters({ isOpen, onClose }) {
             setOpen={(v) => setSections((p) => ({ ...p, propertyType: v }))}
           >
             {["Apartment", "Flat", "Villa"].map((type) => (
-              <label key={type} className="flex items-center gap-2">
+              <label key={type} className="flex text-black items-center gap-2">
                 <input
                   type="checkbox"
                   checked={filters.propertyType.includes(type)}
@@ -180,7 +180,7 @@ export default function PropertyFilters({ isOpen, onClose }) {
                 onChange={(e) =>
                   handleInputChange("roomSize", "min", e.target.value)
                 }
-                className="w-1/2 border rounded p-1"
+                className="w-1/2 border text-black rounded p-1"
               />
               <input
                 type="number"
@@ -189,7 +189,7 @@ export default function PropertyFilters({ isOpen, onClose }) {
                 onChange={(e) =>
                   handleInputChange("roomSize", "max", e.target.value)
                 }
-                className="w-1/2 border rounded p-1"
+                className="w-1/2 border text-black rounded p-1"
               />
             </div>
           </FilterSection>
@@ -211,9 +211,9 @@ export default function PropertyFilters({ isOpen, onClose }) {
                 { borderColor: PRIMARY_COLOR },
               ]}
             />
-            <div className="flex justify-between text-sm mt-2">
-              <span>₹{filters.priceRange[0]}</span>
-              <span>₹{filters.priceRange}</span>
+            <div className="flex justify-between text-black text-sm mt-2">
+              <span >₹{filters.priceRange[0]}</span>
+              <span className="text-black">₹{filters.priceRange}</span>
             </div>
           </FilterSection>
           {/* Furnishing */}
@@ -223,7 +223,10 @@ export default function PropertyFilters({ isOpen, onClose }) {
             setOpen={(v) => setSections((p) => ({ ...p, furnishing: v }))}
           >
             {["Furnished", "Semi-Furnished", "Unfurnished"].map((status) => (
-              <label key={status} className="flex items-center gap-2">
+              <label
+                key={status}
+                className="flex text-black items-center gap-2"
+              >
                 <input
                   type="checkbox"
                   checked={filters.furnishing.includes(status)}
@@ -240,7 +243,10 @@ export default function PropertyFilters({ isOpen, onClose }) {
             setOpen={(v) => setSections((p) => ({ ...p, availability: v }))}
           >
             {["Ready to Move", "Under Construction"].map((status) => (
-              <label key={status} className="flex items-center gap-2">
+              <label
+                key={status}
+                className="flex text-black items-center gap-2"
+              >
                 <input
                   type="checkbox"
                   checked={filters.availability.includes(status)}
@@ -258,7 +264,10 @@ export default function PropertyFilters({ isOpen, onClose }) {
           >
             <div className="flex flex-row justify-between">
               {[1, 2, 3, 4].map((count) => (
-                <label key={count} className="flex items-center gap-2">
+                <label
+                  key={count}
+                  className="flex text-black items-center gap-2"
+                >
                   <input
                     type="checkbox"
                     checked={filters.bathrooms.includes(count)}
@@ -276,7 +285,7 @@ export default function PropertyFilters({ isOpen, onClose }) {
             setOpen={(v) => setSections((p) => ({ ...p, parking: v }))}
           >
             {["Car", "Bike", "Both", "None"].map((opt) => (
-              <label key={opt} className="flex items-center gap-2">
+              <label key={opt} className="flex text-black items-center gap-2">
                 <input
                   type="checkbox"
                   checked={filters.parking.includes(opt)}
@@ -302,7 +311,7 @@ export default function PropertyFilters({ isOpen, onClose }) {
               "South-East",
               "South-West",
             ].map((dir) => (
-              <label key={dir} className="flex items-center gap-2">
+              <label key={dir} className="flex text-black items-center gap-2">
                 <input
                   type="checkbox"
                   checked={filters.facing.includes(dir)}
@@ -319,7 +328,7 @@ export default function PropertyFilters({ isOpen, onClose }) {
             setOpen={(v) => setSections((p) => ({ ...p, advance: v }))}
           >
             {["1 Month", "2 Months", "3 Months+"].map((adv) => (
-              <label key={adv} className="flex items-center gap-2">
+              <label key={adv} className="flex text-black items-center gap-2">
                 <input
                   type="checkbox"
                   checked={filters.advance.includes(adv)}
@@ -336,7 +345,10 @@ export default function PropertyFilters({ isOpen, onClose }) {
             setOpen={(v) => setSections((p) => ({ ...p, tenant: v }))}
           >
             {["Family", "Bachelors Male", "Bachelors female"].map((tenant) => (
-              <label key={tenant} className="flex items-center gap-2">
+              <label
+                key={tenant}
+                className="flex text-black items-center gap-2"
+              >
                 <input
                   type="checkbox"
                   checked={filters.tenant.includes(tenant)}

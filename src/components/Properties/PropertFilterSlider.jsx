@@ -111,32 +111,58 @@ export default function PropertFilterSlider() {
     });
   };
 
+  function ToggleBox({ active, onClick, children }) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        className={`px-4 py-2 rounded-lg border
+        ${
+          active
+            ? "bg-[#7C0902] text-white border-[#7C0902]"
+            : "bg-gray-100 text-[#000]  border-transparent"
+        }
+        transition-colors outline-none text-[16px] `}
+        style={{ minWidth: 70 }}
+      >
+        {children}
+      </button>
+    );
+  }
+
   // ✅ Render content per tab
   const renderFilterContent = (tab) => {
     switch (tab) {
       case "BHK":
-        return [1, 2, 3, 4].map((bhk) => (
-          <label key={bhk} className="flex text-black items-center gap-2">
-            <input
-              type="checkbox"
-              checked={filters.bhk.includes(bhk)}
-              onChange={() => handleCheckboxChange("bhk", bhk)}
-            />
-            {`${bhk}${bhk >= 4 ? " BHK+" : " BHK"}`}
-          </label>
-        ));
+        return (
+          <div className="flex gap-2 flex-wrap">
+            {[1, 2, 3, 4].map((bhk) => (
+              <ToggleBox
+                key={bhk}
+                active={filters.bhk.includes(bhk)}
+                onClick={() => handleCheckboxChange("bhk", bhk)}
+              >
+                {bhk}
+                {bhk >= 4 ? " BHK+" : " BHK"}
+              </ToggleBox>
+            ))}
+          </div>
+        );
 
       case "Property Type":
-        return ["Apartment", "Flat", "Villa"].map((type) => (
-          <label key={type} className="flex  text-black items-center gap-2">
-            <input
-              type="checkbox"
-              checked={filters.propertyType.includes(type)}
-              onChange={() => handleCheckboxChange("propertyType", type)}
-            />
-            {type}
-          </label>
-        ));
+        return (
+          <div className="flex gap-2 flex-wrap">
+            {["Apartment", "Flat", "Villa"].map((type) => (
+              <ToggleBox
+                key={type}
+                active={filters.propertyType.includes(type)}
+                onClick={() => handleCheckboxChange("propertyType", type)}
+              >
+                {type}
+              </ToggleBox>
+            ))}
+          </div>
+        );
 
       case "Room Size":
         return (
@@ -189,108 +215,128 @@ export default function PropertFilterSlider() {
                 { borderColor: PRIMARY_COLOR },
               ]}
             />
+
             <div className="flex justify-between text-sm mt-2">
               <span className="text-black">₹{filters.priceRange[0]}</span>
-              <span>₹{filters.priceRange}</span>
+              <span className="text-black">₹{filters.priceRange[1]}</span>
             </div>
           </>
         );
 
       case "Furnishing":
-        return ["Furnished", "Semi-Furnished", "Unfurnished"].map((status) => (
-          <label key={status} className="flex text-black items-center gap-2">
-            <input
-              type="checkbox"
-              checked={filters.furnishing.includes(status)}
-              onChange={() => handleCheckboxChange("furnishing", status)}
-            />
-            {status}
-          </label>
-        ));
-
-      case "Availability":
-        return ["Ready to Move", "Under Construction"].map((status) => (
-          <label key={status} className="flex text-black items-center gap-2">
-            <input
-              type="checkbox"
-              checked={filters.availability.includes(status)}
-              onChange={() => handleCheckboxChange("availability", status)}
-            />
-            {status}
-          </label>
-        ));
-
-      case "Bathrooms":
-        return [1, 2, 3, 4].map((count) => (
-          <label key={count} className="flex  text-black items-center gap-2">
-            <input
-              type="checkbox"
-              checked={filters.bathrooms.includes(count)}
-              onChange={() => handleCheckboxChange("bathrooms", count)}
-            />
-            {`${count}${count >= 4 ? "+" : ""}`}
-          </label>
-        ));
-
-      case "Parking":
-        return ["Car", "Bike", "Both", "None"].map((opt) => (
-          <label key={opt} className="flex text-black items-center gap-2">
-            <input
-              type="checkbox"
-              checked={filters.parking.includes(opt)}
-              onChange={() => handleCheckboxChange("parking", opt)}
-            />
-            {opt}
-          </label>
-        ));
-
-      case "Facing":
-        return [
-          "East",
-          "West",
-          "North",
-          "South",
-          "North-East",
-          "North-West",
-          "South-East",
-          "South-West",
-        ].map((dir) => (
-          <label key={dir} className="flex text-black items-center gap-2">
-            <input
-              type="checkbox"
-              checked={filters.facing.includes(dir)}
-              onChange={() => handleCheckboxChange("facing", dir)}
-            />
-            {dir}
-          </label>
-        ));
-
-      case "Advance":
-        return ["1 Month", "2 Months", "3 Months+"].map((adv) => (
-          <label key={adv} className="flex text-black items-center gap-2">
-            <input
-              type="checkbox"
-              checked={filters.advance.includes(adv)}
-              onChange={() => handleCheckboxChange("advance", adv)}
-            />
-            {adv}
-          </label>
-        ));
-
-      case "Tenant Type":
-        return ["Family", "Bachelors Male", "Bachelors Female"].map(
-          (tenant) => (
-            <label key={tenant} className="flex text-black items-center gap-2">
-              <input
-                type="checkbox"
-                checked={filters.tenant.includes(tenant)}
-                onChange={() => handleCheckboxChange("tenant", tenant)}
-              />
-              {tenant}
-            </label>
-          )
+        return (
+          <div className="flex gap-2 flex-wrap">
+            {["Furnished", "Semi-Furnished", "Unfurnished"].map((status) => (
+              <ToggleBox
+                key={status}
+                active={filters.furnishing.includes(status)}
+                onClick={() => handleCheckboxChange("furnishing", status)}
+              >
+                {status}
+              </ToggleBox>
+            ))}
+          </div>
         );
 
+      case "Availability":
+        return (
+          <div className="flex gap-2 flex-wrap">
+            {["Ready to Move", "Under Construction"].map((status) => (
+              <ToggleBox
+                key={status}
+                active={filters.availability.includes(status)}
+                onClick={() => handleCheckboxChange("availability", status)}
+              >
+                {status}
+              </ToggleBox>
+            ))}
+          </div>
+        );
+
+      case "Bathrooms":
+        return (
+          <div className="flex gap-2 flex-wrap">
+            {[1, 2, 3, 4].map((count) => (
+              <ToggleBox
+                key={count}
+                active={filters.bathrooms.includes(count)}
+                onClick={() => handleCheckboxChange("bathrooms", count)}
+              >
+                {count}
+                {count === 4 ? "+" : ""}
+              </ToggleBox>
+            ))}
+          </div>
+        );
+
+      case "Parking":
+        return (
+          <div className="flex gap-2 flex-wrap">
+            {["Car", "Bike", "Both", "None"].map((opt) => (
+              <ToggleBox
+                key={opt}
+                active={filters.parking.includes(opt)}
+                onClick={() => handleCheckboxChange("parking", opt)}
+              >
+                {opt}
+              </ToggleBox>
+            ))}
+          </div>
+        );
+
+      case "Facing":
+        return (
+          <div className="flex gap-2 flex-wrap">
+            {[
+              "East",
+              "West",
+              "North",
+              "South",
+              "North-East",
+              "North-West",
+              "South-East",
+              "South-West",
+            ].map((dir) => (
+              <ToggleBox
+                key={dir}
+                active={filters.facing.includes(dir)}
+                onClick={() => handleCheckboxChange("facing", dir)}
+              >
+                {dir}
+              </ToggleBox>
+            ))}
+          </div>
+        );
+
+      case "Advance":
+        return (
+          <div className="flex gap-2 flex-wrap">
+            {["1 Month", "2 Months", "3 Months+"].map((adv) => (
+              <ToggleBox
+                key={adv}
+                active={filters.advance.includes(adv)}
+                onClick={() => handleCheckboxChange("advance", adv)}
+              >
+                {adv}
+              </ToggleBox>
+            ))}
+          </div>
+        );
+
+      case "Tenant Type":
+        return (
+          <div className="flex gap-2 flex-wrap">
+            {["Family", "Bachelors Male", "Bachelors Female"].map((tenant) => (
+              <ToggleBox
+                key={tenant}
+                active={filters.tenant.includes(tenant)}
+                onClick={() => handleCheckboxChange("tenant", tenant)}
+              >
+                {tenant}
+              </ToggleBox>
+            ))}
+          </div>
+        );
       default:
         return null;
     }

@@ -131,7 +131,7 @@ export default function SupportPage() {
               <input
                 type="text"
                 placeholder="Enter ticket title"
-                className="w-full border p-2 rounded-md mb-4 focus:outline-none focus:ring-2 focus:ring-[#7C0902]/50"
+                className="w-full text-black border p-2 rounded-md mb-4 focus:outline-none focus:ring-2 focus:ring-[#7C0902]/50"
                 value={form.title}
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
               />
@@ -141,7 +141,7 @@ export default function SupportPage() {
               </label>
               <textarea
                 placeholder="Describe your issue"
-                className="w-full border p-2 rounded-md mb-4 h-24 resize-none focus:outline-none focus:ring-2 focus:ring-[#7C0902]/50"
+                className="w-full border p-2 text-black rounded-md mb-4 h-24 resize-none focus:outline-none focus:ring-2 focus:ring-[#7C0902]/50"
                 value={form.description}
                 onChange={(e) =>
                   setForm({ ...form, description: e.target.value })

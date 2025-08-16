@@ -4,7 +4,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { propertyData } from "../../utils/propertydata";
 import { useNavigate } from "react-router-dom";
-import { FaMapMarkerAlt, FaPlus } from "react-icons/fa";
+import { FaHeart, FaMapMarkerAlt, FaPlus } from "react-icons/fa";
 import AddPropertyModal from "./AddPropertyModal";
 import { useAuth } from "../../contexts/AuthContext";
 import { BiHomeAlt2 } from "react-icons/bi";
@@ -126,6 +126,16 @@ export default function PropertyList() {
                 <FaMapMarkerAlt className="text-red-500" />
                 {property.location}
               </span>
+              <button
+                className="absolute bottom-3 right-3 bg-white rounded-full border border-[#7C0902] p-2 shadow-md flex items-center justify-center transition hover:bg-[#FFEDF0] hover:border-[#E11D48] group"
+                // onClick={handleWishlistToggle} // Optional: handle add/remove action
+                aria-label="Add to wishlist"
+              >
+                <FaHeart
+                  className="text-[#E11D48] text-lg transition-transform duration-150 group-hover:scale-110"
+                  // You can add conditional coloring for "active" state
+                />
+              </button>
             </div>
             <div className="flex-1 flex flex-col p-4">
               <h3 className="font-bold text-lg text-gray-900 truncate">

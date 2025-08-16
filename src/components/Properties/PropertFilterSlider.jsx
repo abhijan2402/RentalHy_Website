@@ -315,7 +315,7 @@ export default function PropertFilterSlider() {
         {tabs.map((tab) => (
           <button
             key={tab}
-            className={`whitespace-nowrap px-4 py-2 text-[14px] border rounded 
+            className={`whitespace-nowrap px-4 py-2 text-[14px] text-black border rounded 
         ${activeTab === tab ? "bg-[#7C0902] text-white" : "bg-gray-100"}
         md:flex-1 md:text-center`}
             onClick={() => setActiveTab(tab)}

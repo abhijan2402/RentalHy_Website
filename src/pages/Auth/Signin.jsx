@@ -27,9 +27,9 @@ export default function Signin() {
         <div className="mb-8 md:hidden flex flex-col items-center">
           {/* Logo (shown on mobile above form, right side will show on desktop) */}
           <img
-            src="/logo.png"
-            alt="Property Logo"
-            className="h-12 mb-2"
+            src={logo}
+            alt="Logo"
+            className="h-16 md:h-20 mb-4 drop-shadow-xl"
             style={{ objectFit: "contain" }}
           />
           <p className="text-[#7C0902] text-lg font-semibold">Welcome Back!</p>

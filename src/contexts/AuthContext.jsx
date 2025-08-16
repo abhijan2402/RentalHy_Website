@@ -7,19 +7,19 @@ export function AuthProvider({ children }) {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
 
-  console.log(user)
+  console.log(user);
 
   // Mock login (replace with API)
   const login = (email, password) => {
     // API logic here...
     setUser({ email });
-    navigate("/home");
+    navigate("/");
   };
 
   const signup = (email, password) => {
     // API signup logic here...
     setUser({ email });
-    navigate("/home");
+    navigate("/");
   };
 
   const logout = () => {

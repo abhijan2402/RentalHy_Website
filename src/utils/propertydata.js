@@ -89,4 +89,34 @@ export const propertyData = [
     mapEmbedUrl:
       "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2968.648763874234!2d-87.6297981845538!3d41.878113779221225!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3abe123!2sChicago!5e0!3m2!1sen!2sus!4v1692000000002",
   },
+  {
+    id: 4,
+    title: "3 BHK Villa",
+    location: "Bangalore, Karnataka",
+    price: 25000,
+    features: ["3 Beds", "3 Baths", "Private Garden"],
+    status: false,
+    images: [
+      "https://images.unsplash.com/photo-1460518451285-97b6aa326961",
+      "https://images.unsplash.com/photo-1523217582562-09d0def993a6",
+    ],
+    date: "2025-07-05",
+    link: "#",
+    description:
+      "A luxurious 3 BHK villa with a private garden, modern kitchen, and premium fittings. Located in a gated community with 24/7 security, clubhouse, and exquisite landscaping. Perfect for families seeking comfort and privacy in a prime Bangalore location.",
+    amenities: [
+      "Swimming Pool",
+      "Gym",
+      "Clubhouse",
+      "CCTV Surveillance",
+      "Covered Parking",
+    ],
+    contact: {
+      name: "Anita Verma",
+      phone: "+91 9123456789",
+      email: "anita.verma@example.com",
+    },
+    mapEmbedUrl:
+      "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3890.948954446677!2d77.59456231534988!3d12.971598690860624!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae1670f2!2sBangalore!5e0!3m2!1sen!2sin!4v1692000000001",
+  },
 ];

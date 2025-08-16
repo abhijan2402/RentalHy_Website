@@ -22,7 +22,7 @@ export default function AppRoutes() {
     <Routes>
       {/* Public Routes */}
       <Route element={<MainLayout />}>
-        <Route path="/home" element={<Home />} />
+        <Route path="/" element={<Home />} />
         <Route path="/property" element={<Property />} />
         <Route path="/propertydetails/:id" element={<PropertyDetailsPage />} />
         <Route path="/wishlist" element={<Wishlist />} />

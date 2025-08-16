@@ -13,9 +13,9 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [active, setActive] = useState("Home");
 
-  const path = !user ? "/" : "/home";
+  const path = !user ? "/" : "/";
   const navItems = [
-    { name: "Home", path: "/home" },
+    { name: "Home", path: "/" },
     { name: "Convention Hall", path: "/property" },
     { name: "About Us", path: "/about" },
     { name: "Support", path: "/support" },
@@ -48,7 +48,7 @@ export default function Navbar() {
         className="fixed top-0 left-0 w-full z-50 bg-white shadow-md"
       >
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="cursor-pointer" onClick={() => navigate("/home")}>
+          <div className="cursor-pointer" onClick={() => navigate("/")}>
             <img src={logo} alt="Logo" className="h-14 w-auto" />
           </div>
 

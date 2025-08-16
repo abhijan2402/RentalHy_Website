@@ -4,7 +4,7 @@ import { useAuth } from "../contexts/AuthContext";
 
 export default function NotFound() {
   const { user } = useAuth();
-  const path = !user ? "/" : "/home";
+  const path = !user ? "/" : "/";
   return (
     <section className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#f2f9ff] to-[#dceaff] px-6">
       <div className="max-w-2xl text-center">
@@ -41,7 +41,7 @@ export default function NotFound() {
           transition={{ type: "spring", stiffness: 300 }}
         >
           <Link
-            to={"/home"}
+            to={"/"}
             className="inline-block bg-[#7C0902] hover:bg-[#7c080288] text-white px-6 py-3 rounded-lg text-sm sm:text-base transition-all duration-300"
           >
             Go back to Home

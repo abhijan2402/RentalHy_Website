@@ -4,13 +4,13 @@ import { useAuth } from "../contexts/AuthContext";
 
 export default function Breadcrumb({ propertyTitle }) {
   const { user } = useAuth();
-  const path = !user ? "/" : "/home"
+  const path = !user ? "/" : "/";
   const navigate = useNavigate();
 
   return (
     <nav className="max-w-6xl mx-auto flex items-center text-sm text-gray-600 mb-6">
       {/* Home */}
-      <Link to={"/home"} className="flex items-center hover:text-[#7C0902]">
+      <Link to={"/"} className="flex items-center hover:text-[#7C0902]">
         <FaHome className="mr-1" /> Home
       </Link>
 

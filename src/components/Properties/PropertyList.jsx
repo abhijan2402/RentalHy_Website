@@ -7,6 +7,9 @@ import { useNavigate } from "react-router-dom";
 import { FaMapMarkerAlt, FaPlus } from "react-icons/fa";
 import AddPropertyModal from "./AddPropertyModal";
 import { useAuth } from "../../contexts/AuthContext";
+import { BiHomeAlt2 } from "react-icons/bi";
+import { HiHome } from "react-icons/hi2";
+import PropertFilterSlider from "./PropertFilterSlider";
 
 const sliderSettings = {
   dots: true,
@@ -56,7 +59,7 @@ export default function PropertyList() {
   return (
     <div className="flex-1 bg-gray-50 min-h-screen px-2">
       {/* Search and Sort */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-6 items-center w-full">
+      <div className="flex flex-col sm:flex-row gap-3 mb-2 items-center w-full">
         {/* Search */}
         <input
           type="text"
@@ -97,8 +100,11 @@ export default function PropertyList() {
         </div>
       </div>
 
+      {/* Filters silding Tab */}
+      <PropertFilterSlider />
+
       {/* Property List */}
-      <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
         {sortedProperties.map((property) => (
           <div
             key={property.id}
@@ -150,23 +156,23 @@ export default function PropertyList() {
                   {property.status === true ? " Verified" : null}
                 </p>
               </div>
-              <div className="flex justify-between">
+              <div className="w-full flex justify-between">
                 <a
                   onClick={() =>
                     !user
                       ? navigate("/signin")
                       : navigate(`/propertydetails/${property.id}`)
                   }
-                  className="mt-auto text-center cursor-pointer bg-[#7C0902] text-white px-5 py-2 rounded-lg font-semibold text-sm shadow hover:bg-[#600601] transition-colors"
+                  className="w-full mt-auto text-center cursor-pointer bg-[#7C0902] text-white px-5 py-2 rounded-lg font-semibold text-sm shadow hover:bg-[#600601] transition-colors"
                 >
                   View Details
                 </a>
-                <a
+                {/* <a
                   onClick={() => navigate(wishlist)}
                   className="mt-auto text-center cursor-pointer border border-[#7C0902] bg-[#7c080200] text-black px-5 py-2 rounded-lg font-semibold text-sm shadow hover:bg-[#600601a2] hover:text-white transition-colors"
                 >
                   Add Wishlist
-                </a>
+                </a> */}
               </div>
             </div>
           </div>
@@ -176,9 +182,9 @@ export default function PropertyList() {
       {/* Floating Add Button */}
       <button
         onClick={() => (!user ? navigate("/signin") : setShowModal(true))}
-        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-[#7C0902] text-white px-5 py-3 rounded-full shadow-lg hover:bg-[#600601] transition-colors animate-bounce"
+        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-[#7C0902] text-white px-5 py-3 rounded-md shadow-lg hover:bg-[#600601] transition-colors animate-bounce"
       >
-        <FaPlus className="text-lg" />
+        <HiHome className="text-lg" />
         <span className="">Post Property</span>
       </button>
 

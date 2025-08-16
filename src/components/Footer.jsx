@@ -11,7 +11,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10">
         {/* Company Info */}
         <div>
-          <div className="cursor-pointer mb-4" onClick={() => navigate("/home")}>
+          <div className="cursor-pointer mb-4" onClick={() => navigate("/")}>
             <img src={logo} alt="Logo" className="h-14 w-28" />
           </div>
           <p className="text-sm mb-4">

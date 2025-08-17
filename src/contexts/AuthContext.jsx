@@ -1,34 +1,103 @@
-import { createContext, useContext, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { createContext, useContext, useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import {
+  useSignupEmailMutation,
+  useVerifyEmailMutation,
+  useCompleteSignupMutation,
+  useLoginMutation, // import login mutation hook
+} from "../redux/api/authApi";
+import { toast } from "react-toastify";
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const navigate = useNavigate();
+  const location = useLocation();
+  const [userId, setUserId] = useState(null);
   const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+  console.log(user)
 
-  console.log(user);
+  // Signup mutations
+  const [
+    signupEmail,
+    { data: emailData, error: emailError, isLoading: emailLoading },
+  ] = useSignupEmailMutation();
 
-  // Mock login (replace with API)
-  const login = (email, password) => {
-    // API logic here...
-    setUser({ email });
-    navigate("/");
-  };
+  const [
+    verifyEmail,
+    { data: verifyData, error: verifyError, isLoading: verifyLoading },
+  ] = useVerifyEmailMutation();
 
-  const signup = (email, password) => {
-    // API signup logic here...
-    setUser({ email });
-    navigate("/");
+  const [
+    completeSignup,
+    { data: completeData, error: completeError, isLoading: completeLoading },
+  ] = useCompleteSignupMutation();
+
+  // Login mutation
+  const [
+    loginMutation,
+    { data: loginData, error: loginError, isLoading: loginLoading },
+  ] = useLoginMutation();
+
+  // Login handler using loginMutation
+  const login = async (email, password) => {
+    try {
+      const result = await loginMutation({ email, password }).unwrap();
+      console.log(result.msg);
+      if (result.token) {
+        localStorage.setItem("authToken", result.token);
+        setUser(result.user);
+        navigate("/");
+        toast.success("Login Successfully..!!");
+      }
+    } catch (err) {
+      const errorMsg =
+        err?.data?.msg || err?.msg || err?.error || "Something went wrong !!";
+      toast.error(errorMsg);
+      console.error("Login error:", err);
+    }
   };
 
   const logout = () => {
     setUser(null);
+    setUserId(null);
+    localStorage.removeItem("authToken");
     navigate("/signin");
   };
 
+  // useEffect(() => {
+  //   const token = localStorage.getItem("authToken");
+  //   const publicRoutes = ["/signin", "/signup", "/forgot-password"]; // add others as needed
+
+  //   if (!token && !publicRoutes.includes(location.pathname)) {
+  //     navigate("/signin");
+  //   }
+  // }, [location, navigate]);
+
   return (
-    <AuthContext.Provider value={{ user, login, signup, logout }}>
+    <AuthContext.Provider
+      value={{
+        userId,
+        setUserId,
+        user,
+        signupEmail,
+        verifyEmail,
+        completeSignup,
+        emailData,
+        emailError,
+        emailLoading,
+        verifyData,
+        verifyError,
+        verifyLoading,
+        completeData,
+        completeError,
+        completeLoading,
+        login,
+        loginError,
+        loginLoading,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

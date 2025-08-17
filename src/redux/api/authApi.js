@@ -18,6 +18,7 @@ export const authApi = createApi({
         })(),
       }),
     }),
+
     // Step 2: Verify email with OTP
     verifyEmail: builder.mutation({
       query: ({ user_id, verification_code }) => ({
@@ -31,6 +32,7 @@ export const authApi = createApi({
         })(),
       }),
     }),
+
     // Step 3: Complete registration
     completeSignup: builder.mutation({
       query: ({ user_id, phone_number, password, password_confirmation }) => ({
@@ -46,6 +48,20 @@ export const authApi = createApi({
         })(),
       }),
     }),
+
+    // Login mutation (email + password using FormData)
+    login: builder.mutation({
+      query: ({ email, password }) => ({
+        url: "login",
+        method: "POST",
+        body: (() => {
+          const formData = new FormData();
+          formData.append("email", email);
+          formData.append("password", password);
+          return formData;
+        })(),
+      }),
+    }),
   }),
 });
 
@@ -53,4 +69,5 @@ export const {
   useSignupEmailMutation,
   useVerifyEmailMutation,
   useCompleteSignupMutation,
+  useLoginMutation,
 } = authApi;

@@ -12,10 +12,14 @@ import { FaHome, FaHeart, FaEye } from "react-icons/fa";
 import PropertyAnalytics from "../components/Properties/PropertyAnalytics";
 import { propertyData } from "../utils/propertydata";
 import Breadcrumb from "../components/Breadcrumb";
+import { useAuth } from "../contexts/AuthContext";
+import { toast } from "react-toastify";
 
 export default function ProfilePage() {
+  const { user, logout } = useAuth();
+  console.log(user);
   const [editOpen, setEditOpen] = useState(false);
-  const user = {
+  const users = {
     name: "Jhon",
     email: "jhon@gmail.com",
     phone: "+917867565432",
@@ -31,8 +35,8 @@ export default function ProfilePage() {
 
   // Logout handler
   const handleLogout = () => {
-    // Implement your logout logic here, e.g., clearing auth tokens, redirecting, etc.
-    console.log("User logged out");
+    logout();
+    toast.success("Logout Successfully..!!");
   };
 
   return (
@@ -74,9 +78,9 @@ export default function ProfilePage() {
 
           {/* Avatar */}
           <div className="flex-shrink-0">
-            {user?.avatar ? (
+            {users?.image ? (
               <img
-                src={user.avatar}
+                src={users.image}
                 alt="User avatar"
                 className="w-24 h-24 rounded-full object-cover shadow-md border-4 border-[#7C0902]"
               />
@@ -88,7 +92,7 @@ export default function ProfilePage() {
           {/* User info */}
           <div className="flex flex-col justify-center">
             <h2 className="text-2xl font-semibold text-gray-900">
-              {user?.name || "John Cena"}
+              {user?.first_name || "John Cena"}
             </h2>
             <p className="text-gray-600 flex items-center gap-2 mt-1">
               <MailOutlined />
@@ -96,7 +100,7 @@ export default function ProfilePage() {
             </p>
             <p className="text-gray-600 flex items-center gap-2 mt-1">
               <PhoneOutlined />
-              {user?.phone || "xxxxxxxx34"}
+              {users?.phone_number || "xxxxxxxx34"}
             </p>
           </div>
         </motion.div>
@@ -111,7 +115,7 @@ export default function ProfilePage() {
         >
           <Form
             layout="vertical"
-            initialValues={user}
+            initialValues={users}
             onFinish={handleEditSubmit}
           >
             <Form.Item

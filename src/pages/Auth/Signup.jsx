@@ -1,22 +1,99 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { Link } from "react-router-dom";
 import logo from "../../assets/clogo.png";
 
 export default function Signup() {
-  const { signup } = useAuth();
-  const [form, setForm] = useState({ email: "", password: "" });
+  const [sentOtp, setSentOtp] = useState(false);
+  const [otpVerified, setOtpVerified] = useState(false);
+  const [timer, setTimer] = useState(60);
+  const [form, setForm] = useState({
+    email: "",
+    otp: "",
+    phone_number: "",
+    password: "",
+    password_confirmation: "",
+  });
 
-  const handleSubmit = (e) => {
+  const {
+    signupEmail,
+    emailData,
+    emailError,
+    emailLoading,
+    verifyEmail,
+    verifyData,
+    verifyError,
+    verifyLoading,
+    completeSignup,
+    completeData,
+    completeError,
+    completeLoading,
+    userId,
+    setUserId,
+  } = useAuth();
+
+  // Timer for OTP
+  useEffect(() => {
+    if (sentOtp && timer > 0) {
+      const interval = setInterval(() => setTimer((t) => t - 1), 1000);
+      return () => clearInterval(interval);
+    }
+  }, [sentOtp, timer]);
+
+  // Get user_id from OTP API and enable OTP step
+  useEffect(() => {
+    if (emailData && emailData.user_id) {
+      setUserId(emailData.user_id);
+      setSentOtp(true);
+      setTimer(60);
+    }
+  }, [emailData, setUserId]);
+
+  // If OTP verified, unlock submit button
+  useEffect(() => {
+    if (verifyData && (verifyData.message || verifyData.status === "success")) {
+      setOtpVerified(true);
+    }
+  }, [verifyData]);
+
+  // On registration complete
+  useEffect(() => {
+    if (completeData && completeData.message) {
+      window.location.href = "/signin";
+    }
+  }, [completeData]);
+
+  // Handlers
+  const handleSendOtp = (e) => {
     e.preventDefault();
-    signup(form.email, form.password);
+    signupEmail(form.email);
+  };
+
+  const handleVerifyOtp = (e) => {
+    e.preventDefault();
+    verifyEmail({ user_id: userId, verification_code: form.otp });
+  };
+
+  const handleResendOtp = () => {
+    signupEmail(form.email);
+    setTimer(60);
+    setOtpVerified(false);
+  };
+
+  const handleCompleteSubmit = (e) => {
+    e.preventDefault();
+    if (!otpVerified) return;
+    completeSignup({
+      user_id: userId,
+      phone_number: form.phone_number,
+      password: form.password,
+      password_confirmation: form.password_confirmation,
+    });
   };
 
   return (
     <div className="min-h-screen flex bg-white">
-      {/* Left: Form */}
       <div className="w-full md:w-1/2 flex flex-col justify-center px-8 py-12 max-w-xl mx-auto">
-        {/* Breadcrumb */}
         <nav className="mb-8 flex items-center text-sm text-gray-500 space-x-1">
           <Link to="/" className="hover:text-[#7C0902]">
             Home
@@ -25,8 +102,8 @@ export default function Signup() {
           <span className="text-[#7C0902] font-semibold">Sign Up</span>
         </nav>
 
+        {/* Logo for mobile */}
         <div className="mb-8 md:hidden flex flex-col items-center">
-          {/* Logo on mobile */}
           <img
             src={logo}
             alt="Logo"
@@ -40,17 +117,111 @@ export default function Signup() {
           <h2 className="text-2xl md:text-3xl font-extrabold mb-6 text-[#7C0902]">
             Create Your Account
           </h2>
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleCompleteSubmit} className="space-y-5">
+            {/* Email & Send OTP */}
             <div>
               <label className="block mb-1 text-gray-700 font-medium">
                 Email
               </label>
+              <div className="flex gap-2 items-center">
+                <input
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  required
+                  placeholder="example123@gmail.com"
+                  className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#7C0902] transition"
+                  disabled={sentOtp}
+                />
+              </div>
+              {sentOtp ? null : (
+                <div className="flex justify-end py-2">
+                  <button
+                    type="button"
+                    className="bg-[#7C0902] text-white py-1 px-3 cursor-pointer text-[16px] rounded font-semibold hover:bg-[#600601] transition-colors text-sm"
+                    onClick={handleSendOtp}
+                    disabled={emailLoading || sentOtp || !form.email}
+                  >
+                    {emailLoading
+                      ? "Sending..."
+                      : sentOtp
+                      ? "OTP Sent"
+                      : "Send OTP"}
+                  </button>
+                </div>
+              )}
+
+              {emailError && (
+                <p className="text-red-600">
+                  {emailError?.data?.message || "Email request failed"}
+                </p>
+              )}
+            </div>
+
+            {/* OTP & Verify button - show after OTP is sent */}
+            {sentOtp && (
+              <div>
+                <label className="block mb-1 text-gray-700 font-medium">
+                  Enter OTP
+                </label>
+                <div className="flex gap-2 items-center">
+                  <input
+                    type="text"
+                    value={form.otp}
+                    onChange={(e) => setForm({ ...form, otp: e.target.value })}
+                    required={!otpVerified}
+                    placeholder="Enter OTP"
+                    disabled={otpVerified}
+                    className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#7C0902] transition"
+                  />
+                </div>
+                <div className="flex justify-between p-2 ">
+                  <button
+                    type="button"
+                    className="text-[#7C0902] text-[16px] font-medium underline ml-2"
+                    onClick={handleResendOtp}
+                    disabled={timer > 0}
+                  >
+                    {timer > 0 ? `Resend in ${timer}s` : "Resend OTP"}
+                  </button>
+                  {!otpVerified && (
+                    <button
+                      type="button"
+                      className="bg-[#7C0902] text-white py-1 px-4 cursor-pointer rounded font-semibold hover:bg-[#600601] transition-colors text-sm"
+                      onClick={handleVerifyOtp}
+                      disabled={verifyLoading || !form.otp}
+                    >
+                      {verifyLoading ? "Verifying..." : "Verify OTP"}
+                    </button>
+                  )}
+                </div>
+                {verifyError && (
+                  <p className="text-red-600">
+                    {verifyError?.data?.message || "Invalid OTP"}
+                  </p>
+                )}
+                {otpVerified && (
+                  <p className="text-green-600">
+                    OTP Verified! Continue registration.
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Remaining fields - phone, password, confirm password */}
+            <div>
+              <label className="block mb-1 text-gray-700 font-medium">
+                Phone Number
+              </label>
               <input
-                type="email"
-                placeholder="Email"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                type="text"
+                value={form.phone_number}
+                placeholder="XXXXXXXX67"
+                onChange={(e) =>
+                  setForm({ ...form, phone_number: e.target.value })
+                }
                 required
+                disabled={!otpVerified}
                 className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#7C0902] transition"
               />
             </div>
@@ -60,19 +231,48 @@ export default function Signup() {
               </label>
               <input
                 type="password"
-                placeholder="Password"
                 value={form.password}
+                placeholder="******"
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
                 required
+                disabled={!otpVerified}
+                className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#7C0902] transition"
+              />
+            </div>
+            <div>
+              <label className="block mb-1 text-gray-700 font-medium">
+                Confirm Password
+              </label>
+              <input
+                type="password"
+                value={form.password_confirmation}
+                placeholder="******"
+                onChange={(e) =>
+                  setForm({ ...form, password_confirmation: e.target.value })
+                }
+                required
+                disabled={!otpVerified}
                 className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#7C0902] transition"
               />
             </div>
             <button
               type="submit"
-              className="w-full bg-[#7C0902] text-white py-3 rounded-md font-semibold hover:bg-[#600601] transition-colors text-lg shadow"
+              disabled={!otpVerified || completeLoading}
+              className={`w-full text-[16px] py-3 rounded-md font-semibold  shadow transition-colors
+    ${
+      !otpVerified || completeLoading
+        ? "bg-gray-400 cursor-not-allowed"
+        : "bg-[#7C0902] hover:bg-[#600601] text-white"
+    }
+  `}
             >
-              Sign Up
+              {completeLoading ? "Signing..." : "Signup"}
             </button>
+            {completeError && (
+              <p className="text-red-600">
+                {completeError?.data?.message || "Signup failed"}
+              </p>
+            )}
           </form>
           <p className="mt-6 text-sm text-gray-600 text-center">
             Already have an account?{" "}
@@ -85,8 +285,7 @@ export default function Signup() {
           </p>
         </div>
       </div>
-
-      {/* Right: Image + Overlay (desktop only) */}
+      {/* Right-side image/overlay omitted for brevity. */}
       <div className="hidden md:flex w-1/2 relative bg-gray-100">
         <img
           alt="Signup background"

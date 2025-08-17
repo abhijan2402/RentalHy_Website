@@ -99,6 +99,7 @@ const AddPropertyModal = ({ showModal, onClose }) => {
           tenant: "",
         }}
       >
+        {/* Property Title */}
         <Form.Item
           label="Property Title"
           name="title"
@@ -107,6 +108,7 @@ const AddPropertyModal = ({ showModal, onClose }) => {
           <Input placeholder="Enter property title" />
         </Form.Item>
 
+        {/* Description */}
         <Form.Item
           label="Description"
           name="description"
@@ -115,6 +117,18 @@ const AddPropertyModal = ({ showModal, onClose }) => {
           <Input.TextArea placeholder="Enter property description" rows={3} />
         </Form.Item>
 
+        {/* Preferred Tenant */}
+        <Form.Item label="Preferred Tenant" name="tenant">
+          <Radio.Group className={horizontalScrollClass}>
+            {["Family", "Bachelors Male", "Bachelors Female"].map((opt) => (
+              <Radio.Button key={opt} value={opt}>
+                {opt}
+              </Radio.Button>
+            ))}
+          </Radio.Group>
+        </Form.Item>
+
+        {/* Price */}
         <Form.Item
           label="Price"
           name="price"
@@ -132,6 +146,8 @@ const AddPropertyModal = ({ showModal, onClose }) => {
           />
         </Form.Item>
 
+        {/* Location
+         */}
         <Form.Item
           label="Location"
           name="location"
@@ -140,6 +156,7 @@ const AddPropertyModal = ({ showModal, onClose }) => {
           <Input placeholder="Enter location" />
         </Form.Item>
 
+        {/* Area Sq.ft */}
         <Form.Item
           label="Area (sq ft)"
           name="area"
@@ -152,6 +169,7 @@ const AddPropertyModal = ({ showModal, onClose }) => {
           />
         </Form.Item>
 
+        {/* BHK */}
         <Form.Item
           label="BHK"
           name="bhk"
@@ -247,17 +265,6 @@ const AddPropertyModal = ({ showModal, onClose }) => {
         <Form.Item label="Advance" name="advance">
           <Radio.Group className={horizontalScrollClass}>
             {["1 Month", "2 Months", "3+ Months"].map((opt) => (
-              <Radio.Button key={opt} value={opt}>
-                {opt}
-              </Radio.Button>
-            ))}
-          </Radio.Group>
-        </Form.Item>
-
-        {/* Preferred Tenant */}
-        <Form.Item label="Preferred Tenant" name="tenant">
-          <Radio.Group className={horizontalScrollClass}>
-            {["Family", "Bachelors Male", "Bachelors Female"].map((opt) => (
               <Radio.Button key={opt} value={opt}>
                 {opt}
               </Radio.Button>

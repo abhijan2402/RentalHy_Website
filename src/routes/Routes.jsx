@@ -26,29 +26,33 @@ export default function AppRoutes() {
         <Route path="/" element={<Home />} />
         <Route path="/convention" element={<ConventionHall />} />
         <Route path="/propertydetails/:id" element={<PropertyDetailsPage />} />
-        <Route path="/wishlist" element={<Wishlist />} />
-        <Route path="/profile" element={<ProfilePage />} />
         <Route path="/support" element={<SupportPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+
+        {/* Protected Routes */}
+        <Route
+          path="/wishlist"
+          element={
+            <ProtectedRoute>
+              <Wishlist />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
       </Route>
 
       {/* Auth Routes */}
       <Route path="/signin" element={<Signin />} />
       <Route path="/signup" element={<Signup />} />
-
-      {/* Protected Routes */}
-      <Route element={<MainLayout />}>
-        {/* <Route
-          path="/home"
-          element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          }
-        /> */}
-      </Route>
 
       <Route path="*" element={<NotFound />} />
     </Routes>

@@ -5,6 +5,7 @@ import { FaUserCircle, FaHeart } from "react-icons/fa";
 import { useAuth } from "../contexts/AuthContext";
 import logo from "../assets/clogo.png";
 import { BiHeart } from "react-icons/bi";
+import { FaLocationPin, FaLocationPinLock } from "react-icons/fa6";
 
 export default function Navbar() {
   const { user } = useAuth();
@@ -74,7 +75,6 @@ export default function Navbar() {
           </ul>
 
           {/* Right Icons */}
-          {/* Right Icons */}
           <div className="hidden md:flex items-center gap-4">
             <button
               onClick={() => navigate("/wishlist")}
@@ -96,14 +96,21 @@ export default function Navbar() {
             >
               <FaUserCircle className="w-6 h-6" />
             </button>
-            {/* {user && (
-              <button
-                onClick={() => navigate("/profile")}
-                className="relative p-2 rounded-full border border-[#7C0902] text-[#7C0902] hover:bg-[#7C0902] hover:text-white transition duration-300"
-              >
-                <FaUserCircle className="w-6 h-6" />
-              </button>
-            )} */}
+            <div className="flex items-center space-x-3 bg-white rounded-lg px-0 py-0  ">
+              <div className="flex flex-col">
+                <div className="flex gap-1 items-center">
+                  <div className="relative p-0 rounded-full  text-[#7C0902] transition duration-300">
+                    <FaLocationPin className="w-4 h-4" />
+                  </div>
+                  <span className="font-semibold text-[#7C0902] text-[14px]">
+                    {"Jaipur"}
+                  </span>
+                </div>
+                <p className="text-[12px] pl-1 text-gray-600">
+                  {"Abc, Jaipur, Rajasthan"}
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* Mobile Menu Button */}

@@ -10,12 +10,13 @@ import ProtectedRoute from "./ProtectedRoute";
 import Landing from "../pages/Landing";
 import Signin from "../pages/Auth/Signin";
 import Signup from "../pages/Auth/Signup";
-import Property from "../pages/Property";
+import Property from "../pages/ConventionHall";
 import SupportPage from "../pages/SupportPage";
 import AboutPage from "../pages/AboutPage";
 import PropertyDetailsPage from "../pages/PropertyDetailsPage";
 import Wishlist from "../pages/Wishlist";
 import ProfilePage from "../pages/ProfilePage";
+import ConventionHall from "../pages/ConventionHall";
 
 export default function AppRoutes() {
   return (
@@ -23,7 +24,7 @@ export default function AppRoutes() {
       {/* Public Routes */}
       <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
-        <Route path="/property" element={<Property />} />
+        <Route path="/convention" element={<ConventionHall />} />
         <Route path="/propertydetails/:id" element={<PropertyDetailsPage />} />
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/profile" element={<ProfilePage />} />

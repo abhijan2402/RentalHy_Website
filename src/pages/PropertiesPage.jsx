@@ -2,8 +2,11 @@ import React, { useState } from "react";
 import PropertyFilters from "../components/Properties/PropertyFilters";
 import PropertyList from "../components/Properties/PropertyList";
 import { MdFilterList } from "react-icons/md";
+import { GiDoor } from "react-icons/gi";
+import { useNavigate } from "react-router-dom";
 
 export default function PropertiesPage() {
+  const navigate = useNavigate();
   const [openFilters, setOpenFilters] = useState(false);
 
   return (
@@ -23,7 +26,7 @@ export default function PropertiesPage() {
         {/* Right side button */}
         <div className="w-full md:w-auto">
           <button
-            onClick={() => setOpenFilters(true)}
+            onClick={() => navigate("/convention")}
             className="flex items-center justify-center gap-2 w-full md:w-auto"
             style={{
               backgroundColor: "#7C0902",
@@ -32,7 +35,7 @@ export default function PropertiesPage() {
               borderRadius: "6px",
             }}
           >
-            <MdFilterList size={20} /> Filters
+            <GiDoor size={20} /> Convention Hall
           </button>
         </div>
       </div>
@@ -40,7 +43,10 @@ export default function PropertiesPage() {
       {/* Property List */}
       <div className="bg-gradient-to-br flex flex-col from-white via-gray-50 to-gray-100 min-h-screen px-3 sm:px-4 md:px-6 py-6">
         <div className="max-w-7xl mx-auto flex flex-col gap-6 w-full">
-          <PropertyList />
+          <PropertyList
+            openFilters={openFilters}
+            setOpenFilters={setOpenFilters}
+          />
         </div>
       </div>
 

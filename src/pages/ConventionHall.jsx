@@ -2,7 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { FaBuilding } from "react-icons/fa";
 
-const Property = () => {
+const ConventionHall = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <motion.div
@@ -37,4 +37,4 @@ const Property = () => {
   );
 };
 
-export default Property;
+export default ConventionHall;

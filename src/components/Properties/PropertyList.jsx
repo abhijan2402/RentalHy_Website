@@ -11,6 +11,7 @@ import { BiHomeAlt2 } from "react-icons/bi";
 import { HiHome } from "react-icons/hi2";
 import PropertFilterSlider from "./PropertFilterSlider";
 import Pagination from "../Pagination";
+import { MdFilterList } from "react-icons/md";
 
 const sliderSettings = {
   dots: true,
@@ -22,7 +23,7 @@ const sliderSettings = {
   adaptiveHeight: true,
 };
 
-export default function PropertyList() {
+export default function PropertyList({ setOpenFilters, openFilters }) {
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -88,7 +89,6 @@ export default function PropertyList() {
     <div className="flex-1 bg-gray-50 min-h-screen px-2">
       {/* Search and Sort */}
       <div className="flex flex-col sm:flex-row gap-3 mb-2 items-center w-full">
-        {/* Search */}
         {/* Search with dynamic button inside */}
         <div className="relative w-full sm:flex-1">
           <input
@@ -138,6 +138,21 @@ export default function PropertyList() {
               d="M19 9l-7 7-7-7"
             />
           </svg>
+        </div>
+        {/* Right side button */}
+        <div className="w-full md:w-auto">
+          <button
+            onClick={() => setOpenFilters(true)}
+            className="flex items-center justify-center gap-2 w-full md:w-auto"
+            style={{
+              backgroundColor: "#7C0902",
+              color: "white",
+              padding: "8px 12px",
+              borderRadius: "6px",
+            }}
+          >
+            <MdFilterList size={18} /> Filters
+          </button>
         </div>
       </div>
 

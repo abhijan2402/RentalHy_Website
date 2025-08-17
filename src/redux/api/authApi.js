@@ -1,0 +1,56 @@
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+
+export const authApi = createApi({
+  reducerPath: "authApi",
+  baseQuery: fetchBaseQuery({
+    baseUrl: "https://hotpink-rook-901841.hostingersite.com/public/api/",
+  }),
+  endpoints: (builder) => ({
+    // Step 1: Add email to get OTP
+    signupEmail: builder.mutation({
+      query: (email) => ({
+        url: "signup/email",
+        method: "POST",
+        body: (() => {
+          const formData = new FormData();
+          formData.append("email", email);
+          return formData;
+        })(),
+      }),
+    }),
+    // Step 2: Verify email with OTP
+    verifyEmail: builder.mutation({
+      query: ({ user_id, verification_code }) => ({
+        url: "signup/verify-email",
+        method: "POST",
+        body: (() => {
+          const formData = new FormData();
+          formData.append("user_id", user_id);
+          formData.append("verification_code", verification_code);
+          return formData;
+        })(),
+      }),
+    }),
+    // Step 3: Complete registration
+    completeSignup: builder.mutation({
+      query: ({ user_id, phone_number, password, password_confirmation }) => ({
+        url: "signup/complete",
+        method: "POST",
+        body: (() => {
+          const formData = new FormData();
+          formData.append("user_id", user_id);
+          formData.append("phone_number", phone_number);
+          formData.append("password", password);
+          formData.append("password_confirmation", password_confirmation);
+          return formData;
+        })(),
+      }),
+    }),
+  }),
+});
+
+export const {
+  useSignupEmailMutation,
+  useVerifyEmailMutation,
+  useCompleteSignupMutation,
+} = authApi;

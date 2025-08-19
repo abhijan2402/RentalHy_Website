@@ -58,11 +58,11 @@ export default function Signup() {
   }, [verifyData]);
 
   // On registration complete
-  useEffect(() => {
-    if (completeData && completeData.message) {
-      navigate("/signin");
-    }
-  }, [completeData]);
+  // useEffect(() => {
+  //   if (completeData && completeData.message) {
+  //     navigate("/signin");
+  //   }
+  // }, [completeData]);
 
   // Handlers
   const handleSendOtp = (e) => {
@@ -90,6 +90,9 @@ export default function Signup() {
       password: form.password,
       password_confirmation: form.password_confirmation,
     });
+    if (completeData && completeData.message) {
+      navigate("/signin");
+    }
   };
 
   return (

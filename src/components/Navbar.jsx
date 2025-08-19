@@ -17,7 +17,7 @@ export default function Navbar() {
   const path = !user ? "/" : "/";
   const navItems = [
     { name: "Home", path: "/" },
-    { name: "Convention Hall", path: "/convention" },
+    { name: "Convention Space", path: "/convention" },
     { name: "About Us", path: "/about" },
     { name: "Support", path: "/support" },
   ];

@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "../../assets/clogo.png";
 
 export default function Signup() {
+  const navigate = useNavigate();
   const [sentOtp, setSentOtp] = useState(false);
   const [otpVerified, setOtpVerified] = useState(false);
   const [timer, setTimer] = useState(60);
@@ -59,7 +60,7 @@ export default function Signup() {
   // On registration complete
   useEffect(() => {
     if (completeData && completeData.message) {
-      window.location.href = "/signin";
+      navigate("/signin");
     }
   }, [completeData]);
 

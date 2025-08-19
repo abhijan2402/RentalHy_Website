@@ -12,7 +12,7 @@ export default function PropertiesPage() {
   return (
     <>
       {/* Heading + Filters Open Btn */}
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:justify-between md:items-center mt-8 text-left gap-4 px-3 sm:px-4 md:px-6">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:justify-between md:items-center mt-8 text-left gap- px-0 sm:px-4 md:px-2">
         {/* Left side heading */}
         <div className="flex-1">
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800">

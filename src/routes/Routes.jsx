@@ -7,16 +7,14 @@ import NotFound from "../pages/NotFound";
 
 import ProtectedRoute from "./ProtectedRoute";
 
-import Landing from "../pages/Landing";
 import Signin from "../pages/Auth/Signin";
 import Signup from "../pages/Auth/Signup";
-import Property from "../pages/ConventionHall";
 import SupportPage from "../pages/SupportPage";
 import AboutPage from "../pages/AboutPage";
 import PropertyDetailsPage from "../pages/PropertyDetailsPage";
 import Wishlist from "../pages/Wishlist";
 import ProfilePage from "../pages/ProfilePage";
-import ConventionHall from "../pages/ConventionHall";
+import ConventionPage from "../pages/ConventionPage";
 
 export default function AppRoutes() {
   return (
@@ -24,7 +22,7 @@ export default function AppRoutes() {
       {/* Public Routes */}
       <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
-        <Route path="/convention" element={<ConventionHall />} />
+        <Route path="/convention" element={<ConventionPage />} />
         <Route path="/propertydetails/:id" element={<PropertyDetailsPage />} />
         <Route path="/support" element={<SupportPage />} />
         <Route path="/about" element={<AboutPage />} />

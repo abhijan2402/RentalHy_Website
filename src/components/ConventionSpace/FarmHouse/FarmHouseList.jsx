@@ -2,16 +2,14 @@ import React, { useState } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { propertyData } from "../../utils/propertydata";
 import { useNavigate } from "react-router-dom";
 import { FaHeart, FaMapMarkerAlt, FaPlus } from "react-icons/fa";
-import AddPropertyModal from "./AddPropertyModal";
-import { useAuth } from "../../contexts/AuthContext";
-import { BiHomeAlt2 } from "react-icons/bi";
-import { HiHome } from "react-icons/hi2";
-import PropertFilterSlider from "./PropertFilterSlider";
-import Pagination from "../Pagination";
-import { MdFilterList } from "react-icons/md";
+
+import { farmhousedata } from "../../../utils/farmhousedata";
+import { useAuth } from "../../../contexts/AuthContext";
+import Pagination from "../../Pagination";
+import { CgHome } from "react-icons/cg";
+import AddFarmHouse from "./AddFarmHouse";
 
 const sliderSettings = {
   dots: true,
@@ -23,7 +21,7 @@ const sliderSettings = {
   adaptiveHeight: true,
 };
 
-export default function PropertyList({ setOpenFilters, openFilters }) {
+export default function FarmHouseList({ setOpenFilters, openFilters }) {
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -38,7 +36,7 @@ export default function PropertyList({ setOpenFilters, openFilters }) {
   const [itemsPerPage, setItemsPerPage] = useState(8);
 
   // Normalize prices for sorting
-  const normalizedProperties = propertyData.map((p) => ({
+  const normalizedProperties = farmhousedata.map((p) => ({
     ...p,
     numPrice:
       typeof p.price === "string" && p.price[0] === "$"
@@ -83,85 +81,13 @@ export default function PropertyList({ setOpenFilters, openFilters }) {
   // Calculate items for current page
   const startIdx = (currentPage - 1) * itemsPerPage;
   const endIdx = currentPage * itemsPerPage;
-  const pageProperties = sortedProperties.slice(startIdx, endIdx);
+  const farmhousedataPage = sortedProperties.slice(startIdx, endIdx);
 
   return (
-    <div className="flex-1 bg-gray-50 min-h-screen px-2">
-      {/* Search and Sort */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-2 items-center w-full">
-        {/* Search with dynamic button inside */}
-        <div className="relative w-full sm:flex-1">
-          <input
-            type="text"
-            placeholder="Search by title or location..."
-            className="w-full border border-gray-300 rounded px-4 py-2 text-sm pr-20 focus:ring-1 focus:ring-[#7C0902] outline-none"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") handleButton();
-            }}
-          />
-          <button
-            onClick={handleButton}
-            className={`absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1 rounded 
-            ${isSearching ? "bg-gray-400" : "bg-[#7C0902]"}
-            text-white text-sm font-medium`}
-          >
-            {isSearching ? "Reset" : "Search"}
-          </button>
-        </div>
-        {/* Sorting */}
-        <div className="relative w-full sm:w-auto">
-          <select
-            className="w-full appearance-none border border-gray-300 rounded-lg px-4 py-2 text-sm text-gray-700 bg-white focus:ring-1 focus:ring-[#7C0902] focus:border-[#7C0902] outline-none pr-8"
-            value={sort}
-            onChange={(e) => setSort(e.target.value)}
-          >
-            <option value="">Sort by</option>
-            <option value="low-high">Price: Low to High</option>
-            <option value="high-low">Price: High to Low</option>
-            <option value="newest">Newest First</option>
-            <option value="oldest">Oldest First</option>
-          </select>
-          {/* Custom dropdown icon */}
-          <svg
-            className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 9l-7 7-7-7"
-            />
-          </svg>
-        </div>
-        {/* Right side button */}
-        <div className="w-full md:w-auto">
-          <button
-            onClick={() => setOpenFilters(true)}
-            className="flex items-center justify-center gap-2 w-full md:w-auto"
-            style={{
-              backgroundColor: "#7C0902",
-              color: "white",
-              padding: "8px 12px",
-              borderRadius: "6px",
-            }}
-          >
-            <MdFilterList size={18} /> Filters
-          </button>
-        </div>
-      </div>
-
-      {/* Filters silding Tab */}
-      <PropertFilterSlider />
-
+    <div className="flex-1 bg-gray-50 min-h-screen">
       {/* Property List */}
-      <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-        {pageProperties.map((property) => (
+      <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-2">
+        {farmhousedataPage.map((property) => (
           <div
             key={property.id}
             className="bg-white border rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow flex flex-col"
@@ -256,13 +182,13 @@ export default function PropertyList({ setOpenFilters, openFilters }) {
         onClick={() => (!user ? navigate("/signin") : setShowModal(true))}
         className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-[#7C0902] text-white px-5 py-3 rounded-md shadow-lg hover:bg-[#600601] transition-colors animate-bounce"
       >
-        <HiHome className="text-lg" />
-        <span className="">Post Property</span>
+        🏡
+        <span className="">Upload Farm House</span>
       </button>
 
       {/* Modal */}
       {showModal && (
-        <AddPropertyModal
+        <AddFarmHouse
           showModal={showModal}
           onClose={() => setShowModal(false)}
         />

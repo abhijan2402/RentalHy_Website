@@ -16,6 +16,13 @@ export default function Signup() {
     password_confirmation: "",
   });
 
+  const [errors, setErrors] = useState({
+    email: "",
+    otp: "",
+    password: "",
+    password_confirmation: "",
+  });
+
   const {
     signupEmail,
     emailData,
@@ -57,12 +64,49 @@ export default function Signup() {
     }
   }, [verifyData]);
 
-  // On registration complete
-  // useEffect(() => {
-  //   if (completeData && completeData.message) {
-  //     navigate("/signin");
-  //   }
-  // }, [completeData]);
+  // Validation
+  useEffect(() => {
+    // Email validation regex (simple)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (form.email && !emailRegex.test(form.email)) {
+      setErrors((prev) => ({
+        ...prev,
+        email: "Please enter a valid email address.",
+      }));
+    } else {
+      setErrors((prev) => ({ ...prev, email: "" }));
+    }
+
+    // Validate OTP length minimum 6 digits
+    if (form.otp && form.otp.length < 6) {
+      setErrors((prev) => ({ ...prev, otp: "OTP must be at least 6 digits." }));
+    } else {
+      setErrors((prev) => ({ ...prev, otp: "" }));
+    }
+
+    // Validate password minimum 8 chars
+    if (form.password && form.password.length < 8) {
+      setErrors((prev) => ({
+        ...prev,
+        password: "Password must be at least 8 characters.",
+      }));
+    } else {
+      setErrors((prev) => ({ ...prev, password: "" }));
+    }
+
+    // Validate password confirmation matches password
+    if (
+      form.password_confirmation &&
+      form.password_confirmation !== form.password
+    ) {
+      setErrors((prev) => ({
+        ...prev,
+        password_confirmation: "Passwords do not match.",
+      }));
+    } else {
+      setErrors((prev) => ({ ...prev, password_confirmation: "" }));
+    }
+  }, [form.email, form.otp, form.password, form.password_confirmation]);
 
   // Handlers
   const handleSendOtp = (e) => {
@@ -83,13 +127,17 @@ export default function Signup() {
 
   const handleCompleteSubmit = (e) => {
     e.preventDefault();
+    // Only proceed if no validation errors
     if (!otpVerified) return;
+    if (errors.otp || errors.password || errors.password_confirmation) return;
+
     completeSignup({
       user_id: userId,
       phone_number: form.phone_number,
       password: form.password,
       password_confirmation: form.password_confirmation,
     });
+
     if (completeData && completeData.message) {
       navigate("/signin");
     }
@@ -134,27 +182,27 @@ export default function Signup() {
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                   required
                   placeholder="example123@gmail.com"
-                  className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#7C0902] transition"
+                  className={`w-full px-4 py-2 text-black border rounded focus:outline-none focus:ring-2 focus:ring-[#7C0902] transition ${
+                    errors.email ? "border-red-600" : ""
+                  }`}
                   disabled={sentOtp}
                 />
               </div>
-              {sentOtp ? null : (
+              {errors.email && <p className="text-red-600">{errors.email}</p>}
+              {!sentOtp && (
                 <div className="flex justify-end py-2">
                   <button
                     type="button"
                     className="bg-[#7C0902] text-white py-1 px-3 cursor-pointer text-[16px] rounded font-semibold hover:bg-[#600601] transition-colors text-sm"
                     onClick={handleSendOtp}
-                    disabled={emailLoading || sentOtp || !form.email}
+                    disabled={
+                      emailLoading || sentOtp || !form.email || !!errors.email
+                    }
                   >
-                    {emailLoading
-                      ? "Sending..."
-                      : sentOtp
-                      ? "OTP Sent"
-                      : "Send OTP"}
+                    {emailLoading ? "Sending..." : "Send OTP"}
                   </button>
                 </div>
               )}
-
               {emailError && (
                 <p className="text-red-600">
                   {emailError?.data?.message || "Email request failed"}
@@ -176,9 +224,12 @@ export default function Signup() {
                     required={!otpVerified}
                     placeholder="Enter OTP"
                     disabled={otpVerified}
-                    className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#7C0902] transition"
+                    className={`w-full px-4 py-2 text-black border rounded focus:outline-none focus:ring-2 focus:ring-[#7C0902] transition ${
+                      errors.otp ? "border-red-600" : ""
+                    }`}
                   />
                 </div>
+                {errors.otp && <p className="text-red-600">{errors.otp}</p>}
                 <div className="flex justify-between p-2 ">
                   <button
                     type="button"
@@ -193,7 +244,7 @@ export default function Signup() {
                       type="button"
                       className="bg-[#7C0902] text-white py-1 px-4 cursor-pointer rounded font-semibold hover:bg-[#600601] transition-colors text-sm"
                       onClick={handleVerifyOtp}
-                      disabled={verifyLoading || !form.otp}
+                      disabled={verifyLoading || !form.otp || !!errors.otp}
                     >
                       {verifyLoading ? "Verifying..." : "Verify OTP"}
                     </button>
@@ -226,7 +277,7 @@ export default function Signup() {
                 }
                 required
                 disabled={!otpVerified}
-                className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#7C0902] transition"
+                className="w-full px-4 py-2 border text-black rounded focus:outline-none focus:ring-2 focus:ring-[#7C0902] transition"
               />
             </div>
             <div>
@@ -240,8 +291,13 @@ export default function Signup() {
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
                 required
                 disabled={!otpVerified}
-                className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#7C0902] transition"
+                className={`w-full px-4 py-2 border rounded text-black focus:outline-none focus:ring-2 focus:ring-[#7C0902] transition ${
+                  errors.password ? "border-red-600" : ""
+                }`}
               />
+              {errors.password && (
+                <p className="text-red-600">{errors.password}</p>
+              )}
             </div>
             <div>
               <label className="block mb-1 text-gray-700 font-medium">
@@ -256,19 +312,28 @@ export default function Signup() {
                 }
                 required
                 disabled={!otpVerified}
-                className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#7C0902] transition"
+                className={`w-full px-4 py-2 border text-black rounded focus:outline-none focus:ring-2 focus:ring-[#7C0902] transition ${
+                  errors.password_confirmation ? "border-red-600" : ""
+                }`}
               />
+              {errors.password_confirmation && (
+                <p className="text-red-600">{errors.password_confirmation}</p>
+              )}
             </div>
             <button
               type="submit"
-              disabled={!otpVerified || completeLoading}
-              className={`w-full text-[16px] py-3 rounded-md font-semibold  shadow transition-colors
-    ${
-      !otpVerified || completeLoading
-        ? "bg-gray-400 cursor-not-allowed"
-        : "bg-[#7C0902] hover:bg-[#600601] text-white"
-    }
-  `}
+              disabled={
+                !otpVerified ||
+                completeLoading ||
+                !!errors.otp ||
+                !!errors.password ||
+                !!errors.password_confirmation
+              }
+              className={`w-full text-[16px] py-3 rounded-md font-semibold  shadow transition-colors ${
+                !otpVerified || completeLoading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-[#7C0902] hover:bg-[#600601] text-white"
+              }`}
             >
               {completeLoading ? "Signing..." : "Signup"}
             </button>
@@ -289,7 +354,8 @@ export default function Signup() {
           </p>
         </div>
       </div>
-      {/* Right-side image/overlay omitted for brevity. */}
+
+      {/* Right-side image/overlay */}
       <div className="hidden md:flex w-1/2 relative bg-gray-100">
         <img
           alt="Signup background"

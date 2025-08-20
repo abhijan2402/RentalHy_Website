@@ -87,6 +87,74 @@ export default function ConventionHallList({ setOpenFilters, openFilters }) {
 
   return (
     <div className="flex-1 bg-gray-50 min-h-screen px-0">
+      {/* Search and Sort */}
+      <div className="flex flex-col sm:flex-row gap-3 mb-2 items-center w-full">
+        {/* Search with dynamic button inside */}
+        <div className="relative w-full sm:flex-1">
+          <input
+            type="text"
+            placeholder="Search by title or location..."
+            className="w-full border border-gray-300 rounded px-4 py-2 text-sm pr-20 focus:ring-1 focus:ring-[#7C0902] outline-none"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleButton();
+            }}
+          />
+          <button
+            onClick={handleButton}
+            className={`absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1 rounded 
+                  ${isSearching ? "bg-gray-400" : "bg-[#7C0902]"}
+                  text-white text-sm font-medium`}
+          >
+            {isSearching ? "Reset" : "Search"}
+          </button>
+        </div>
+        {/* Sorting */}
+        <div className="relative w-full sm:w-auto">
+          <select
+            className="w-full appearance-none border border-gray-300 rounded-lg px-4 py-2 text-sm text-gray-700 bg-white focus:ring-1 focus:ring-[#7C0902] focus:border-[#7C0902] outline-none pr-8"
+            value={sort}
+            onChange={(e) => setSort(e.target.value)}
+          >
+            <option value="">Sort by</option>
+            <option value="low-high">Price: Low to High</option>
+            <option value="high-low">Price: High to Low</option>
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+          </select>
+          {/* Custom dropdown icon */}
+          <svg
+            className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        </div>
+        {/* Right side button */}
+        <div className="w-full md:w-auto">
+          <button
+            onClick={() => setOpenFilters(true)}
+            className="flex items-center justify-center gap-2 w-full md:w-auto"
+            style={{
+              backgroundColor: "#7C0902",
+              color: "white",
+              padding: "8px 12px",
+              borderRadius: "6px",
+            }}
+          >
+            <MdFilterList size={18} /> Filters
+          </button>
+        </div>
+      </div>
       {/* Property List */}
       <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-2">
         {conventionhallPage.map((property) => (
@@ -123,7 +191,7 @@ export default function ConventionHallList({ setOpenFilters, openFilters }) {
               <p className="font-medium text-sm px-2 py-1 text-gray-600 truncate">
                 {property.description}
               </p>
-              
+
               <div className="mb-2">
                 <span className="text-xl font-semibold text-[#7C0902]">
                   {property.price >= 100000
@@ -133,12 +201,19 @@ export default function ConventionHallList({ setOpenFilters, openFilters }) {
               </div>
               <div className="flex justify-between">
                 <p className="text-xs text-gray-400 mb-2">
+                  <span className="text-black">Address:</span>{" "}
+                  {property.location}
+                </p>
+              </div>
+              <div className="flex justify-between">
+                <p className="text-xs text-gray-400 mb-2">
                   Posted: {property.date}
                 </p>
                 <p className="text-xs text-[#7C0902] mb-2">
                   {property.status === true ? " Verified" : null}
                 </p>
               </div>
+             
               {/* Button at bottom */}
               <div className="mt-auto w-full">
                 <a

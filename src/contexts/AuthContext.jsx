@@ -15,7 +15,7 @@ export function AuthProvider({ children }) {
   const [userId, setUserId] = useState(null);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
-  console.log(user)
+  console.log(user);
 
   // Signup mutations
   const [
@@ -46,6 +46,7 @@ export function AuthProvider({ children }) {
       console.log(result.msg);
       if (result.token) {
         localStorage.setItem("authToken", result.token);
+        localStorage.setItem("user", JSON.stringify(result.user));
         setUser(result.user);
         navigate("/");
         toast.success("Login Successfully..!!");
@@ -58,21 +59,20 @@ export function AuthProvider({ children }) {
     }
   };
 
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    const storedUser = localStorage.getItem("user");
+    if (token && storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
   const logout = () => {
     setUser(null);
     setUserId(null);
     localStorage.removeItem("authToken");
     navigate("/signin");
   };
-
-  // useEffect(() => {
-  //   const token = localStorage.getItem("authToken");
-  //   const publicRoutes = ["/signin", "/signup", "/forgot-password"]; // add others as needed
-
-  //   if (!token && !publicRoutes.includes(location.pathname)) {
-  //     navigate("/signin");
-  //   }
-  // }, [location, navigate]);
 
   return (
     <AuthContext.Provider

@@ -221,12 +221,19 @@ export default function PropertyList({ setOpenFilters, openFilters }) {
               </div>
               <div className="flex justify-between">
                 <p className="text-xs text-gray-400 mb-2">
+                  <span className="text-black">Address:</span>{" "}
+                  {property.location}
+                </p>
+              </div>
+              <div className="flex justify-between">
+                <p className="text-xs text-gray-400 mb-2">
                   Posted: {property.date}
                 </p>
                 <p className="text-xs text-[#7C0902] mb-2">
                   {property.status === true ? " Verified" : null}
                 </p>
               </div>
+
               {/* Button at bottom */}
               <div className="mt-auto w-full">
                 <a

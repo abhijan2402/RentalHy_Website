@@ -102,7 +102,7 @@ export default function Signin() {
                 onChange={handleChange}
                 onBlur={() => handleBlur("email")}
                 required
-                className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 transition ${
+                className={`w-full px-4 py-2 text-black border rounded focus:outline-none focus:ring-2 transition ${
                   errors.email
                     ? "border-red-500 focus:ring-red-200"
                     : "focus:ring-[#7C0902]"
@@ -126,7 +126,7 @@ export default function Signin() {
                   onChange={handleChange}
                   onBlur={() => handleBlur("password")}
                   required
-                  className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 transition ${
+                  className={`w-full px-4 py-2 text-black border rounded focus:outline-none focus:ring-2 transition ${
                     errors.password
                       ? "border-red-500 focus:ring-red-200"
                       : "focus:ring-[#7C0902]"

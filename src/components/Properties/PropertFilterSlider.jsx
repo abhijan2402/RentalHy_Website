@@ -386,7 +386,7 @@ export default function PropertFilterSlider() {
       {activeTab && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center md:items-center md:justify-center z-50">
           {/* Card Modal in desktop, Bottom Sheet in mobile */}
-          <div className="bg-white w-full md:w-1/2 md:max-w-lg rounded-t-lg md:rounded-lg p-4 max-h-[80%] overflow-y-auto absolute bottom-0 md:relative flex flex-col">
+          <div className="bg-white w-full md:w-1/2 md:max-w-lg rounded-t-lg md:rounded-lg p-4 max-h-[80%] overflow-y-auto absolute md:relative flex flex-col">
             {/* Header */}
             <div className="flex justify-between items-center border-b pb-2 mb-2">
               <h2 className="text-lg text-[#7C0902] font-semibold">

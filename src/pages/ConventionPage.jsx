@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import { FaBuilding } from "react-icons/fa";
 import ConventionHall from "../components/ConventionSpace/ConventionHall/ConventionHall";
 import FarmHouse from "../components/ConventionSpace/FarmHouse/FarmHouse";
+import Breadcrumb from "../components/Breadcrumb";
 
 const ConventionPage = () => {
   const [activeTab, setActiveTab] = useState("conventionhall");
 
   return (
     <div className="w-full max-w-6xl mx-auto mt-[120px]">
+       <Breadcrumb propertyTitle={"Convention Space"} />
       {/* Tab buttons */}
       <div className="flex px-6 gap-2 mb-4 border-b border-white">
         <button

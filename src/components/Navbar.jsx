@@ -131,7 +131,7 @@ export default function Navbar() {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ duration: 0.3 }}
-            className="fixed top-0 right-0 w-full h-full bg-white text-black flex flex-col items-center justify-center z-50 md:hidden"
+            className="fixed top-0 right-0 w-full h-full bg-white text-black flex flex-col items-center justify-center z-[8888] md:hidden"
           >
             <button
               className="absolute top-6 right-6 text-3xl text-black"

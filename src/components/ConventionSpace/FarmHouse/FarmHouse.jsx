@@ -4,6 +4,7 @@ import PropertyFilters from "../../Properties/PropertyFilters";
 import { useNavigate } from "react-router-dom";
 
 import FarmHouseList from "./FarmHouseList";
+import FarmHouseFilters from "./FarmHouseFilters";
 
 export default function FarmHouse() {
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ export default function FarmHouse() {
       </div>
 
       {/* Filters Modal */}
-      <PropertyFilters
+      <FarmHouseFilters
         isOpen={openFilters}
         onClose={() => setOpenFilters(false)}
       />

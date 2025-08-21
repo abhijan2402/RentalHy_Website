@@ -114,6 +114,21 @@ export default function Navbar() {
           </div>
 
           {/* Mobile Menu Button */}
+          <div className="md:hidden flex items-center space-x-3 bg-white rounded-lg px-0 py-0  ">
+            <div className="flex flex-col">
+              <div className="flex gap-1 items-center">
+                <div className="relative p-0 rounded-full  text-[#7C0902] transition duration-300">
+                  <FaLocationPin className="w-4 h-4" />
+                </div>
+                <span className="font-semibold text-[#7C0902] text-[14px]">
+                  {"Jaipur"}
+                </span>
+              </div>
+              <p className="text-[12px] pl-1 text-gray-600">
+                {"Abc, Jaipur, Rajasthan"}
+              </p>
+            </div>
+          </div>
           <button
             className="md:hidden text-black text-3xl"
             onClick={() => setIsMobileMenuOpen(true)}
@@ -152,29 +167,36 @@ export default function Navbar() {
                   {item.name}
                 </li>
               ))}
-              <li className="flex gap-4 items-center">
-                <div
-                  className="relative cursor-pointer text-black"
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
-                    navigate("/wishlist");
-                  }}
-                >
-                  <FaHeart className="text-2xl" />
-                  {wishlistCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
-                      {wishlistCount}
-                    </span>
-                  )}
-                </div>
-                <FaUserCircle
-                  className="text-3xl cursor-pointer"
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
-                    navigate("/profile");
-                  }}
-                />
-              </li>
+              <ul className="flex flex-col gap-4 items-start">
+                <li>
+                  <div
+                    className="relative cursor-pointer text-black"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      navigate("/wishlist");
+                    }}
+                  >
+                    <span className="text-lg font-medium">Wishlist</span>
+                    {wishlistCount > 0 && (
+                      <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                        {wishlistCount}
+                      </span>
+                    )}
+                  </div>
+                </li>
+
+                <li>
+                  <div
+                    className="cursor-pointer text-black text-lg font-medium"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      navigate("/profile");
+                    }}
+                  >
+                    Profile
+                  </div>
+                </li>
+              </ul>
             </ul>
           </motion.div>
         )}

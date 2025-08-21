@@ -35,7 +35,13 @@ export const authApi = createApi({
 
     // Step 3: Complete registration
     completeSignup: builder.mutation({
-      query: ({ user_id, phone_number, password, password_confirmation }) => ({
+      query: ({
+        user_id,
+        phone_number,
+        password,
+        password_confirmation,
+        username,
+      }) => ({
         url: "signup/complete",
         method: "POST",
         body: (() => {
@@ -44,6 +50,7 @@ export const authApi = createApi({
           formData.append("phone_number", phone_number);
           formData.append("password", password);
           formData.append("password_confirmation", password_confirmation);
+          formData.append("name", username);
           return formData;
         })(),
       }),

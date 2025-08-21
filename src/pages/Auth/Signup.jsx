@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../../assets/clogo.png";
+import { toast } from "react-toastify";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -14,6 +15,7 @@ export default function Signup() {
     phone_number: "",
     password: "",
     password_confirmation: "",
+    username: "",
   });
 
   const [errors, setErrors] = useState({
@@ -130,15 +132,23 @@ export default function Signup() {
     // Only proceed if no validation errors
     if (!otpVerified) return;
     if (errors.otp || errors.password || errors.password_confirmation) return;
-
+    console.log({
+      user_id: userId,
+      phone_number: form.phone_number,
+      password: form.password,
+      password_confirmation: form.password_confirmation,
+      username: form.username,
+    });
     completeSignup({
       user_id: userId,
       phone_number: form.phone_number,
       password: form.password,
       password_confirmation: form.password_confirmation,
+      username: form.username,
     });
 
     if (completeData && completeData.message) {
+      toast.success(completeData?.message || "Signup Completed successfully");
       navigate("/signin");
     }
   };
@@ -266,6 +276,20 @@ export default function Signup() {
             {/* Remaining fields - phone, password, confirm password */}
             <div>
               <label className="block mb-1 text-gray-700 font-medium">
+                Username
+              </label>
+              <input
+                type="text"
+                value={form.username}
+                placeholder="Rohan"
+                onChange={(e) => setForm({ ...form, username: e.target.value })}
+                required
+                disabled={!otpVerified}
+                className="w-full px-4 py-2 border text-black rounded focus:outline-none focus:ring-2 focus:ring-[#7C0902] transition"
+              />
+            </div>
+            <div>
+              <label className="block mb-1 text-gray-700 font-medium">
                 Phone Number
               </label>
               <input
@@ -339,7 +363,7 @@ export default function Signup() {
             </button>
             {completeError && (
               <p className="text-red-600">
-                {completeError?.data?.message || "Signup failed"}
+                {completeError?.data?.errors || "Signup failed"}
               </p>
             )}
           </form>

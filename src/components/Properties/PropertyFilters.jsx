@@ -26,21 +26,16 @@ const FilterSection = ({ title, open, setOpen, children }) => {
   );
 };
 
-export default function PropertyFilters({ isOpen, onClose }) {
-  const [filters, setFilters] = useState({
-    bhk: [],
-    propertyType: [],
-    roomSize: { min: "", max: "" },
-    priceRange: [500, 50000],
-    furnishing: [],
-    availability: [],
-    bathrooms: [],
-    parking: [],
-    facing: [],
-    advance: [],
-    tenant: [],
-  });
-
+export default function PropertyFilters({
+  isOpen,
+  onClose,
+  resetCategory,
+  handlePriceChange,
+  handleInputChange,
+  handleCheckboxChange,
+  filters,
+  setFilters,
+}) {
   const [sections, setSections] = useState({
     bhk: true,
     propertyType: true,
@@ -55,41 +50,12 @@ export default function PropertyFilters({ isOpen, onClose }) {
     tenant: true,
   });
 
-  const handleCheckboxChange = (key, value) => {
-    setFilters((prev) => {
-      const arr = prev[key];
-      const updated = arr.includes(value)
-        ? arr.filter((v) => v !== value)
-        : [...arr, value];
-      const newFilters = { ...prev, [key]: updated };
-      console.log(newFilters);
-      return newFilters;
-    });
-  };
-
-  const handleInputChange = (key, field, value) => {
-    setFilters((prev) => {
-      const updated = { ...prev[key], [field]: value };
-      const newFilters = { ...prev, [key]: updated };
-      console.log(newFilters);
-      return newFilters;
-    });
-  };
-
-  const handlePriceChange = (range) => {
-    setFilters((prev) => {
-      const newFilters = { ...prev, priceRange: range };
-      console.log(newFilters);
-      return newFilters;
-    });
-  };
-
   const resetFilters = () => {
     const resetState = {
       bhk: [],
       propertyType: [],
       roomSize: { min: "", max: "" },
-      priceRange: [500, 50000],
+      priceRange: [],
       furnishing: [],
       availability: [],
       bathrooms: [],
@@ -97,6 +63,7 @@ export default function PropertyFilters({ isOpen, onClose }) {
       facing: [],
       advance: [],
       tenant: [],
+      parking: [],
     };
     setFilters(resetState);
     console.log("Filters reset:", resetState);
@@ -142,7 +109,7 @@ export default function PropertyFilters({ isOpen, onClose }) {
               open={sections.bhk}
               setOpen={(v) => setSections((p) => ({ ...p, bhk: v }))}
             >
-              {[1, 2, 3, 4].map((bhk) => (
+              {["1 BHK", "2 BHK", "3 BHK", "4+"].map((bhk) => (
                 <label
                   key={bhk}
                   className="flex  text-black items-center gap-2"
@@ -152,7 +119,8 @@ export default function PropertyFilters({ isOpen, onClose }) {
                     checked={filters.bhk.includes(bhk)}
                     onChange={() => handleCheckboxChange("bhk", bhk)}
                   />
-                  {`${bhk} ${bhk >= 4 ? "BHK+" : "BHK"}`}
+                  {bhk}
+                  {bhk >= "4+" ? " BHK" : ""}
                 </label>
               ))}
             </FilterSection>
@@ -182,7 +150,7 @@ export default function PropertyFilters({ isOpen, onClose }) {
               open={sections.tenant}
               setOpen={(v) => setSections((p) => ({ ...p, tenant: v }))}
             >
-              {["Family", "Bachelors Male", "Bachelors female"].map(
+              {["Family", "Bachelors male", "Bachelors female"].map(
                 (tenant) => (
                   <label
                     key={tenant}

@@ -15,6 +15,7 @@ import PropertyDetailsPage from "../pages/PropertyDetailsPage";
 import Wishlist from "../pages/Wishlist";
 import ProfilePage from "../pages/ProfilePage";
 import ConventionPage from "../pages/ConventionPage";
+import ResortFarmHousePage from "../pages/ResortFarmHousePage";
 
 export default function AppRoutes() {
   return (
@@ -23,6 +24,7 @@ export default function AppRoutes() {
       <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
         <Route path="/convention" element={<ConventionPage />} />
+        <Route path="/farm-resort" element={<ResortFarmHousePage />} />
         <Route path="/propertydetails/:id" element={<PropertyDetailsPage />} />
         <Route path="/support" element={<SupportPage />} />
         <Route path="/about" element={<AboutPage />} />

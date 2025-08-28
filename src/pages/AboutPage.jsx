@@ -30,7 +30,7 @@ const sliderSettings = {
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-gray-50 py-16 px-6 mt-8 max-w-7xl mx-auto flex flex-col gap-16">
+    <div className="min-h-screen bg-gray-50 py-16 px-6 mt-16 max-w-7xl mx-auto flex flex-col gap-16">
       {/* Top Section: Header + Slider */}
       <div className="md:flex md:gap-12 items-center">
         {/* Left Header Details */}
@@ -40,7 +40,7 @@ export default function AboutPage() {
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
         >
-          <h1 className="text-5xl font-extrabold text-[#7C0902] mb-4 leading-tight">
+          <h1 className="text-4xl font-extrabold text-[#7C0902] mb-4 leading-tight">
             About Us
           </h1>
           <p className="text-gray-700 text-lg mb-6 leading-relaxed">

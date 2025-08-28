@@ -6,18 +6,23 @@ import { useAuth } from "../contexts/AuthContext";
 import logo from "../assets/clogo.png";
 import { BiHeart } from "react-icons/bi";
 import { FaLocationPin, FaLocationPinLock } from "react-icons/fa6";
+import { useNavbar } from "../contexts/NavbarContext";
+import { useGetWishlistStatsQuery } from "../redux/api/propertyApi";
 
 export default function Navbar() {
   const { user } = useAuth();
+  const { data, isLoading, error } = useGetWishlistStatsQuery();
+  const { activeMain, setActiveMain, activeButton, setActiveButton } =
+    useNavbar();
   const navigate = useNavigate();
-  const location = useLocation(); // get current route
+  const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [active, setActive] = useState("Home");
+  // const [active, setActive] = useState("Home");
 
-  const path = !user ? "/" : "/";
   const navItems = [
     { name: "Home", path: "/" },
-    { name: "Convention Space", path: "/convention" },
+    { name: "Convention/Function Hall", path: "/convention" },
+    { name: "Resort/Farm House", path: "/farm-resort" },
     { name: "About Us", path: "/about" },
     { name: "Support", path: "/support" },
   ];
@@ -25,24 +30,27 @@ export default function Navbar() {
   // Example wishlist count
   const wishlistCount = 3;
 
-  // Set active based on current path
   useEffect(() => {
     const currentItem = navItems.find(
       (item) => item.path === location.pathname
     );
-    if (currentItem) {
-      setActive(currentItem.name);
-    } else {
-      setActive(null); // No active if route not in navItems
-    }
-  }, [location.pathname, navItems]);
+    if (currentItem) setActiveMain(currentItem.name);
+  }, [location.pathname]);
 
-  const handleClick = (item) => {
-    setActive(item.name);
-    setIsMobileMenuOpen(false);
+  // Optional: sync activeButton when activeMain changes so buttons highlight accordingly
+  useEffect(() => {
+    if (activeMain === "Home") setActiveButton("tolet");
+    else if (activeMain === "Convention/Function Hall")
+      setActiveButton("convention");
+    else if (activeMain === "Resort/Farm House") setActiveButton("resort");
+    else setActiveButton(null);
+  }, [activeMain, setActiveButton]);
+
+  const handleClickMain = (item) => {
+    setActiveMain(item.name);
+    setActiveButton(null);
     navigate(item.path);
   };
-
   return (
     <>
       {/* Navbar */}
@@ -58,13 +66,13 @@ export default function Navbar() {
           </div>
 
           {/* Nav Items */}
-          <ul className="hidden md:flex gap-6 items-center flex-1 justify-center">
+          <ul className="hidden md:flex gap-2 items-center flex-1 justify-center">
             {navItems.map((item) => (
               <li
                 key={item.name}
-                onClick={() => handleClick(item)}
-                className={`cursor-pointer font-medium px-4 py-2 rounded ${
-                  active === item.name
+                onClick={() => handleClickMain(item)}
+                className={`cursor-pointer font-medium text-sm px-4 py-2 rounded ${
+                  activeMain === item.name
                     ? "text-white bg-[#7C0902]"
                     : "text-black hover:text-[#7C0902]"
                 }`}
@@ -84,9 +92,9 @@ export default function Navbar() {
               <BiHeart className="w-6 h-6" />
 
               {/* Badge */}
-              {wishlistCount > 0 && (
+              {data?.data?.length > 0 && (
                 <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
-                  {wishlistCount}
+                  {data?.data?.length}
                 </span>
               )}
             </button>

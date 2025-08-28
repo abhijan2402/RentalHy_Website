@@ -9,11 +9,15 @@ import {
   Button,
   message,
   Radio,
+  Checkbox,
 } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
+import { useAddPropertyMutation } from "../../redux/api/propertyApi";
+import { toast } from "react-toastify";
+import { usePropertyFilters } from "../../hooks/usePropertyFilters";
 
 const { Option } = Select;
-
+const { Group: CheckboxGroup } = Checkbox;
 const normFile = (e) => {
   // Antd's Upload event normalization for form value
   if (Array.isArray(e)) {
@@ -21,10 +25,20 @@ const normFile = (e) => {
   }
   return e && e.fileList;
 };
+const bhkOptions = ["1RK", "1BHK", "2BHK", "3BHK", "4BHK+", "5BHK+"];
 
+const furnishingOptions = ["Furnished", "Semi-furnished", "Unfurnished"];
+
+const tenantOptions = ["Family", "Bachelors male", "Bachelors female"];
+
+const availabilityOptions = ["Ready to Move", "Under Construction"];
+
+const advanceOptions = ["1 month", "2 months", "3 months+"];
 const AddPropertyModal = ({ showModal, onClose }) => {
   const horizontalScrollClass =
     "flex gap-2 overflow-x-auto flex-nowrap md:overflow-x-visible md:flex-wrap";
+
+  const [addProperty, { isLoading }] = useAddPropertyMutation();
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
 
@@ -45,27 +59,78 @@ const AddPropertyModal = ({ showModal, onClose }) => {
     setFileList(newFileList.slice(0, 5)); // limit max 5 images
   };
 
-  const onFinish = (values) => {
+  const onFinish = async (values) => {
+    console.log(values);
     if (!values.images || values.images.length === 0) {
-      message.error("Please upload at least one property image.");
+      toast.error("Please upload at least one property image.");
       return;
     }
-    // Prepare image info (name and uid)
-    const imagesInfo = values.images.map((file) => ({
-      name: file.name,
-      uid: file.uid,
-      // optionally url: file.url or preview
-    }));
 
-    const dataToSubmit = {
-      ...values,
-      images: imagesInfo,
-    };
+    const validAvailabilityOptions = ["Ready to Move", "Under Construction"];
+    const validAdvanceOptions = ["1 month", "2 months", "3 months+"];
 
-    console.log("Submitted data:", dataToSubmit);
-    form.resetFields();
-    setFileList([]);
-    onClose();
+    const formData = new FormData();
+
+    try {
+      // Add amenities (do this BEFORE looping other fields)
+      if (values.amenities) {
+        const amenityObj = {};
+        values.amenities.forEach(({ amenityKey, amenityValue }) => {
+          if (amenityKey) amenityObj[amenityKey] = amenityValue;
+        });
+        // Append as JSON string (for a key-value object)
+        formData.append("amenities", JSON.stringify(amenityObj));
+      }
+
+      Object.entries(values).forEach(([key, value]) => {
+        if (key === "images" || key === "amenities") return; // skip amenities/images, already added
+
+        if (Array.isArray(value)) {
+          if (key === "availability" || key === "advance") {
+            const firstValid = value.find((v) =>
+              (key === "availability"
+                ? validAvailabilityOptions
+                : validAdvanceOptions
+              ).includes(v)
+            );
+            if (!firstValid) throw new Error(`Invalid ${key} selected`);
+            formData.append(key, firstValid);
+          } else {
+            value.forEach((val, idx) => {
+              formData.append(`${key}[${idx}]`, val);
+            });
+          }
+        } else {
+          if (
+            key === "availability" &&
+            !validAvailabilityOptions.includes(value)
+          ) {
+            throw new Error("Invalid availability selected");
+          }
+          if (key === "advance" && !validAdvanceOptions.includes(value)) {
+            throw new Error("Invalid advance selected");
+          }
+          if (key === "price" || key === "area_sqft") {
+            formData.append(key, value?.toString() || "");
+          } else {
+            formData.append(key, value);
+          }
+        }
+      });
+
+      values.images.forEach((fileObj, idx) => {
+        const file = fileObj.originFileObj || fileObj;
+        formData.append(`images[${idx}]`, file);
+      });
+
+      await addProperty(formData).unwrap();
+      toast.success("Property added successfully!");
+      form.resetFields();
+      setFileList([]);
+      onClose();
+    } catch (error) {
+      toast.error(error.message || "Failed to add property. Please try again.");
+    }
   };
 
   return (
@@ -88,15 +153,16 @@ const AddPropertyModal = ({ showModal, onClose }) => {
         layout="vertical"
         onFinish={onFinish}
         initialValues={{
-          bhk: "",
-          type: "",
-          furnishing: "",
+          property_type: "",
           bathrooms: "",
-          availability: "",
           parking: "",
           facing: "",
+          bhk: [],
+          furnishing_status: [],
+          preferred_tenant_type: [],
+          availability: "",
           advance: "",
-          tenant: "",
+          amenities: [{ amenityKey: "", amenityValue: "" }],
         }}
       >
         {/* Property Title */}
@@ -118,14 +184,17 @@ const AddPropertyModal = ({ showModal, onClose }) => {
         </Form.Item>
 
         {/* Preferred Tenant */}
-        <Form.Item label="Preferred Tenant" name="tenant">
-          <Radio.Group className={horizontalScrollClass}>
-            {["Family", "Bachelors Male", "Bachelors Female"].map((opt) => (
-              <Radio.Button key={opt} value={opt}>
-                {opt}
-              </Radio.Button>
-            ))}
-          </Radio.Group>
+        <Form.Item
+          label="Preferred Tenant"
+          name="preferred_tenant_type"
+          rules={[
+            {
+              required: true,
+              message: "Please select at least one tenant type",
+            },
+          ]}
+        >
+          <CheckboxGroup options={tenantOptions} />
         </Form.Item>
 
         {/* Price */}
@@ -159,7 +228,7 @@ const AddPropertyModal = ({ showModal, onClose }) => {
         {/* Area Sq.ft */}
         <Form.Item
           label="Area (sq ft)"
-          name="area"
+          name="area_sqft"
           rules={[{ type: "number", min: 0, message: "Area must be positive" }]}
         >
           <InputNumber
@@ -173,26 +242,17 @@ const AddPropertyModal = ({ showModal, onClose }) => {
         <Form.Item
           label="BHK"
           name="bhk"
-          rules={[{ required: true, message: "Please select BHK" }]}
+          rules={[
+            { required: true, message: "Please select at least one BHK" },
+          ]}
         >
-          <Radio.Group
-            optionType="button"
-            buttonStyle="solid"
-            className="w-full flex-row-scroll"
-          >
-            <Radio.Button value="1RK">1RK</Radio.Button>
-            <Radio.Button value="1BHK">1BHK</Radio.Button>
-            <Radio.Button value="2BHK">2BHK</Radio.Button>
-            <Radio.Button value="3BHK">3BHK</Radio.Button>
-            <Radio.Button value="4BHK+">4BHK</Radio.Button>
-            <Radio.Button value="4BHK+">5BHK+</Radio.Button>
-          </Radio.Group>
+          <CheckboxGroup options={bhkOptions} />
         </Form.Item>
 
         {/* Property Type */}
         <Form.Item
           label="Property Type"
-          name="type"
+          name="property_type"
           rules={[{ required: true, message: "Please select property type" }]}
         >
           <Radio.Group className={horizontalScrollClass}>
@@ -205,14 +265,14 @@ const AddPropertyModal = ({ showModal, onClose }) => {
         </Form.Item>
 
         {/* Furnishing Status */}
-        <Form.Item label="Furnishing Status" name="furnishing">
-          <Radio.Group className={horizontalScrollClass}>
-            {["Furnished", "Semi-furnished", "Unfurnished"].map((opt) => (
-              <Radio.Button key={opt} value={opt}>
-                {opt}
-              </Radio.Button>
-            ))}
-          </Radio.Group>
+        <Form.Item
+          label="Furnishing Status"
+          name="furnishing_status"
+          rules={[
+            { required: true, message: "Please select furnishing status" },
+          ]}
+        >
+          <CheckboxGroup options={furnishingOptions} />
         </Form.Item>
 
         {/* Bathrooms */}
@@ -227,18 +287,19 @@ const AddPropertyModal = ({ showModal, onClose }) => {
         </Form.Item>
 
         {/* Availability */}
-        <Form.Item label="Availability" name="availability">
-          <Radio.Group className={horizontalScrollClass}>
-            {["Ready to move", "Under Construction"].map((opt) => (
-              <Radio.Button key={opt} value={opt}>
-                {opt}
-              </Radio.Button>
-            ))}
+        <Form.Item
+          label="Availability"
+          name="availability"
+          rules={[{ required: true, message: "Please select availability" }]}
+        >
+          <Radio.Group>
+            <Radio value="Ready to Move">Ready to move</Radio>
+            <Radio value="Under Construction">Under Construction</Radio>
           </Radio.Group>
         </Form.Item>
 
         {/* Parking Available */}
-        <Form.Item label="Parking Available" name="parking">
+        <Form.Item label="Parking Available" name="parking_available">
           <Radio.Group className={horizontalScrollClass}>
             {["Bike", "Car", "Both", "None"].map((opt) => (
               <Radio.Button key={opt} value={opt}>
@@ -249,7 +310,7 @@ const AddPropertyModal = ({ showModal, onClose }) => {
         </Form.Item>
 
         {/* Facing */}
-        <Form.Item label="Facing" name="facing">
+        <Form.Item label="Facing" name="facing_direction">
           <Radio.Group className={horizontalScrollClass}>
             {["North", "East", "West", "South", "NE", "NW", "SE", "SW"].map(
               (opt) => (
@@ -262,15 +323,58 @@ const AddPropertyModal = ({ showModal, onClose }) => {
         </Form.Item>
 
         {/* Advance */}
-        <Form.Item label="Advance" name="advance">
-          <Radio.Group className={horizontalScrollClass}>
-            {["1 Month", "2 Months", "3+ Months"].map((opt) => (
-              <Radio.Button key={opt} value={opt}>
-                {opt}
-              </Radio.Button>
-            ))}
+        <Form.Item
+          label="Advance"
+          name="advance"
+          rules={[{ required: true, message: "Please select advance" }]}
+        >
+          <Radio.Group>
+            <Radio value="1 month">1 Month</Radio>
+            <Radio value="2 months">2 Months</Radio>
+            <Radio value="3 months+">3 Months+</Radio>
           </Radio.Group>
         </Form.Item>
+
+        {/* Amenities */}
+        <Form.List name="amenities">
+          {(fields, { add, remove }) => (
+            <>
+              {fields.map(({ key, name, ...restField }) => (
+                <div
+                  key={key}
+                  style={{ display: "flex", gap: 8, marginBottom: 8 }}
+                >
+                  <Form.Item
+                    {...restField}
+                    name={[name, "amenityKey"]}
+                    rules={[
+                      { required: true, message: "Amenity name required" },
+                    ]}
+                  >
+                    <Input placeholder="Amenity Name (e.g. Death road)" />
+                  </Form.Item>
+                  <Form.Item
+                    {...restField}
+                    name={[name, "amenityValue"]}
+                    rules={[
+                      { required: true, message: "Amenity value required" },
+                    ]}
+                  >
+                    <Input placeholder="Value (e.g. yes)" />
+                  </Form.Item>
+                  <Button danger onClick={() => remove(name)}>
+                    Remove
+                  </Button>
+                </div>
+              ))}
+              <Form.Item>
+                <Button type="dashed" onClick={() => add()} block>
+                  Add Amenity
+                </Button>
+              </Form.Item>
+            </>
+          )}
+        </Form.List>
 
         {/* Images Upload */}
         <Form.Item

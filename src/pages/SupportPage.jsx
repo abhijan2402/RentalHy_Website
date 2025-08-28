@@ -38,7 +38,7 @@ export default function SupportPage() {
   };
 
   return (
-    <div className="min-h-screen mt-8 bg-gray-50 px-6 py-16 max-w-7xl mx-auto">
+    <div className="min-h-screen mt-16 bg-gray-50 px-6 py-16 max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <motion.div

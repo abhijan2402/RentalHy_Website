@@ -1,17 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { propertyData } from "../../utils/propertydata";
 import { useNavigate } from "react-router-dom";
-import { FaHeart, FaMapMarkerAlt, FaPlus } from "react-icons/fa";
+import { FaHeart, FaMapMarkerAlt, FaSpinner } from "react-icons/fa";
 import AddPropertyModal from "./AddPropertyModal";
 import { useAuth } from "../../contexts/AuthContext";
-import { BiHomeAlt2 } from "react-icons/bi";
+import { BiErrorCircle } from "react-icons/bi";
 import { HiHome } from "react-icons/hi2";
 import PropertFilterSlider from "./PropertFilterSlider";
 import Pagination from "../Pagination";
 import { MdFilterList } from "react-icons/md";
+import { useAddToWishlistMutation } from "../../redux/api/propertyApi";
+import { motion } from "framer-motion";
+import { convertToIST } from "../../utils/utils";
+import { TbDatabaseOff } from "react-icons/tb";
+import { usePropertyFilters } from "../../hooks/usePropertyFilters";
+import PropertyFilters from "./PropertyFilters";
 
 const sliderSettings = {
   dots: true,
@@ -26,64 +31,241 @@ const sliderSettings = {
 export default function PropertyList({ setOpenFilters, openFilters }) {
   const navigate = useNavigate();
   const { user } = useAuth();
-
-  const wishlist = !user ? "/signin" : "/wishlist";
+  const [addWhislist] = useAddToWishlistMutation();
+  const {
+    data,
+    propertyData,
+    error,
+    isLoading,
+    search,
+    searchKeyword,
+    sort,
+    perpage,
+    handleSearchInputChange,
+    handleSearchButton,
+    handleSortChange,
+    handleItemsPerPage,
+    resetCategory,
+    handlePriceChange,
+    handleInputChange,
+    handleCheckboxChange,
+    filters,
+    setFilters,
+  } = usePropertyFilters();
 
   const [showModal, setShowModal] = useState(false);
+  const properties = data?.data?.data ?? [];
+  console.log(propertyData);
+  // const totalItems = 20 || 0;
+  // const totalPages = Math.ceil(totalItems / (2 || 1));
+  // const [currentPage, setCurrentPage] = useState(data?.data?.current_page || 1);
+  // const totalItems = 100 || 0;
+  // const totalPages = Math.ceil(totalItems / (data?.data?.per_page || 1));
+ const [currentPage, setCurrentPage] = useState(1);
 
-  const [search, setSearch] = useState("");
-  const [searchKeyword, setSearchKeyword] = useState(""); // triggered search
-  const [sort, setSort] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(8);
+ useEffect(() => {
+   if (data?.data?.current_page) {
+     setCurrentPage(data.data.current_page);
+   }
+ }, [data]);
+  const totalItems = data?.data?.total;
+  const totalPages = Math.max(1, Math.ceil(totalItems / data?.data?.per_page));
+  console.log(data);
 
-  // Normalize prices for sorting
-  const normalizedProperties = propertyData.map((p) => ({
-    ...p,
-    numPrice:
-      typeof p.price === "string" && p.price[0] === "$"
-        ? Number(p.price.replace(/[^0-9.-]+/g, ""))
-        : Number(p.price),
-  }));
+  const handleWishlistToggle = (id) => {
+    console.log(id);
+    addWhislist(id)
+      .unwrap()
+      .then(() => {
+        toast.success("Wishlist updated!");
+      })
+      .catch(() => {
+        toast.error("Failed to update wishlist");
+      });
+  };
 
-  // Triggered filtering
-  const sortedProperties = [...normalizedProperties]
-    .filter(
-      (p) =>
-        p.title.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-        p.location.toLowerCase().includes(searchKeyword.toLowerCase())
-    )
-    .sort((a, b) => {
-      if (sort === "low-high") return a.numPrice - b.numPrice;
-      if (sort === "high-low") return b.numPrice - a.numPrice;
-      if (sort === "newest")
-        return new Date(b.date).getTime() - new Date(a.date).getTime();
-      if (sort === "oldest")
-        return new Date(a.date).getTime() - new Date(b.date).getTime();
-      return 0;
-    });
-
-  // Handler toggles
-  const isSearching = searchKeyword !== "";
-
-  function handleButton() {
-    if (!isSearching && search.trim() !== "") {
-      setSearchKeyword(search);
-    } else {
-      // Reset
-      setSearch("");
-      setSearchKeyword("");
+  const renderState = () => {
+    if (isLoading) {
+      return (
+        <div className="flex flex-col  items-center justify-center h-[60vh] text-gray-600 gap-3">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+          >
+            <FaSpinner size={40} className="text-[#7C0902]" />
+          </motion.div>
+          <p className="text-lg font-medium">Loading properties...</p>
+        </div>
+      );
     }
-  }
 
-  // Pagination Methods
-  const totalItems = sortedProperties.length;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
+    if (error) {
+      return (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col items-center justify-center h-[60vh] text-red-600 gap-3"
+        >
+          <BiErrorCircle size={50} />
+          <p className="text-lg font-semibold">Something went wrong</p>
+          <p className="text-sm text-gray-500">Please try again later</p>
+        </motion.div>
+      );
+    }
 
-  // Calculate items for current page
-  const startIdx = (currentPage - 1) * itemsPerPage;
-  const endIdx = currentPage * itemsPerPage;
-  const pageProperties = sortedProperties.slice(startIdx, endIdx);
+    if (properties?.length === 0) {
+      return (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="flex flex-col items-center justify-center h-[60vh] text-gray-500 gap-3"
+        >
+          <TbDatabaseOff size={50} />
+          <p className="text-lg font-medium">No properties found</p>
+        </motion.div>
+      );
+    }
+
+    return (
+      <div className="max-w-7xl mx-auto flex flex-col gap-6 w-full">
+        {/* Property List */}
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          {properties?.map((property) => (
+            <div
+              key={property.id}
+              className="bg-white border rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow flex flex-col"
+            >
+              <div className="relative">
+                <Slider {...sliderSettings}>
+                  {(property.images ?? []).map((img, idx) => (
+                    <img
+                      key={idx}
+                      src={img?.image_url || "/placeholder.jpg"}
+                      alt={property.title}
+                      className="w-full h-56 object-cover"
+                      draggable="false"
+                      onClick={() =>
+                        !user
+                          ? navigate("/signin")
+                          : navigate(`/propertydetails/${property.id}`)
+                      }
+                    />
+                  ))}
+                </Slider>
+                <span className="absolute top-2 left-2 bg-white/80 text-xs px-3 py-1 rounded shadow font-bold text-gray-700 flex items-center gap-1">
+                  <FaMapMarkerAlt className="text-red-500" />
+                  {property.location}
+                </span>
+                <button
+                  className={`absolute bottom-3 right-3 rounded-full border p-2 shadow-md flex items-center justify-center transition
+        ${
+          property?.is_wishlist
+            ? "bg-[#7C0902] border-[#7C0902]"
+            : "bg-white border-gray-300"
+        }
+        hover:bg-[#FFEDF0] hover:border-[#E11D48] group`}
+                  aria-label={
+                    property?.is_wishlist
+                      ? "Remove from wishlist"
+                      : "Add to wishlist"
+                  }
+                  onClick={() => handleWishlistToggle(property.id)}
+                >
+                  <FaHeart
+                    className={`text-lg transition-transform duration-150 group-hover:scale-110 ${
+                      property?.is_wishlist
+                        ? "text-red-500"
+                        : "text-gray-400 hover:text-red-500"
+                    }`}
+                  />
+                </button>
+              </div>
+              <div className="flex-1 flex flex-col p-4">
+                <h3 className="font-bold text-lg text-gray-900 truncate">
+                  {property.title}
+                </h3>
+                <ul className="flex flex-wrap gap-2 mt-1 mb-3">
+                  <li className="text-xs bg-gray-100 px-3 py-1 rounded-full text-gray-700 font-medium">
+                    {property.bhk}
+                  </li>
+                  <li className="text-xs bg-gray-100 px-3 py-1 rounded-full text-gray-700 font-medium">
+                    {property.availability}
+                  </li>
+                </ul>
+                <div className="mb-2">
+                  <span className="text-xl font-semibold text-[#7C0902]">
+                    {/* {property.price >= 100000
+                      ? `$${property.price.toLocaleString()}`
+                      : `₹${property.price.toLocaleString()}`} */}
+                    ₹{property.price.toLocaleString()}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <p className="text-xs text-gray-400 mb-2">
+                    <span className="text-black">Address:</span>{" "}
+                    {property.location}
+                  </p>
+                </div>
+                <div className="flex justify-between">
+                  <p className="text-xs text-gray-400 mb-2">
+                    Posted: {convertToIST(property.created_at)}
+                  </p>
+                  <p className="text-xs text-[#7C0902] mb-2">
+                    {property.status === 1 ? " Verified" : null}
+                  </p>
+                </div>
+
+                {/* Button at bottom */}
+                <div className="mt-auto w-full">
+                  <a
+                    onClick={() =>
+                      !user
+                        ? navigate("/signin")
+                        : navigate(`/propertydetails/${property.id}`)
+                    }
+                    className="w-full block text-center cursor-pointer bg-[#7C0902] text-white px-5 py-2 rounded-lg font-semibold text-sm shadow hover:bg-[#600601] transition-colors"
+                  >
+                    View Details
+                  </a>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="flex flex-col md:flex-row mt-4 justify-between items-center gap-4">
+          {/* Items per page selector */}
+          <div className="flex items-center space-x-2">
+            <label htmlFor="per-page" className="text-[#7C0902] text-sm">
+              Items per page:
+            </label>
+            <select
+              id="per-page"
+              value={data?.data?.per_page}
+              onChange={(e) => handleItemsPerPage(e.target.value)}
+              className="border border-gray-300 text-[#7C0902] rounded px-2 py-1 text-sm"
+            >
+              {[2, 5, 10, 20, 50].map((num) => (
+                <option key={num} value={num}>
+                  {num}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Pagination Buttons */}
+          <div>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={(page) =>
+                setCurrentPage(Math.max(1, Math.min(page, totalPages)))
+              }
+            />
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="flex-1 bg-gray-50 min-h-screen px-2">
@@ -96,18 +278,16 @@ export default function PropertyList({ setOpenFilters, openFilters }) {
             placeholder="Search by title or location..."
             className="w-full border border-gray-300 rounded px-4 py-2 text-sm pr-20 focus:ring-1 focus:ring-[#7C0902] outline-none"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") handleButton();
-            }}
+            onChange={handleSearchInputChange}
+            onKeyDown={(e) => e.key === "Enter" && handleSearchButton()}
           />
           <button
-            onClick={handleButton}
+            onClick={handleSearchButton}
             className={`absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1 rounded 
-            ${isSearching ? "bg-gray-400" : "bg-[#7C0902]"}
+            ${searchKeyword ? "bg-gray-400" : "bg-[#7C0902]"}
             text-white text-sm font-medium`}
           >
-            {isSearching ? "Reset" : "Search"}
+            {searchKeyword ? "Reset" : "Search"}
           </button>
         </div>
         {/* Sorting */}
@@ -115,13 +295,13 @@ export default function PropertyList({ setOpenFilters, openFilters }) {
           <select
             className="w-full appearance-none border border-gray-300 rounded-lg px-4 py-2 text-sm text-gray-700 bg-white focus:ring-1 focus:ring-[#7C0902] focus:border-[#7C0902] outline-none pr-8"
             value={sort}
-            onChange={(e) => setSort(e.target.value)}
+            onChange={handleSortChange}
           >
             <option value="">Sort by</option>
-            <option value="low-high">Price: Low to High</option>
-            <option value="high-low">Price: High to Low</option>
-            <option value="newest">Newest First</option>
-            <option value="oldest">Oldest First</option>
+            <option value="price_low_to_high">Price: Low to High</option>
+            <option value="price_high_to_low">Price: High to Low</option>
+            <option value="newest_first">Newest First</option>
+            <option value="oldest_first">Oldest First</option>
           </select>
           {/* Custom dropdown icon */}
           <svg
@@ -157,107 +337,15 @@ export default function PropertyList({ setOpenFilters, openFilters }) {
       </div>
 
       {/* Filters silding Tab */}
-      <PropertFilterSlider />
-
-      {/* Property List */}
-      <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-        {pageProperties.map((property) => (
-          <div
-            key={property.id}
-            className="bg-white border rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow flex flex-col"
-          >
-            <div className="relative">
-              <Slider {...sliderSettings}>
-                {property.images.map((img, idx) => (
-                  <img
-                    key={idx}
-                    src={img}
-                    alt={property.title}
-                    className="w-full h-56 object-cover"
-                    draggable="false"
-                    onClick={() =>
-                      !user
-                        ? navigate("/signin")
-                        : navigate(`/propertydetails/${property.id}`)
-                    }
-                  />
-                ))}
-              </Slider>
-              <span className="absolute top-2 left-2 bg-white/80 text-xs px-3 py-1 rounded shadow font-bold text-gray-700 flex items-center gap-1">
-                <FaMapMarkerAlt className="text-red-500" />
-                {property.location}
-              </span>
-              <button
-                className="absolute bottom-3 right-3 bg-[#7C0902] rounded-full border border-[#7C0902] p-2 shadow-md flex items-center justify-center transition hover:bg-[#FFEDF0] hover:border-[#E11D48] group"
-                // onClick={handleWishlistToggle} // Optional: handle add/remove action
-                aria-label="Add to wishlist"
-              >
-                <FaHeart
-                  className="text-white text-lg hover:text-red-500 transition-transform duration-150 group-hover:scale-110"
-                  // You can add conditional coloring for "active" state
-                />
-              </button>
-            </div>
-            <div className="flex-1 flex flex-col p-4">
-              <h3 className="font-bold text-lg text-gray-900 truncate">
-                {property.title}
-              </h3>
-              <ul className="flex flex-wrap gap-2 mt-1 mb-3">
-                {property.features?.map((feature, idx) => (
-                  <li
-                    key={idx}
-                    className="text-xs bg-gray-100 px-3 py-1 rounded-full text-gray-700 font-medium"
-                  >
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-              <div className="mb-2">
-                <span className="text-xl font-semibold text-[#7C0902]">
-                  {property.price >= 100000
-                    ? `$${property.price.toLocaleString()}`
-                    : `₹${property.price.toLocaleString()}`}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <p className="text-xs text-gray-400 mb-2">
-                  <span className="text-black">Address:</span>{" "}
-                  {property.location}
-                </p>
-              </div>
-              <div className="flex justify-between">
-                <p className="text-xs text-gray-400 mb-2">
-                  Posted: {property.date}
-                </p>
-                <p className="text-xs text-[#7C0902] mb-2">
-                  {property.status === true ? " Verified" : null}
-                </p>
-              </div>
-
-              {/* Button at bottom */}
-              <div className="mt-auto w-full">
-                <a
-                  onClick={() =>
-                    !user
-                      ? navigate("/signin")
-                      : navigate(`/propertydetails/${property.id}`)
-                  }
-                  className="w-full block text-center cursor-pointer bg-[#7C0902] text-white px-5 py-2 rounded-lg font-semibold text-sm shadow hover:bg-[#600601] transition-colors"
-                >
-                  View Details
-                </a>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={(page) => {
-          if (page >= 1 && page <= totalPages) setCurrentPage(page);
-        }}
+      <PropertFilterSlider
+        filters={filters}
+        handleCheckboxChange={handleCheckboxChange}
+        handleInputChange={handleInputChange}
+        handlePriceChange={handlePriceChange}
+        resetCategory={resetCategory}
       />
+
+      {renderState()}
       {/* Floating Add Button */}
       <button
         onClick={() => (!user ? navigate("/signin") : setShowModal(true))}
@@ -274,6 +362,18 @@ export default function PropertyList({ setOpenFilters, openFilters }) {
           onClose={() => setShowModal(false)}
         />
       )}
+
+      {/* Filters Modal */}
+      <PropertyFilters
+        isOpen={openFilters}
+        onClose={() => setOpenFilters(false)}
+        filters={filters}
+        handleCheckboxChange={handleCheckboxChange}
+        handleInputChange={handleInputChange}
+        handlePriceChange={handlePriceChange}
+        resetCategory={resetCategory}
+        setFilters={setFilters}
+      />
     </div>
   );
 }

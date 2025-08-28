@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { FiRefreshCw, FiX } from "react-icons/fi";
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
+import { usePropertyFilters } from "../../hooks/usePropertyFilters";
 
 const PRIMARY_COLOR = "#7C0902";
 
@@ -20,96 +21,16 @@ const tabs = [
   "Room Size",
 ];
 
-export default function PropertFilterSlider() {
-  const [filters, setFilters] = useState({
-    bhk: [],
-    propertyType: [],
-    roomSize: { min: "", max: "" },
-    priceRange: [5000, 50000],
-    furnishing: [],
-    availability: [],
-    bathrooms: [],
-    parking: [],
-    facing: [],
-    advance: [],
-    tenant: [],
-  });
+export default function PropertFilterSlider({
+  resetCategory,
+  handlePriceChange,
+  handleInputChange,
+  handleCheckboxChange,
+  filters
+}) {
+
 
   const [activeTab, setActiveTab] = useState(null); // open modal for this tab
-
-  const handleCheckboxChange = (key, value) => {
-    setFilters((prev) => {
-      const arr = prev[key];
-      const updated = arr.includes(value)
-        ? arr.filter((v) => v !== value)
-        : [...arr, value];
-      const newFilters = { ...prev, [key]: updated };
-      console.log(newFilters);
-      return newFilters;
-    });
-  };
-
-  const handleInputChange = (key, field, value) => {
-    setFilters((prev) => {
-      const updated = { ...prev[key], [field]: value };
-      const newFilters = { ...prev, [key]: updated };
-      console.log(newFilters);
-      return newFilters;
-    });
-  };
-
-  const handlePriceChange = (range) => {
-    setFilters((prev) => {
-      const newFilters = { ...prev, priceRange: range };
-      console.log(newFilters);
-      return newFilters;
-    });
-  };
-
-  const resetCategory = (tab) => {
-    setFilters((prev) => {
-      const reset = { ...prev };
-      switch (tab) {
-        case "BHK":
-          reset.bhk = [];
-          break;
-        case "Property Type":
-          reset.propertyType = [];
-          break;
-        case "Room Size":
-          reset.roomSize = { min: "", max: "" };
-          break;
-        case "Price":
-          reset.priceRange = [5000, 50000];
-          break;
-        case "Furnishing":
-          reset.furnishing = [];
-          break;
-        case "Availability":
-          reset.availability = [];
-          break;
-        case "Bathrooms":
-          reset.bathrooms = [];
-          break;
-        case "Parking":
-          reset.parking = [];
-          break;
-        case "Facing":
-          reset.facing = [];
-          break;
-        case "Advance":
-          reset.advance = [];
-          break;
-        case "Tenant":
-          reset.tenant = [];
-          break;
-        default:
-          break;
-      }
-      console.log("Reset:", reset);
-      return reset;
-    });
-  };
 
   function ToggleBox({ active, onClick, children }) {
     return (
@@ -136,14 +57,14 @@ export default function PropertFilterSlider() {
       case "BHK":
         return (
           <div className="flex gap-2 flex-wrap">
-            {[1, 2, 3, 4].map((bhk) => (
+            {["1 BHK", "2 BHK", "3 BHK", "4+", ""].map((bhk) => (
               <ToggleBox
                 key={bhk}
                 active={filters.bhk.includes(bhk)}
                 onClick={() => handleCheckboxChange("bhk", bhk)}
               >
                 {bhk}
-                {bhk >= 4 ? " BHK+" : " BHK"}
+                {bhk >= "5+" ? " BHK" : ""}
               </ToggleBox>
             ))}
           </div>
@@ -205,7 +126,7 @@ export default function PropertFilterSlider() {
             <Slider
               range
               min={0}
-              max={100000}
+              max={500000}
               step={1000}
               value={filters.priceRange}
               onChange={handlePriceChange}
@@ -323,10 +244,10 @@ export default function PropertFilterSlider() {
           </div>
         );
 
-      case "Tenant Type":
+      case "Preferred Tenant Type":
         return (
           <div className="flex gap-2 flex-wrap">
-            {["Family", "Bachelors Male", "Bachelors Female"].map((tenant) => (
+            {["Family", "Bachelors male", "Bachelors female"].map((tenant) => (
               <ToggleBox
                 key={tenant}
                 active={filters.tenant.includes(tenant)}
@@ -427,7 +348,6 @@ export default function PropertFilterSlider() {
               <button
                 className="px-4 py-2 bg-[#7C0902] text-[14px] text-white rounded hover:bg-[#a01002] transition"
                 onClick={() => {
-                  // Apply filters logic (if needed, may be automatic on change)
                   setActiveTab(null);
                 }}
               >

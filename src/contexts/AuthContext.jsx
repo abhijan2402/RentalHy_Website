@@ -80,6 +80,7 @@ export function AuthProvider({ children }) {
         userId,
         setUserId,
         user,
+        setUser,
         signupEmail,
         verifyEmail,
         completeSignup,

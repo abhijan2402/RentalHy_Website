@@ -172,7 +172,7 @@ export default function PrivacyPolicy() {
               <br />
               Phone: +91-9782488408, +91-7976114618
               <br />
-              Address: 109-A Bajrangdeep colony, Jagatpura, Jaipur, 302022
+              109-A Bajrangdeep colony, Jagatpura, Jaipur, 302022
             </p>
           </section>
         </div>

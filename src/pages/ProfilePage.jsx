@@ -22,7 +22,7 @@ import {
   // baseUrl: import.meta.env.VITE_BASE_URL
 export default function ProfilePage() {
   
-  const { user, logout } = useAuth();
+  const { user, logout, setUser } = useAuth();
 
   const [editOpen, setEditOpen] = useState(false);
   const [imageEditOpen, setImageEditOpen] = useState(false);
@@ -60,6 +60,7 @@ export default function ProfilePage() {
       if (res && res.message) {
         toast.success("Profile updated successfully");
         setEditOpen(false);
+         setUser(res.user);
       } 
     } catch (err) {
       toast.error(err.data?.message || "Error updating profile");
@@ -67,7 +68,6 @@ export default function ProfilePage() {
   };
 
   const handleImageChange = (info) => {
-    console.log(info);
     if (info.file.status === "removed") {
       setImageFile(null);
       setImagePreview(null);
@@ -248,14 +248,27 @@ export default function ProfilePage() {
               toast.error("Please select an image to upload");
               return;
             }
+
             try {
               const imageFormData = new FormData();
               imageFormData.append("image", imageFile);
-              await uploadImage(imageFormData).unwrap();
-              toast.success("Profile image updated successfully");
-              setImageEditOpen(false);
+
+              // unwrap will return full API response
+              const res = await uploadImage(imageFormData).unwrap();
+
+              if (res?.status === "success") {
+                toast.success(
+                  res.message || "Profile image updated successfully"
+                );
+
+                setUser(res.user);
+
+                setImageEditOpen(false);
+              }
             } catch (error) {
-              toast.error("Failed to update profile image");
+              toast.error(
+                error?.data?.message || "Failed to update profile image"
+              );
             }
           }}
           disabled={!imageFile}

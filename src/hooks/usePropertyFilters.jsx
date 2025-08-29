@@ -15,12 +15,14 @@ export function usePropertyFilters() {
     facing: [],
     advance: [],
     tenant: [],
-    parking:[],
+    parking: [],
   });
   const [search, setSearch] = useState("");
   const [searchKeyword, setSearchKeyword] = useState("");
   const [sort, setSort] = useState("");
   const [perpage, setPerPage] = useState("");
+  const [pageno, setPageNo] = useState(1);
+  console.log(pageno);
   // _____________Manage States Ends Here______________________
 
   // *******************Manage APIs**********************
@@ -45,7 +47,10 @@ export function usePropertyFilters() {
   };
 
   // Fetch data
-  const { data, isLoading, error } = useGetPropertiesQuery(filterPayload);
+  const { data, isLoading, error } = useGetPropertiesQuery({
+    filterPayload,
+    pageno,
+  });
 
   // Property Listing Data
   const [propertyData, setPropertyData] = useState([]);
@@ -56,7 +61,7 @@ export function usePropertyFilters() {
     } else {
       setPropertyData([]);
     }
-  }, [data?.data?.data]);
+  }, [data?.data?.data, pageno, perpage]);
 
   // useEffect(() => {
   //   refetch();
@@ -199,5 +204,6 @@ export function usePropertyFilters() {
     handleSortChange,
     handleItemsPerPage,
     perpage,
+    setPageNo,
   };
 }

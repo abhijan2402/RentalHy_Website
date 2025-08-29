@@ -201,8 +201,7 @@ export default function ConventionHallList({ setOpenFilters, openFilters }) {
               </div>
               <div className="flex justify-between">
                 <p className="text-xs text-gray-400 mb-2">
-                  <span className="text-black">Address:</span>{" "}
-                  {property.location}
+                  <span className="text-black"></span> {property.location}
                 </p>
               </div>
               <div className="flex justify-between">
@@ -213,7 +212,7 @@ export default function ConventionHallList({ setOpenFilters, openFilters }) {
                   {property.status === true ? " Verified" : null}
                 </p>
               </div>
-             
+
               {/* Button at bottom */}
               <div className="mt-auto w-full">
                 <a

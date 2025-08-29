@@ -58,6 +58,12 @@ export default function Footer() {
           <h3 className="text-lg font-semibold mb-3">Legal</h3>
           <ul className="space-y-2 text-sm">
             <li
+              onClick={() => navigate("/about")}
+              className="hover:text-gray-300 transition cursor-pointer"
+            >
+              About
+            </li>
+            <li
               onClick={() => navigate("/privacy-policy")}
               className="hover:text-gray-300 transition cursor-pointer"
             >

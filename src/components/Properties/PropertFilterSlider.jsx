@@ -10,7 +10,7 @@ const PRIMARY_COLOR = "#7C0902";
 const tabs = [
   "BHK",
   "Property Type",
-  "Tenant Type",
+  "Preferred Tenant Type",
   "Price",
   "Furnishing",
   "Availability",
@@ -26,10 +26,8 @@ export default function PropertFilterSlider({
   handlePriceChange,
   handleInputChange,
   handleCheckboxChange,
-  filters
+  filters,
 }) {
-
-
   const [activeTab, setActiveTab] = useState(null); // open modal for this tab
 
   function ToggleBox({ active, onClick, children }) {
@@ -57,14 +55,14 @@ export default function PropertFilterSlider({
       case "BHK":
         return (
           <div className="flex gap-2 flex-wrap">
-            {["1 BHK", "2 BHK", "3 BHK", "4+", ""].map((bhk) => (
+            {["1 BHK", "2 BHK", "3 BHK", "4+"].map((bhk) => (
               <ToggleBox
                 key={bhk}
                 active={filters.bhk.includes(bhk)}
                 onClick={() => handleCheckboxChange("bhk", bhk)}
               >
                 {bhk}
-                {bhk >= "5+" ? " BHK" : ""}
+                {bhk >= "4+" ? " BHK" : ""}
               </ToggleBox>
             ))}
           </div>
@@ -128,6 +126,7 @@ export default function PropertFilterSlider({
               min={0}
               max={500000}
               step={1000}
+              defaultValue={[5000, 200000]}
               value={filters.priceRange}
               onChange={handlePriceChange}
               trackStyle={{ backgroundColor: PRIMARY_COLOR }}
@@ -246,14 +245,14 @@ export default function PropertFilterSlider({
 
       case "Preferred Tenant Type":
         return (
-          <div className="flex gap-2 flex-wrap">
+          <div className="flex gap-2  text-black flex-wrap">
             {["Family", "Bachelors male", "Bachelors female"].map((tenant) => (
               <ToggleBox
                 key={tenant}
                 active={filters.tenant.includes(tenant)}
                 onClick={() => handleCheckboxChange("tenant", tenant)}
               >
-                {tenant}
+                <span className="text-black">{tenant}</span>
               </ToggleBox>
             ))}
           </div>

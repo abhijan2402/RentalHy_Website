@@ -1,6 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-
 function filtersToFormData(filters) {
   const formData = new FormData();
   for (const key in filters) {
@@ -32,14 +31,15 @@ export const propertyApi = createApi({
   endpoints: (builder) => ({
     // 1. Get properties (listing)
     getProperties: builder.query({
-      query: (filters) => {
+      query: ({ filters, pageno }) => {
         const formData = filtersToFormData(filters);
+        console.group(pageno);
         for (let pair of formData.entries()) {
           console.log(pair[0] + ": " + pair[1]);
         }
 
         return {
-          url: "properties",
+          url: `properties?page=${pageno}`,
           method: "POST",
           body: formData,
         };
@@ -77,19 +77,35 @@ export const propertyApi = createApi({
           body: formData,
         };
       },
+      invalidatesTags: ["property", "wishlistStats"],
     }),
 
-    // 5. Wishlist stats
+    // 5. Add to wishlist
+    removeToWishlist: builder.mutation({
+      query: (id) => {
+        const formData = new FormData();
+        formData.append("property_id", id);
+        return {
+          url: "wishlist/remove",
+          method: "POST",
+          body: formData,
+        };
+      },
+      invalidatesTags: ["property", "wishlistStats"],
+    }),
+
+    // 6. Wishlist stats
     getWishlistStats: builder.query({
       query: () => "wishlist/stats",
+      providesTags: ["wishlistStats"],
     }),
 
-    // 6. My properties (owned by user)
+    // 7. My properties (owned by user)
     getMyProperties: builder.query({
       query: () => "my-property",
     }),
 
-    // 6.  Upload Property
+    // 8.  Upload Property
     addProperty: builder.mutation({
       query: (formdata) => ({
         url: `properties/add`,
@@ -106,6 +122,7 @@ export const {
   useGetPropertyDetailsQuery,
   useAddPropertyViewMutation,
   useAddToWishlistMutation,
+  useRemoveToWishlistMutation,
   useGetWishlistStatsQuery,
   useGetMyPropertiesQuery,
   useAddPropertyMutation,

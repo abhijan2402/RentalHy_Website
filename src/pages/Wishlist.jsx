@@ -149,7 +149,7 @@ const Wishlist = () => {
                 </div>
                 <div className="flex justify-between">
                   <p className="text-xs text-gray-400 mb-2">
-                    <span className="text-black">Address:</span>{" "}
+                    <span className="text-black"></span>{" "}
                     {pro?.property.location}
                   </p>
                 </div>

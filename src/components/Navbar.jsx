@@ -23,7 +23,7 @@ export default function Navbar() {
     { name: "Home", path: "/" },
     { name: "Convention/Function Hall", path: "/convention" },
     { name: "Resort/Farm House", path: "/farm-resort" },
-    { name: "About Us", path: "/about" },
+    { name: "Hostel", path: "/about" },
     { name: "Support", path: "/support" },
   ];
 
@@ -47,9 +47,11 @@ export default function Navbar() {
   }, [activeMain, setActiveButton]);
 
   const handleClickMain = (item) => {
+    console.log(item);
     setActiveMain(item.name);
     setActiveButton(null);
     navigate(item.path);
+    if (isMobileMenuOpen) setIsMobileMenuOpen(false);
   };
   return (
     <>
@@ -167,9 +169,9 @@ export default function Navbar() {
               {navItems.map((item) => (
                 <li
                   key={item.name}
-                  onClick={() => handleClick(item)}
+                  onClick={() => handleClickMain(item)}
                   className={`cursor-pointer font-medium ${
-                    active === item.name ? "text-[#7C0902]" : "text-black"
+                    activeMain === item.name ? "text-[#7C0902]" : "text-black"
                   }`}
                 >
                   {item.name}

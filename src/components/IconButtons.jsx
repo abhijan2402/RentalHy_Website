@@ -1,5 +1,5 @@
 import { useNavbar } from "../contexts/NavbarContext";
-import { FaBuilding, FaHome, FaTree } from "react-icons/fa";
+import { FaBuilding, FaHome, FaRestroom, FaTree } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 export default function IconButtons() {
@@ -10,6 +10,7 @@ export default function IconButtons() {
     tolet: <FaHome />,
     convention: <FaBuilding />,
     resort: <FaTree />,
+    hostel: <FaRestroom />,
   };
 
   return (
@@ -26,8 +27,10 @@ export default function IconButtons() {
           aria-pressed={activeButton === btn.id}
           style={{ minWidth: 120 }}
         >
-          <span className="text-lg">{iconMap[btn.id]}</span>
-          <span className="truncate">{btn.label}</span>
+          <span className="text-sm">{iconMap[btn.id]}</span>
+          <span className="truncate text-sm">
+            {btn.label === "Home" ? "To-Let" : btn.label}
+          </span>
         </button>
       ))}
     </div>

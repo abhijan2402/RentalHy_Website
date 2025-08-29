@@ -11,12 +11,18 @@ import { HiHome } from "react-icons/hi2";
 import PropertFilterSlider from "./PropertFilterSlider";
 import Pagination from "../Pagination";
 import { MdFilterList } from "react-icons/md";
-import { useAddToWishlistMutation } from "../../redux/api/propertyApi";
+import {
+  useAddToWishlistMutation,
+  useGetWishlistStatsQuery,
+  useRemoveToWishlistMutation,
+} from "../../redux/api/propertyApi";
 import { motion } from "framer-motion";
 import { convertToIST } from "../../utils/utils";
 import { TbDatabaseOff } from "react-icons/tb";
 import { usePropertyFilters } from "../../hooks/usePropertyFilters";
 import PropertyFilters from "./PropertyFilters";
+import { toast } from "react-toastify";
+import { message } from "antd";
 
 const sliderSettings = {
   dots: true,
@@ -31,7 +37,8 @@ const sliderSettings = {
 export default function PropertyList({ setOpenFilters, openFilters }) {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [addWhislist] = useAddToWishlistMutation();
+  const [addWhishlist] = useAddToWishlistMutation();
+  const [removeWhishlist] = useRemoveToWishlistMutation();
   const {
     data,
     propertyData,
@@ -51,38 +58,59 @@ export default function PropertyList({ setOpenFilters, openFilters }) {
     handleCheckboxChange,
     filters,
     setFilters,
+    setPageNo,
   } = usePropertyFilters();
-
+  const { refetch } = useGetWishlistStatsQuery();
   const [showModal, setShowModal] = useState(false);
   const properties = data?.data?.data ?? [];
-  console.log(propertyData);
-  // const totalItems = 20 || 0;
-  // const totalPages = Math.ceil(totalItems / (2 || 1));
-  // const [currentPage, setCurrentPage] = useState(data?.data?.current_page || 1);
-  // const totalItems = 100 || 0;
-  // const totalPages = Math.ceil(totalItems / (data?.data?.per_page || 1));
- const [currentPage, setCurrentPage] = useState(1);
+  console.log(data?.data);
 
- useEffect(() => {
-   if (data?.data?.current_page) {
-     setCurrentPage(data.data.current_page);
-   }
- }, [data]);
-  const totalItems = data?.data?.total;
-  const totalPages = Math.max(1, Math.ceil(totalItems / data?.data?.per_page));
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalItems = data?.data?.total ?? 0;
+  const perPage = data?.data?.per_page ?? 20;
+  const totalPages = Math.max(1, Math.ceil(totalItems / perPage));
+  useEffect(() => {
+    if (data?.data?.current_page) {
+      setCurrentPage(data?.data?.current_page);
+    }
+  }, [data]);
+
   console.log(data);
 
-  const handleWishlistToggle = (id) => {
-    console.log(id);
-    addWhislist(id)
-      .unwrap()
-      .then(() => {
-        toast.success("Wishlist updated!");
-      })
-      .catch(() => {
-        toast.error("Failed to update wishlist");
-      });
+  const handleWishlistToggle = async (property) => {
+    try {
+      if (property?.is_wishlist === 1) {
+        // Remove from wishlist
+        await removeWhishlist(property.id)
+          .unwrap()
+          .then((res) => {
+            toast.success(res?.message || "Wishlist updated!");
+            refetch();
+          })
+          .catch((err) => {
+            toast.error(err?.data?.message);
+          });
+        console.log("Removed from wishlist:", property.id);
+      } else {
+        // Add to wishlist
+        await addWhishlist(property.id)
+          .unwrap()
+          .unwrap()
+          .then((res) => {
+            toast.success(res?.message || "Wishlist updated!");
+            refetch();
+          })
+          .catch((err) => {
+            toast.error(err?.data?.message || "Something went worng!");
+          });
+        console.log("Added to wishlist:", property.id);
+      }
+    } catch (error) {
+      console.error("Wishlist toggle error:", error);
+    }
   };
+
+ 
 
   const renderState = () => {
     if (isLoading) {
@@ -163,19 +191,17 @@ export default function PropertyList({ setOpenFilters, openFilters }) {
             ? "bg-[#7C0902] border-[#7C0902]"
             : "bg-white border-gray-300"
         }
-        hover:bg-[#FFEDF0] hover:border-[#E11D48] group`}
+         group`}
                   aria-label={
                     property?.is_wishlist
                       ? "Remove from wishlist"
                       : "Add to wishlist"
                   }
-                  onClick={() => handleWishlistToggle(property.id)}
+                  onClick={() => handleWishlistToggle(property)}
                 >
                   <FaHeart
                     className={`text-lg transition-transform duration-150 group-hover:scale-110 ${
-                      property?.is_wishlist
-                        ? "text-red-500"
-                        : "text-gray-400 hover:text-red-500"
+                      property?.is_wishlist ? "text-red-500" : "text-gray-400 "
                     }`}
                   />
                 </button>
@@ -194,16 +220,12 @@ export default function PropertyList({ setOpenFilters, openFilters }) {
                 </ul>
                 <div className="mb-2">
                   <span className="text-xl font-semibold text-[#7C0902]">
-                    {/* {property.price >= 100000
-                      ? `$${property.price.toLocaleString()}`
-                      : `₹${property.price.toLocaleString()}`} */}
                     ₹{property.price.toLocaleString()}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <p className="text-xs text-gray-400 mb-2">
-                    <span className="text-black">Address:</span>{" "}
-                    {property.location}
+                    <span className="text-black"></span> {property.location}
                   </p>
                 </div>
                 <div className="flex justify-between">
@@ -236,12 +258,12 @@ export default function PropertyList({ setOpenFilters, openFilters }) {
           {/* Items per page selector */}
           <div className="flex items-center space-x-2">
             <label htmlFor="per-page" className="text-[#7C0902] text-sm">
-              Items per page:
+              Items per page: {data?.data?.per_page}
             </label>
-            <select
+            {/* <select
               id="per-page"
               value={data?.data?.per_page}
-              onChange={(e) => handleItemsPerPage(e.target.value)}
+              // onChange={(e) => handleItemsPerPage(e.target.value)}
               className="border border-gray-300 text-[#7C0902] rounded px-2 py-1 text-sm"
             >
               {[2, 5, 10, 20, 50].map((num) => (
@@ -249,19 +271,15 @@ export default function PropertyList({ setOpenFilters, openFilters }) {
                   {num}
                 </option>
               ))}
-            </select>
+            </select> */}
           </div>
 
           {/* Pagination Buttons */}
-          <div>
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={(page) =>
-                setCurrentPage(Math.max(1, Math.min(page, totalPages)))
-              }
-            />
-          </div>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={(page) => setPageNo(page)}
+          />
         </div>
       </div>
     );

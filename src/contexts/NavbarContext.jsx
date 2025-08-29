@@ -1,30 +1,52 @@
 import { createContext, useState, useContext, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 const NavbarContext = createContext();
 
 const buttons = [
-  { id: "tolet", label: "To-Let", path: "/" },
+  { id: "tolet", label: "Home", path: "/" },
   { id: "convention", label: "Convention/Function Hall", path: "/convention" },
   { id: "resort", label: "Resort/Farm House", path: "/farm-resort" },
+  { id: "hostel", label: "Hostel", path: "/hostel" },
+];
+
+const navItems = [
+  { name: "Home", path: "/" },
+  { name: "Convention/Function Hall", path: "/convention" },
+  { name: "Resort/Farm House", path: "/farm-resort" },
+  { name: "Hostel", path: "/hostel" },
+  { name: "Support", path: "/support" },
+  { name: "Profile", path: "/profile" },
 ];
 
 export function NavbarProvider({ children }) {
   const [activeMain, setActiveMain] = useState("Home");
-  const [activeButton, setActiveButton] = useState(null);
+  const [activeButton, setActiveButton] = useState("tolet");
+  const location = useLocation();
 
-  // Sync activeButton if activeMain changes
+  // ✅ Sync with route changes
   useEffect(() => {
-    if (activeMain === "Home") setActiveButton("tolet");
-    else if (activeMain === "Convention/Function Hall")
-      setActiveButton("convention");
-    else if (activeMain === "Resort/Farm House") setActiveButton("resort");
-    else setActiveButton(null);
-  }, [activeMain]);
+    const currentItem = navItems.find(
+      (item) => item.path === location.pathname
+    );
 
-  // Call this on button click from component, pass navigate explicitly
+    if (currentItem) {
+      setActiveMain(currentItem.name);
+
+      // map main nav to button
+      if (currentItem.name === "Home") setActiveButton("tolet");
+      else if (currentItem.name === "Convention/Function Hall")
+        setActiveButton("convention");
+      else if (currentItem.name === "Resort/Farm House")
+        setActiveButton("resort");
+      else setActiveButton(null); // for About, Support, Profile etc.
+    }
+  }, [location.pathname]);
+
   const handleButtonClick = (btn, navigate) => {
     setActiveButton(btn.id);
     setActiveMain(btn.label);
+
     if (navigate && typeof navigate === "function") {
       const buttonWithPath = buttons.find((b) => b.id === btn.id);
       if (buttonWithPath) {

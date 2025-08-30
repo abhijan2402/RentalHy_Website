@@ -19,7 +19,7 @@ export default function IconButtons() {
         <button
           key={btn.id}
           onClick={() => handleButtonClick(btn, navigate)}
-          className={`flex items-center gap-2 px-3 py-2 rounded transition-colors duration-200 ${
+          className={`flex items-center justify-center gap-2 px-3 py-2 rounded transition-colors duration-200 ${
             activeButton === btn.id
               ? "bg-[#7C0902] text-white"
               : "bg-gray-200 text-black hover:bg-gray-200"
@@ -28,9 +28,9 @@ export default function IconButtons() {
           style={{ minWidth: 120 }}
         >
           <span className="text-sm">{iconMap[btn.id]}</span>
-          <span className="truncate text-sm">
+          <span className="truncate text-sm font-medium">
             {btn.label === "Home" ? "To-Let" : btn.label}
-          </span>
+         </span>
         </button>
       ))}
     </div>

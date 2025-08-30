@@ -7,7 +7,7 @@ import {
   PhoneOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
-import { Form, Input, Button, Modal, Tooltip, Upload } from "antd";
+import { Form, Input, Button, Modal, Tooltip, Upload, Tabs } from "antd";
 import { FaHome, FaHeart, FaEye } from "react-icons/fa";
 import PropertyAnalytics from "../components/Properties/PropertyAnalytics";
 import { propertyData } from "../utils/propertydata";
@@ -15,13 +15,15 @@ import Breadcrumb from "../components/Breadcrumb";
 import { useAuth } from "../contexts/AuthContext";
 import { toast } from "react-toastify";
 import { BiPhone } from "react-icons/bi";
+
 import {
   useUpdateProfileMutation,
   useUploadProfileImageMutation,
 } from "../redux/api/profileApi";
-  // baseUrl: import.meta.env.VITE_BASE_URL
+
+const { TabPane } = Tabs;
+
 export default function ProfilePage() {
-  
   const { user, logout, setUser } = useAuth();
 
   const [editOpen, setEditOpen] = useState(false);
@@ -60,8 +62,9 @@ export default function ProfilePage() {
       if (res && res.message) {
         toast.success("Profile updated successfully");
         setEditOpen(false);
-         setUser(res.user);
-      } 
+        localStorage.setItem("user", JSON.stringify(res.user));
+        setUser(res.user);
+      }
     } catch (err) {
       toast.error(err.data?.message || "Error updating profile");
     }
@@ -91,7 +94,7 @@ export default function ProfilePage() {
   return (
     <div className="mt-[120px]">
       <Breadcrumb propertyTitle={"Profile"} />
-      <div className="max-w-4xl mx-auto p-6">
+      <div className="max-w-6xl mx-auto p-6">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -165,10 +168,32 @@ export default function ProfilePage() {
           </div>
         </motion.div>
 
-        <div className="mt-8">
-          <PropertyAnalytics properties={propertyData} />
-        </div>
+        {/* Tabs for different property types */}
+        <Tabs defaultActiveKey="myProperty" className="mt-8">
+          <TabPane tab="My Property" key="myProperty">
+            <PropertyAnalytics />
+          </TabPane>
+          <TabPane tab="Convention / Function Hall" key="conventionHall">
+            <div className="flex border border-dashed border-[#7C0902] rounded text-[#7C0902] justify-center items-center h-[100px]">
+              Coming Soon..
+            </div>
+            {/* <ConventionHallComponent /> */}
+          </TabPane>
+          <TabPane tab="Resort / Farm House" key="resortFarmHouse">
+            <div className="flex border border-dashed border-[#7C0902] rounded text-[#7C0902] justify-center items-center h-[100px]">
+              Coming Soon..
+            </div>
+            {/* <ResortFarmHouseComponent /> */}
+          </TabPane>
+          <TabPane tab="Hotels" key="hotels">
+            <div className="flex border border-dashed border-[#7C0902] rounded text-[#7C0902] justify-center items-center h-[100px]">
+              Coming Soon..
+            </div>
+            {/* <HotelsComponent /> */}
+          </TabPane>
+        </Tabs>
       </div>
+
       {/* Profile Deatails Upload */}
       <Modal
         open={editOpen}

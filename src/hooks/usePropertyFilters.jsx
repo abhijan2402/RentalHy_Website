@@ -15,7 +15,6 @@ export function usePropertyFilters() {
     facing: [],
     advance: [],
     tenant: [],
-    parking: [],
   });
   const [search, setSearch] = useState("");
   const [searchKeyword, setSearchKeyword] = useState("");

@@ -65,7 +65,7 @@ export function AuthProvider({ children }) {
     if (token && storedUser) {
       setUser(JSON.parse(storedUser));
     }
-  }, []);
+  }, [setUser]);
 
   const logout = () => {
     setUser(null);

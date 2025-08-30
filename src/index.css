@@ -35,9 +35,33 @@
     scrollbar-width: none;
     /* Firefox */
 }
-input{
+
+input {
     color: gray;
 }
-lable{
+
+lable {
     color: black;
+}
+
+/* Active tab text color */
+.ant-tabs-tab-active .ant-tabs-tab-btn {
+    color: #7C0902 !important;
+    font-weight: 600;
+    /* optional for emphasis */
+}
+
+/* Active tab bottom border color */
+.ant-tabs-ink-bar {
+    background-color: #7C0902 !important;
+}
+
+/* Inactive tab text color */
+/* .ant-tabs-tab .ant-tabs-tab-btn {
+
+} */
+
+/* Optional: Hover effect on inactive tabs */
+.ant-tabs-tab:hover .ant-tabs-tab-btn {
+    color: #7C0902;
 }

@@ -13,11 +13,15 @@ import {
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Breadcrumb from "../components/Breadcrumb";
-import { useGetWishlistStatsQuery } from "../redux/api/propertyApi";
+import {
+  useGetWishlistStatsQuery,
+  useRemoveToWishlistMutation,
+} from "../redux/api/propertyApi";
 import { TbDatabaseOff } from "react-icons/tb";
 import { BiErrorCircle } from "react-icons/bi";
 import { convertToIST } from "../utils/utils";
 import { useAuth } from "../contexts/AuthContext";
+import { toast } from "react-toastify";
 
 const sliderSettings = {
   dots: true,
@@ -33,7 +37,27 @@ const Wishlist = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { data, isLoading, error } = useGetWishlistStatsQuery();
+  const [removeWhishlist] = useRemoveToWishlistMutation();
   console.log(data);
+
+  const handleWishlistToggle = async (property) => {
+    try {
+      // Remove from wishlist
+      await removeWhishlist(property.property_id)
+        .unwrap()
+        .then((res) => {
+          toast.success(res?.message || "Wishlist updated!");
+          refetch();
+        })
+        .catch((err) => {
+          toast.error(err?.data?.message);
+        });
+      console.log("Removed from wishlist:", property.property_id);
+    } catch (error) {
+      toast.error(error || "Something went wrong..!");
+      console.error("Wishlist toggle error:", error);
+    }
+  };
 
   const renderState = (navigate, user) => {
     if (isLoading) {
@@ -112,19 +136,21 @@ const Wishlist = () => {
                   <FaMapMarkerAlt className="text-red-500" />
                   {pro?.property.location}
                 </span>
-                {/* 
-                
                 <button
-                  className="absolute bottom-3 right-3 bg-[#7C0902] rounded-full border border-[#7C0902] p-2 shadow-md flex items-center justify-center transition hover:bg-[#FFEDF0] hover:border-[#E11D48] group"
-                  
-                  aria-label="Add to wishlist"
+                  className={`absolute bottom-3 right-3 rounded-full border p-2 shadow-md flex items-center justify-center transition
+                       ${"bg-[#ffff] border-[#7C0902]"}
+                        group`}
+                  aria-label={
+                    pro?.property?.is_wishlist
+                      ? "Remove from wishlist"
+                      : "Add to wishlist"
+                  }
+                  onClick={() => handleWishlistToggle(pro)}
                 >
                   <FaHeart
-                    className="text-white text-lg hover:text-red-500 transition-transform duration-150 group-hover:scale-110"
-                    
+                    className={`text-lg transition-transform duration-150 group-hover:scale-110 ${"text-red-500"}`}
                   />
                 </button>
-                */}
               </div>
               <div className="flex-1 flex flex-col p-4">
                 <h3 className="font-bold text-lg text-gray-900 truncate">

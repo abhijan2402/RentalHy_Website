@@ -89,7 +89,7 @@ export default function PropertyAnalytics() {
                   <FaEye /> {property.total_views || "408"} Views
                 </span>
                 <span className="flex items-center gap-1 text-pink-700">
-                  <FaHeart /> {property.wishlist_count || "120"} Saved
+                  <FaHeart /> {property.wishlist_count || "0"} Saved
                 </span>
               </div>
 

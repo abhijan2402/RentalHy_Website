@@ -188,7 +188,7 @@ export default function PropertyList({ setOpenFilters, openFilters }) {
                   className={`absolute bottom-3 right-3 rounded-full border p-2 shadow-md flex items-center justify-center transition
         ${
           property?.is_wishlist
-            ? "bg-[#7C0902] border-[#7C0902]"
+            ? "bg-[#ffff] border-red-600"
             : "bg-white border-gray-300"
         }
          group`}

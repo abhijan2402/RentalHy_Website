@@ -7,9 +7,17 @@ import { convertToIST } from "../../utils/utils";
 import { motion } from "framer-motion";
 import { BiErrorCircle } from "react-icons/bi";
 import { TbDatabaseOff } from "react-icons/tb";
+import { toast } from "react-toastify";
+import {
+  useAddToWishlistMutation,
+  useRemoveToWishlistMutation,
+} from "../../redux/api/propertyApi";
+import PropertyMap from "../PropertyMap";
 
 export default function PropertyDetails({ property, error, isLoading }) {
   const [showMore, setShowMore] = useState(false);
+  const [addWhishlist] = useAddToWishlistMutation();
+  const [removeWhishlist] = useRemoveToWishlistMutation();
   console.log(property);
   // Slider settings
   const sliderSettings = {
@@ -74,6 +82,39 @@ export default function PropertyDetails({ property, error, isLoading }) {
   } catch {
     furnishingArray = [];
   }
+
+  const handleWishlistToggle = async (property) => {
+    try {
+      if (property?.is_wishlist === 1) {
+        // Remove from wishlist
+        await removeWhishlist(property.id)
+          .unwrap()
+          .then((res) => {
+            toast.success(res?.message || "Wishlist updated!");
+            refetch();
+          })
+          .catch((err) => {
+            toast.error(err?.data?.message);
+          });
+        console.log("Removed from wishlist:", property.id);
+      } else {
+        // Add to wishlist
+        await addWhishlist(property.id)
+          .unwrap()
+          .unwrap()
+          .then((res) => {
+            toast.success(res?.message || "Wishlist updated!");
+            refetch();
+          })
+          .catch((err) => {
+            toast.error(err?.data?.message || "Something went worng!");
+          });
+        console.log("Added to wishlist:", property.id);
+      }
+    } catch (error) {
+      console.error("Wishlist toggle error:", error);
+    }
+  };
 
   const renderState = () => {
     if (isLoading) {
@@ -155,13 +196,14 @@ export default function PropertyDetails({ property, error, isLoading }) {
             className={`absolute bottom-3 right-3 rounded-full border p-2 shadow-md flex items-center justify-center transition
         ${
           property?.is_wishlist
-            ? "bg-[#7C0902] border-[#7C0902]"
+            ? "bg-[#ffff] border-red-600"
             : "bg-white border-gray-300"
         }
         hover:bg-[#FFEDF0] hover:border-[#E11D48] group`}
             aria-label={
               property?.is_wishlist ? "Remove from wishlist" : "Add to wishlist"
             }
+            onClick={() => handleWishlistToggle(property)}
           >
             <FaHeart
               className={`text-lg transition-transform duration-150 group-hover:scale-110 ${
@@ -198,7 +240,7 @@ export default function PropertyDetails({ property, error, isLoading }) {
 
         {/* Bhk and Furnishing Status */}
         <div className="mb-6">
-          <h2 className="text-lg text-black font-medium mb-2">
+          <h2 className="text-lg text-black font-medium mb-0">
             Property Details
           </h2>
 
@@ -206,33 +248,31 @@ export default function PropertyDetails({ property, error, isLoading }) {
             className="felx flex-row
            gap-5 sm:flex"
           >
-            {/* BHK */}
-            <div>
-              <h3 className="font-semibold mb-1">BHK</h3>
+            {/* Property Type */}
+            <div className="mt-2">
+              {/* <h3 className="font-semibold text-black" >BHK</h3> */}
               <ul className="flex flex-wrap gap-2 mb-3">
-                {bhkArray.map((bhk, idx) => (
-                  <li
-                    key={idx}
-                    className="bg-blue-100 px-3 py-1 rounded-full text-blue-700 text-sm font-medium"
-                  >
-                    {bhk}
-                  </li>
-                ))}
+                <li className="bg-red-100 px-3 py-1 rounded-md text-red-700 text-sm font-medium">
+                  {property?.property_type}
+                </li>
               </ul>
             </div>
-
+            {/* BHK */}
+            <div className="mt-2">
+              {/* <h3 className="font-semibold text-black" >BHK</h3> */}
+              <ul className="flex flex-wrap gap-2 mb-3">
+                <li className="bg-blue-100 px-3 py-1 rounded-md text-blue-700 text-sm font-medium">
+                  {property?.bhk}
+                </li>
+              </ul>
+            </div>
             {/* Furnishing Status */}
-            <div>
-              <h3 className="font-semibold mb-1">Furnishing Status</h3>
+            <div className="mt-2">
+              {/* <h3 className="font-semibold mb-1">Furnishing Status</h3> */}
               <ul className="flex flex-wrap gap-2">
-                {furnishingArray.map((furnish, idx) => (
-                  <li
-                    key={idx}
-                    className="bg-green-100 px-3 py-1 rounded-full text-green-700 text-sm font-medium"
-                  >
-                    {furnish}
-                  </li>
-                ))}
+                <li className="bg-green-100 px-3 py-1 rounded-md text-green-700 text-sm font-medium">
+                  {property?.furnishing_status}
+                </li>
               </ul>
             </div>
           </div>
@@ -244,14 +284,9 @@ export default function PropertyDetails({ property, error, isLoading }) {
             Preferred Tenant Types
           </h2>
           <ul className="flex flex-wrap gap-2">
-            {preferredTenantArray.map((tenant, idx) => (
-              <li
-                key={idx}
-                className="bg-gray-100 px-3 py-1 rounded-full text-gray-700 text-sm "
-              >
-                {tenant}
-              </li>
-            ))}
+            <li className="bg-gray-100 px-3 py-1 rounded-full text-gray-700 text-sm ">
+              {property?.preferred_tenant_type}
+            </li>
           </ul>
         </div>
 
@@ -271,18 +306,26 @@ export default function PropertyDetails({ property, error, isLoading }) {
         </div>
 
         {/* Amenities */}
+        {/* Amenities */}
         <div className="mb-6">
           <h2 className="text-lg text-black font-medium mb-2">Amenities</h2>
-          <ul className="flex flex-wrap gap-2">
-            {Object.entries(amenitiesObj).map(([key, value], idx) => (
-              <li
-                key={idx}
-                className="bg-gray-100 px-3 py-1 rounded-full text-gray-700 text-sm "
-              >
-                {key}
-              </li>
-            ))}
-          </ul>
+          {property?.amenities && Object.keys(property.amenities).length > 0 ? (
+            <ul className="flex flex-wrap gap-2">
+              {Object.entries(property.amenities).map(([key, value], idx) => (
+                <li
+                  key={idx}
+                  className="bg-gray-100 px-3 py-1 rounded-md text-gray-700 text-sm"
+                >
+                  <span className="font-semibold text-black capitalize">
+                    {key.trim()}
+                  </span>
+                  : {value}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-gray-500 text-sm">No amenities available</p>
+          )}
         </div>
 
         {/* Posted Date */}
@@ -345,20 +388,7 @@ export default function PropertyDetails({ property, error, isLoading }) {
         </div>
 
         {/* Map */}
-        <div className="mb-6">
-          <h2 className="text-lg font-bold mb-2">Location Map</h2>
-          <iframe
-            title="property-location"
-            src={`https://www.google.com/maps?q=${encodeURIComponent(
-              property.location
-            )}&output=embed`}
-            width="100%"
-            height="300"
-            allowFullScreen=""
-            loading="lazy"
-            className="rounded-lg border"
-          ></iframe>
-        </div>
+        <PropertyMap lat={property?.lat} lng={property?.long} />
       </div>
     );
   };

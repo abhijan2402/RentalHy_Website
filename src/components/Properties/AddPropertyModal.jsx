@@ -27,13 +27,10 @@ const normFile = (e) => {
 };
 const bhkOptions = ["1RK", "1BHK", "2BHK", "3BHK", "4BHK+", "5BHK+"];
 
-const furnishingOptions = ["Furnished", "Semi-furnished", "Unfurnished"];
+const furnishingOptions = ["Furnished", "Semi-Furnished", "Unfurnished"];
 
 const tenantOptions = ["Family", "Bachelors male", "Bachelors female"];
 
-const availabilityOptions = ["Ready to Move", "Under Construction"];
-
-const advanceOptions = ["1 month", "2 months", "3 months+"];
 const AddPropertyModal = ({ showModal, onClose }) => {
   const horizontalScrollClass =
     "flex gap-2 overflow-x-auto flex-nowrap md:overflow-x-visible md:flex-wrap";
@@ -43,13 +40,13 @@ const AddPropertyModal = ({ showModal, onClose }) => {
   const [fileList, setFileList] = useState([]);
 
   const handleBeforeUpload = (file) => {
-    const isImage = file.type.startsWith("image/");
-    if (!isImage) {
-      message.error("You can only upload image files!");
+    const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
+    if (!allowedTypes.includes(file.type)) {
+      message.error("You can only upload JPEG, PNG, or JPG image files!");
       return Upload.LIST_IGNORE;
     }
     if (fileList.length >= 5) {
-      message.error("You can upload up to 10 images only!");
+      message.error("You can upload up to 5 images only!"); // corrected message to 5
       return Upload.LIST_IGNORE;
     }
     return true;
@@ -141,7 +138,13 @@ const AddPropertyModal = ({ showModal, onClose }) => {
       onOk={() => form.submit()}
       okText="Upload Property"
       okButtonProps={{
-        style: { backgroundColor: "#7C0902", borderColor: "#7C0902" },
+        style: {
+          backgroundColor: "#7C0902",
+          borderColor: "#7C0902",
+          color: "white",
+        },
+        disabled: isLoading, // disables button when loading
+        loading: isLoading, // shows loading spinner on button when loading
       }}
       cancelButtonProps={{
         style: { borderColor: "#7C0902", color: "#7C0902" },

@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 function filtersToFormData(filters) {
-  console.log(filters)
+  console.log(filters);
   const formData = new FormData();
   for (const key in filters) {
     if (!filters.hasOwnProperty(key)) continue;
@@ -84,12 +84,12 @@ export const propertyApi = createApi({
     // 5. Add to wishlist
     removeToWishlist: builder.mutation({
       query: (id) => {
-        const formData = new FormData();
-        formData.append("property_id", id);
+        // const formData = new FormData();
+        // formData.append("property_id", id);
         return {
-          url: "wishlist/remove",
+          url: `wishlist/remove/${id}`,
           method: "POST",
-          body: formData,
+          body: {},
         };
       },
       invalidatesTags: ["property", "wishlistStats"],

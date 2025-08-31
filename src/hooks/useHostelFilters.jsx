@@ -48,7 +48,6 @@ export function useHostelFilters(initialValues) {
     setFilters,
     pendingFilters,
     setPendingFilters,
-    setPendingFilters,
     toggleFilterValue,
     handleRangeChange,
     resetFilters,

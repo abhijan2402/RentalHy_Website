@@ -9,6 +9,12 @@ export default function ConventionHall() {
   const navigate = useNavigate();
   const [openFilters, setOpenFilters] = useState(false);
   const {
+    data,
+    isLoading,
+    error,
+    search,
+    searchKeyword,
+    sort,
     filters,
     setFilters,
     pendingFilters,
@@ -19,6 +25,10 @@ export default function ConventionHall() {
     applyFilters,
     isSelected,
     toggleYesNo,
+    handleSearchInputChange,
+    handleSearchButton,
+    handleSortChange,
+    setPageNo,
   } = useConventionFilters();
 
   const handleApplyFilters = () => {
@@ -47,11 +57,21 @@ export default function ConventionHall() {
         </div>
       </div>
       {/* Property List */}
-      <div className="bg-gradient-to-br flex flex-col from-white via-gray-50 to-gray-100 min-h-screen px-3 sm:px-4 md:px-6 py-6">
+      <div className=" flex flex-col from-white via-gray-50 to-gray-100 min-h-screen px-3 sm:px-4 md:px-6 py-6">
         <div className="max-w-7xl mx-auto flex flex-col gap-6 w-full">
           <ConventionHallList
             openFilters={openFilters}
             setOpenFilters={setOpenFilters}
+            handleSearchInputChange={handleSearchInputChange}
+            handleSearchButton={handleSearchButton}
+            handleSortChange={handleSortChange}
+            search={search}
+            searchKeyword={searchKeyword}
+            sort={sort}
+            data={data}
+            isLoading={isLoading}
+            error={error}
+            setPageNo={setPageNo}
           />
         </div>
       </div>
@@ -70,7 +90,7 @@ export default function ConventionHall() {
         resetFilters={resetFilters}
         applyFilters={applyFilters}
         isSelected={isSelected}
-        onApply={handleApplyFilters} // pass onApply handler
+        onApply={handleApplyFilters}
       />
     </>
   );

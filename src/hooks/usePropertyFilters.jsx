@@ -7,8 +7,8 @@ export function usePropertyFilters() {
     bhk: [],
     propertyType: [],
     roomSize: { min: "", max: "" },
-    priceRange: [], // empty by default
-    furnishing: [], // 👈 keep same name for consistency
+    priceRange: [],
+    furnishing: [],
     availability: [],
     bathrooms: [],
     parking: [],
@@ -21,7 +21,6 @@ export function usePropertyFilters() {
   const [sort, setSort] = useState("");
   const [perpage, setPerPage] = useState("");
   const [pageno, setPageNo] = useState(1);
-  console.log(pageno);
   // _____________Manage States Ends Here______________________
 
   // *******************Manage APIs**********************
@@ -44,6 +43,7 @@ export function usePropertyFilters() {
     sort_by: sort || "",
     per_page: perpage || "",
   };
+  // console.log(filterPayload);
 
   // Fetch data
   const { data, isLoading, error } = useGetPropertiesQuery({
@@ -51,6 +51,7 @@ export function usePropertyFilters() {
     pageno,
   });
 
+  // console.log(data?.data?.data)
   // Property Listing Data
   const [propertyData, setPropertyData] = useState([]);
 
@@ -61,10 +62,6 @@ export function usePropertyFilters() {
       setPropertyData([]);
     }
   }, [data?.data?.data, pageno, perpage]);
-
-  // useEffect(() => {
-  //   refetch();
-  // }, [refetch, filters]);
 
   // *******************Manage APIs Ends Here**********************
 

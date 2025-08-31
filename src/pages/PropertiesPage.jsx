@@ -46,18 +46,6 @@ export default function PropertiesPage() {
         {/* Right side: Button */}
         <div className="w-full md:w-auto flex justify-start md:justify-end">
           <IconButtons />
-          {/* <button
-            onClick={() => navigate("/convention")}
-            className="flex items-center justify-center gap-2 w-full md:w-auto"
-            style={{
-              backgroundColor: "#7C0902",
-              color: "white",
-              padding: "12px 16px",
-              borderRadius: "6px",
-            }}
-          >
-            <GiDoor size={20} /> Convention Space
-          </button> */}
         </div>
       </div>
 
@@ -70,8 +58,6 @@ export default function PropertiesPage() {
           />
         </div>
       </div>
-
-     
     </>
   );
 }

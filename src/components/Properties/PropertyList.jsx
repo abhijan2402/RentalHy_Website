@@ -63,7 +63,7 @@ export default function PropertyList({ setOpenFilters, openFilters }) {
   const { refetch } = useGetWishlistStatsQuery();
   const [showModal, setShowModal] = useState(false);
   const properties = data?.data?.data ?? [];
-  console.log(data?.data);
+  // console.log(data?.data);
 
   const [currentPage, setCurrentPage] = useState(1);
   const totalItems = data?.data?.total ?? 0;
@@ -75,7 +75,7 @@ export default function PropertyList({ setOpenFilters, openFilters }) {
     }
   }, [data]);
 
-  console.log(data);
+  // console.log(data);
 
   const handleWishlistToggle = async (property) => {
     try {

@@ -1,14 +1,11 @@
 import React, { useState } from "react";
-import PropertyFilters from "../../Properties/PropertyFilters";
-
 import { useNavigate } from "react-router-dom";
+import IconButtons from "../IconButtons";
+import HostelList from "./HostelList";
+import HostelFilters from "./HostelFilters";
+import { useHostelFilters } from "../../hooks/useHostelFilters";
 
-import FarmHouseList from "./FarmHouseList";
-import FarmHouseFilters from "./FarmHouseFilters";
-import IconButtons from "../../IconButtons";
-import { useFarmFilters } from "../../../hooks/useFarmFilters";
-
-export default function FarmHouse() {
+export default function HostelSpace() {
   const navigate = useNavigate();
   const [openFilters, setOpenFilters] = useState(false);
   const {
@@ -21,13 +18,7 @@ export default function FarmHouse() {
     resetFilters,
     applyFilters,
     isSelected,
-    toggleYesNo,
-  } = useFarmFilters();
-
-  const handleApplyFilters = () => {
-    applyFilters(); // commit staged filters
-    setOpenFilters(false); // close modal // Optionally trigger API call here with filters or pendingFilters // console.log("Filters applied:", filters);
-  };
+  } = useHostelFilters();
 
   return (
     <>
@@ -36,10 +27,10 @@ export default function FarmHouse() {
         {/* Left side heading */}
         <div className="flex-1">
           <h1 className="text-2xl sm:text-2xl md:text-2xl font-bold text-gray-800">
-            Explore <span className="text-[#7C0902]">Resorts/Farm Houses</span>
+            Explore <span className="text-[#7C0902]">Hostels</span>
           </h1>
           <p className="mt-1 text-[#7C0902] text-[14px] sm:text-[13px] md:text-[14px]">
-            Find your ideal Resorts/Farms from our curated listings
+            Find your ideal Hostel stay from our curated listings
           </p>
         </div>
 
@@ -52,7 +43,7 @@ export default function FarmHouse() {
       {/* Property List */}
       <div className="bg-gradient-to-br flex flex-col from-white via-gray-50 to-gray-100 min-h-screen px-3 sm:px-4 md:px-6 py-6">
         <div className="max-w-7xl mx-auto flex flex-col gap-6 w-full">
-          <FarmHouseList
+          <HostelList
             openFilters={openFilters}
             setOpenFilters={setOpenFilters}
           />
@@ -60,20 +51,18 @@ export default function FarmHouse() {
       </div>
 
       {/* Filters Modal */}
-      <FarmHouseFilters
+      <HostelFilters
         isOpen={openFilters}
         onClose={() => setOpenFilters(false)}
         filters={filters}
         setFilters={setFilters}
         pendingFilters={pendingFilters}
-        setPendingFilters={setPendingFilters}
         toggleFilterValue={toggleFilterValue}
-        toggleYesNo={toggleYesNo}
         handleRangeChange={handleRangeChange}
         resetFilters={resetFilters}
         applyFilters={applyFilters}
         isSelected={isSelected}
-        onApply={handleApplyFilters}
+        setPendingFilters={setPendingFilters}
       />
     </>
   );

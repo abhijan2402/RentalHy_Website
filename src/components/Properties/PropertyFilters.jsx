@@ -63,7 +63,6 @@ export default function PropertyFilters({
       facing: [],
       advance: [],
       tenant: [],
-      parking: [],
     };
     setFilters(resetState);
     console.log("Filters reset:", resetState);

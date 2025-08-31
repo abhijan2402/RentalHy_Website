@@ -23,7 +23,7 @@ export default function Navbar() {
     { name: "Home", path: "/" },
     { name: "Convention/Function Hall", path: "/convention" },
     { name: "Resort/Farm House", path: "/farm-resort" },
-    { name: "Hostel", path: "/about" },
+    { name: "Hostel", path: "/hostel" },
     { name: "Support", path: "/support" },
   ];
 
@@ -43,6 +43,7 @@ export default function Navbar() {
     else if (activeMain === "Convention/Function Hall")
       setActiveButton("convention");
     else if (activeMain === "Resort/Farm House") setActiveButton("resort");
+    else if (activeMain === "Hostel") setActiveButton("hostel");
     else setActiveButton(null);
   }, [activeMain, setActiveButton]);
 

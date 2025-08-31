@@ -39,6 +39,8 @@ export function NavbarProvider({ children }) {
         setActiveButton("convention");
       else if (currentItem.name === "Resort/Farm House")
         setActiveButton("resort");
+      else if (currentItem.name === "Hostel")
+        setActiveButton("hostel");
       else setActiveButton(null); // for About, Support, Profile etc.
     }
   }, [location.pathname]);

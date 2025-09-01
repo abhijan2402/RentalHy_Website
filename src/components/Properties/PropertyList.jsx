@@ -23,6 +23,7 @@ import { usePropertyFilters } from "../../hooks/usePropertyFilters";
 import PropertyFilters from "./PropertyFilters";
 import { toast } from "react-toastify";
 import { message } from "antd";
+import CardLoader from "../CardLoader";
 
 const sliderSettings = {
   dots: true,
@@ -110,19 +111,11 @@ export default function PropertyList({ setOpenFilters, openFilters }) {
     }
   };
 
- 
-
   const renderState = () => {
     if (isLoading) {
       return (
-        <div className="flex flex-col  items-center justify-center h-[60vh] text-gray-600 gap-3">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-          >
-            <FaSpinner size={40} className="text-[#7C0902]" />
-          </motion.div>
-          <p className="text-lg font-medium">Loading properties...</p>
+        <div className="mt-5">
+          <CardLoader count={9} />;
         </div>
       );
     }
@@ -157,7 +150,7 @@ export default function PropertyList({ setOpenFilters, openFilters }) {
     return (
       <div className="max-w-7xl mx-auto flex flex-col gap-6 w-full">
         {/* Property List */}
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {properties?.map((property) => (
             <div
               key={property.id}

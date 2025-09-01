@@ -315,7 +315,7 @@ const AddPropertyModal = ({ showModal, onClose }) => {
         {/* Facing */}
         <Form.Item label="Facing" name="facing_direction">
           <Radio.Group className={horizontalScrollClass}>
-            {["North", "East", "West", "South", "NE", "NW", "SE", "SW"].map(
+            {["North", "East", "West", "South"].map(
               (opt) => (
                 <Radio.Button key={opt} value={opt}>
                   {opt}

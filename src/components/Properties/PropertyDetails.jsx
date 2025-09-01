@@ -55,33 +55,7 @@ export default function PropertyDetails({ property, error, isLoading }) {
     console.error("Failed to parse amenities", e);
   }
 
-  // Perferred Tent Type
-  let preferredTenantArray = [];
-  try {
-    preferredTenantArray = property?.preferred_tenant_type
-      ? JSON.parse(property.preferred_tenant_type)
-      : [];
-  } catch (e) {
-    console.error("Failed to parse preferred_tenant_type", e);
-    preferredTenantArray = [];
-  }
-  // BHK and Furnishing status
-  let bhkArray = [];
-  let furnishingArray = [];
-
-  try {
-    bhkArray = property?.bhk ? JSON.parse(property.bhk) : [];
-  } catch {
-    bhkArray = [];
-  }
-
-  try {
-    furnishingArray = property?.furnishing_status
-      ? JSON.parse(property.furnishing_status)
-      : [];
-  } catch {
-    furnishingArray = [];
-  }
+ 
 
   const handleWishlistToggle = async (property) => {
     try {
@@ -222,7 +196,7 @@ export default function PropertyDetails({ property, error, isLoading }) {
 
         {/* Description */}
         <div className="mb-6">
-          <h2 className="text-lg font-bold mb-2">Description</h2>
+          <h2 className="text-lg text-black font-bold mb-2">Description</h2>
           <p className="text-gray-700">
             {showMore
               ? property?.description

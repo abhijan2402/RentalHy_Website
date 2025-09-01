@@ -18,9 +18,8 @@ function filtersToFormData(filters = {}) {
   return formData;
 }
 
-
-export const conventionApi = createApi({
-  reducerPath: "conventionApi",
+export const hostelApi = createApi({
+  reducerPath: "hostelApi",
   baseQuery: fetchBaseQuery({
     baseUrl: "https://hotpink-rook-901841.hostingersite.com/public/api/",
     prepareHeaders: (headers) => {
@@ -32,49 +31,38 @@ export const conventionApi = createApi({
     },
   }),
   endpoints: (builder) => ({
-    // 1. Get Convention properties (listing)
-    getConventionProperties: builder.query({
+    // 1. Get Hostel List
+    getHostelList: builder.query({
       query: ({ filterPayload, pageno }) => {
         const formData = filtersToFormData(filterPayload);
-        // console.group(pageno, filterPayload);
-        // for (let pair of formData.entries()) {
-        //   console.log(pair[0] + ": " + pair[1]);
-        // }
-
         return {
-          url: `hall_listing?page=${pageno}`,
+          url: `hostels/list?page=${pageno}`,
           method: "POST",
           body: formData,
         };
       },
-      providesTags: ["conventionProperty"],
+      providesTags: ["hostel"],
     }),
 
-    // 2. Convention details
-    getconventionDetails: builder.query({
-      query: (id) => `/hall_deatils/${id}`,
+    // 2. Get Hostel Details
+    getHostelDetails: builder.query({
+      query: (id) => `hall_details/${id}`,
     }),
 
-    // 3. My Convention properties (owned by user)
-    getMyConventionProperties: builder.query({
-      query: () => "my-convention",
-    }),
-
-    // 4.  Upload Convention
-    addConvention: builder.mutation({
+    // 3. Upload Hostel
+    addHostel: builder.mutation({
       query: (formdata) => ({
-        url: `hall_add/hall`,
+        url: `hostels`,
         method: "POST",
         body: formdata,
       }),
-      invalidatesTags: ["conventionProperty"],
+      invalidatesTags: ["hostel"],
     }),
   }),
 });
 
 export const {
-  useGetMyConventionPropertiesQuery,
-  useGetconventionDetailsQuery,
-  useGetConventionPropertiesQuery,
-  useAddConventionMutation,
-} = conventionApi;
+  useGetHostelListQuery,
+  useGetHostelDetailsQuery,
+  useAddHostelMutation,
+} = hostelApi;

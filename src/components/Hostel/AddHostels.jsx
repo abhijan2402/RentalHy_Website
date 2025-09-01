@@ -16,15 +16,15 @@ import {
 } from "antd";
 import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import moment from "moment";
+import { useAddHostelMutation } from "../../redux/api/hostelApi";
+import { toast } from "react-toastify";
 
 const { TextArea } = Input;
 const { RangePicker } = DatePicker;
 
 const normFile = (e) => {
-  if (Array.isArray(e)) {
-    return e;
-  }
-  return e && e.fileList;
+  if (Array.isArray(e)) return e;
+  return e?.fileList?.map((file) => file.originFileObj) || [];
 };
 
 const maxImages = 5;
@@ -48,42 +48,46 @@ const bathroomTypeOptions = [
 
 // Hostel Type
 const hostelTypeOptions = [
-  { label: "Male hostel", value: "maleHostel" },
-  { label: "Female hostel", value: "femaleHostel" },
-  { label: "Co-living hostel", value: "coLivingHostel" },
+  { label: "Male hostel", value: "male" },
+  { label: "Female hostel", value: "female" },
+  { label: "Co-living hostel", value: "co-living" },
 ];
 
 // Furnishing Status & Features
 const furnishingOptions = [
-  { label: "Bed with mattress and pillow", value: "bedComplete" },
-  { label: "Bed frame only", value: "bedFrameOnly" },
-  { label: "Study table & chair", value: "studyTableChair" },
-  { label: "Wardrobe/Cupboard", value: "wardrobeCupboard" },
+  { label: "Bed with mattress and pillow", value: "Complete Bed" },
+  { label: "Bed frame only", value: "Bed Frame only" },
+  { label: "Study table & chair", value: "Study Table, Chair" },
+  { label: "Wardrobe/Cupboard", value: "Wardrobe, Cupboard" },
   { label: "Fan", value: "fan" },
   { label: "Lights", value: "lights" },
   { label: "Curtains", value: "curtains" },
   { label: "AC", value: "ac" },
-  { label: "Geyser (Hot water)", value: "geyserHotWater" },
-  { label: "Basic appliances", value: "basicAppliances" },
-  { label: "Limited storage space", value: "limitedStorage" },
-  { label: "Only room (no furniture/appliance)", value: "onlyRoom" },
-  { label: "Tenant brings own setup", value: "tenantOwnSetup" },
+  { label: "Geyser (Hot water)", value: "geyser HotWater" },
+  { label: "Basic appliances", value: "basic Appliances" },
+  { label: "Limited storage space", value: "limited Storage" },
+  { label: "Only room (no furniture/appliance)", value: "only Room" },
+  { label: "Tenant brings own setup", value: "tenant Own Setup" },
 ];
 
 const standardPriceOptions = [
-  "Single room (Day/Month)",
-  "Double sharing/month",
-  "Triple sharing/month",
-  "4 sharing/month",
-  "Security Deposit",
-];
-const standardPriceDormitoyOptions = [
-  "1 Day Stay",
-  "1 Week Stay",
-  "1 Month Stay",
+  { label: "Double sharing/month", value: "double_sharing_price" },
+  { label: "Triple sharing/month", value: "triple_sharing_price" },
+  { label: "4 sharing/month", value: "four_sharing_price" },
+  { label: "Security Deposit", value: "security_deposit" },
+  { label: "Single room (Day/Month)", value: "single_room_price" },
 ];
 
-const yesNoOptions = ["Yes", "No"];
+const standardPriceDormitoyOptions = [
+  { label: "1 Day Stay", value: "one_day_stay" },
+  { label: "1 Week Stay", value: "one_week_stay" },
+  { label: "1 month Stay", value: "one_month_stay" },
+];
+
+const yesNoOptions = [
+  { label: "Yes", value: "1" },
+  { label: "No", value: "0" },
+];
 
 function cleanObject(obj) {
   if (Array.isArray(obj)) {
@@ -120,7 +124,7 @@ function cleanObject(obj) {
 
 const AddHostels = ({ showModal, onClose }) => {
   const [form] = Form.useForm();
-
+  const [addHostel, { error, isLoading }] = useAddHostelMutation();
   const [hostelImgae, setHostelImgae] = useState([]);
   const [MenuImages, setMenuImages] = useState([]);
 
@@ -133,36 +137,67 @@ const AddHostels = ({ showModal, onClose }) => {
     return true;
   };
 
-  const handleChangeFactory =
-    (setFn) =>
-    ({ fileList }) => {
-      setFn(fileList.slice(0, maxImages));
-    };
+  const handleChangeFactory = (setFn) => (fileList) => {
+    setFn(fileList.slice(0, maxImages));
+  };
 
-  const onFinish = (values) => {
+  const onFinish = async (values) => {
     // Validate mandatory uploads
-    if (!values.hostelImages || values.hostelImages.length === 0) {
+    if (!values.images || values.images.length === 0) {
       message.error("Please upload at least one hall image.");
       return;
     }
 
-    // Prepare images info safely or empty array if missing
-    const prepareImagesInfo = (files = []) =>
-      files.map((file) => ({ name: file.name, uid: file.uid }));
+    const formData = new FormData();
 
-    // Compose raw payload
-    const rawPayload = {
-      ...values,
-      hostelImages: prepareImagesInfo(values.hostelImages),
-      menuImages: prepareImagesInfo(values.menuImages),
-    };
+    Object.entries(values).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        value.forEach((item, index) => {
+          // ✅ hostel_type & bathroom_type → plain values
+          if (key === "hostel_type" || key === "bathroom_type") {
+            formData.append(key, item);
+          }
+          // ✅ images → raw file with indexed keys like images[0], images[1]
+          else if (key === "images") {
+            formData.append(`images[${index}]`, item?.originFileObj ?? item);
+          }
+          // ✅ menu_images → raw file with indexed keys
+          else if (key === "menu_images") {
+            formData.append(
+              `menu_images[${index}]`,
+              item?.originFileObj ?? item
+            );
+          }
+          // ✅ other array fields → indexed keys
+          else {
+            formData.append(`${key}[${index}]`, item);
+          }
+        });
+      } else if (value !== null && value !== undefined) {
+        formData.append(key, value);
+      }
+    });
 
-    // Clean recursively all undefined, null, empty strings, empty arrays, empty objects
-    const cleanedPayload = cleanObject(rawPayload);
+    // Debug: log all FormData values
+    for (let pair of formData.entries()) {
+      console.log(pair[0] + ": ", pair[1]);
+    }
 
-    console.log("Cleaned payload:", cleanedPayload);
+    await addHostel(formData)
+      .unwrap()
+      .then((response) => {
+        toast.success("Hostel added successfully!");
+        console.log(response);
+      })
+      .catch((error) => {
+        const errMsg =
+          error?.data?.message ||
+          error?.error ||
+          "Failed to add hostel. Please try again.";
+        toast.error(errMsg);
+      });
 
-    // Continue with API submission etc...
+    // Reset logic if needed
     form.resetFields();
     setHostelImgae([]);
     setMenuImages([]);
@@ -191,13 +226,33 @@ const AddHostels = ({ showModal, onClose }) => {
           onFinish={onFinish}
           initialValues={{
             priceOptions: {},
+            mess: "",
+            breakfast: "",
+            lunch: "",
+            dinner: "",
+            tea_coffee: "",
+            snacks: "",
+            wifi: "",
+            ac: "",
+            laundry_service: "",
+            housekeeping: "",
+            hot_water: "",
+            power_backup: "",
+            parking: "",
+            gym: "",
+            play_area: "",
+            tv: "",
+            dining_table: "",
+            security: "",
+            ro_water: "",
+            study_area: "",
           }}
           style={{ padding: "4px" }}
         >
           {/* Hostel Images */}
           <Form.Item
             label="Hostel Images (max 5)"
-            name="hostelImages" // changed from hostelImgae
+            name="images" // changed from hostelImgae
             valuePropName="fileList"
             getValueFromEvent={normFile}
             rules={[{ required: true, message: "Upload hostel images" }]}
@@ -229,7 +284,7 @@ const AddHostels = ({ showModal, onClose }) => {
           {/* Contact Details */}
           <Form.Item
             label="Contact Details"
-            name="contactDetails"
+            name="contact_number"
             rules={[
               { required: true, message: "Please enter contact details" },
             ]}
@@ -239,7 +294,7 @@ const AddHostels = ({ showModal, onClose }) => {
           {/* Alternate Contact Details */}
           <Form.Item
             label="Alternate Contact Details"
-            name="alternateContactDetails"
+            name="alternate_contact_number"
           >
             <TextArea rows={2} placeholder="Enter alternate contact details" />
           </Form.Item>
@@ -255,53 +310,70 @@ const AddHostels = ({ showModal, onClose }) => {
           {/* Price Options with individual inputs*/}
           <Form.Item style={{ marginBottom: 0 }}>
             <Row gutter={16}>
-              {standardPriceOptions.map((opt) => (
-                <Col key={opt} span={12} style={{ marginBottom: 12 }}>
-                  <Form.Item name={["priceOptions", opt]} label={opt} noStyle>
-                    <label htmlFor="">{opt}</label>
+              {standardPriceOptions.map(({ label, value }) => (
+                <Col key={value} span={12} style={{ marginBottom: 12 }}>
+                  <label className="block mb-1 font-medium">{label}</label>
+                  <Form.Item name={value} noStyle>
                     <InputNumber
                       min={0}
                       style={{ width: "100%" }}
-                      placeholder={`Price for ${opt}`}
-                      formatter={(value) => (value ? `₹ ${value}` : "")}
-                      parser={(value) => value.replace(/\₹\s?|(,*)/g, "")}
+                      placeholder={`Price for ${label}`}
+                      formatter={(v) => (v ? `₹ ${v}` : "")}
+                      parser={(v) => v.replace(/\₹\s?|(,*)/g, "")}
                     />
                   </Form.Item>
                 </Col>
               ))}
             </Row>
           </Form.Item>
+
           <p className="font-bold text-[#7C0902]">Dormitory Price</p>
           {/*Dormitory Price Options with individual inputs*/}
-          <Form.Item style={{ marginBottom: 0, color: "" }}>
+          <Form.Item style={{ marginBottom: 0 }}>
             <Row gutter={16}>
-              {standardPriceDormitoyOptions.map((opt) => (
-                <Col key={opt} span={12} style={{ marginBottom: 12 }}>
-                  <Form.Item name={["priceOptions", opt]} label={opt} noStyle>
-                    <label htmlFor="">{opt}</label>
-                    <InputNumber
-                      min={0}
-                      style={{ width: "100%" }}
-                      placeholder={`Price for ${opt}`}
-                      formatter={(value) => (value ? `₹ ${value}` : "")}
-                      parser={(value) => value.replace(/\₹\s?|(,*)/g, "")}
-                    />
-                  </Form.Item>
-                </Col>
-              ))}
+              <Col span={12} style={{ marginBottom: 12 }}>
+                <label className="block mb-1 font-medium">1 Day Stay</label>
+                <Form.Item name={["one_day_stay"]} noStyle>
+                  <InputNumber
+                    min={0}
+                    style={{ width: "100%" }}
+                    placeholder="Price for 1 Day Stay"
+                    formatter={(value) => (value ? `₹ ${value}` : "")}
+                    parser={(value) => value.replace(/\₹\s?|(,*)/g, "")}
+                  />
+                </Form.Item>
+              </Col>
+
+              <Col span={12} style={{ marginBottom: 12 }}>
+                <label className="block mb-1 font-medium">1 Week Stay</label>
+                <Form.Item name={["one_week_stay"]} noStyle>
+                  <InputNumber
+                    min={0}
+                    style={{ width: "100%" }}
+                    placeholder="Price for 1 Week Stay"
+                    formatter={(value) => (value ? `₹ ${value}` : "")}
+                    parser={(value) => value.replace(/\₹\s?|(,*)/g, "")}
+                  />
+                </Form.Item>
+              </Col>
+
+              <Col span={12} style={{ marginBottom: 12 }}>
+                <label className="block mb-1 font-medium">1 Month Stay</label>
+                <Form.Item name={["one_month_stay"]} noStyle>
+                  <InputNumber
+                    min={0}
+                    style={{ width: "100%" }}
+                    placeholder="Price for 1 Month Stay"
+                    formatter={(value) => (value ? `₹ ${value}` : "")}
+                    parser={(value) => value.replace(/\₹\s?|(,*)/g, "")}
+                  />
+                </Form.Item>
+              </Col>
             </Row>
           </Form.Item>
-          {/* Security Deposit */}
-          <Form.Item label="Security Deposit" name="securityDeposit">
-            <InputNumber
-              min={0}
-              max={15000}
-              style={{ width: "100%" }}
-              placeholder="Enter Security Deposit"
-            />
-          </Form.Item>
+
           {/* Map Link  */}
-          <Form.Item label="Map Link" name="maplink">
+          <Form.Item label="Map Link" name="map_link">
             <Input
               style={{ width: "100%" }}
               placeholder="Enter Security Deposit"
@@ -318,52 +390,46 @@ const AddHostels = ({ showModal, onClose }) => {
           {/* Room Size (sq.ft) */}
           <Form.Item label="Room Size (sq.ft)">
             <Input.Group compact>
-              <Form.Item name={["roomSize", "min"]} noStyle>
+              <Form.Item name={["room_size_min"]} noStyle>
                 <Input style={{ width: 150 }} placeholder="Min" type="number" />
               </Form.Item>
               {/* <span style={{ margin: "0 8px" }}>to</span> */}
-              <Form.Item name={["roomSize", "max"]} noStyle>
+              <Form.Item name={["room_size_max"]} noStyle>
                 <Input style={{ width: 150 }} placeholder="Max" type="number" />
               </Form.Item>
             </Input.Group>
           </Form.Item>
           {/* Hostel Types */}
-          <Form.Item label="Hostel Type" name="hostelType">
+          <Form.Item label="Hostel Type" name="hostel_type">
             <Checkbox.Group options={hostelTypeOptions} />
           </Form.Item>
           {/* Furnishing Status */}
           <Form.Item
             label="Furnishing Status & Features"
-            name="furnishingFeatures"
+            name="furnishing_status"
           >
             <Checkbox.Group options={furnishingOptions} />
           </Form.Item>
           {/* Bathrooms */}
-          <Form.Item label="Bathroom Type" name="bathroomType">
+          <Form.Item label="Bathroom Type" name="bathroom_type">
             <Checkbox.Group options={bathroomTypeOptions} />
           </Form.Item>
           {/* Yes/No toggles for amenities */}
           {[
-            { label: "Menu", name: "Menu" },
             { label: "Wifi", name: "wifi" },
-            { label: "Ac/Non-AC", name: "ac/non-ac" },
-            { label: "Laundry Service", name: "laundryService" },
+            { label: "Ac/Non-AC", name: "ac" },
+            { label: "Laundry Service", name: "laundry_service" },
             { label: "Housekeeping", name: "housekeeping" },
-            { label: "Hot Water / Geyser", name: "hotWaterGeyser" },
-            { label: "Power Backup", name: "powerBackup" },
-            { label: "Parking Available", name: "parkingAvailable" },
-            { label: "Parking (2W/4W)", name: "parking2W4W" },
+            { label: "Hot Water / Geyser", name: "hot_water" },
+            { label: "Power Backup", name: "power_backup" },
+            { label: "Parking Available", name: "parking" },
             { label: "Gym", name: "gym" },
-            { label: "Play Area", name: "playArea" },
+            { label: "Play Area", name: "play_area" },
             { label: "TV", name: "tv" },
-            { label: "Dining Table", name: "diningTable" },
+            { label: "Dining Table", name: "dining_table" },
             { label: "Security", name: "security" },
-            { label: "RO Drinking Water", name: "roDrinkingWater" },
-            { label: "Study Area", name: "studyArea" },
-            { label: "Normal Water for Cooking", name: "normalWater" },
-            { label: "Drinking Water Available", name: "drinkingWater" },
-            { label: "Provides Catering Persons", name: "cateringPersons" },
-            { label: "Photographers Required", name: "photographersRequired" },
+            { label: "RO Drinking Water", name: "ro_water" },
+            { label: "Study Area", name: "study_area" },
           ].map(({ label, name }) => (
             <Form.Item key={name} label={label} name={name}>
               <Radio.Group options={yesNoOptions} />
@@ -376,61 +442,87 @@ const AddHostels = ({ showModal, onClose }) => {
             { label: "Breakfast", name: "breakfast" },
             { label: "Lunch", name: "lunch" },
             { label: "Dinner", name: "dinner" },
-            { label: "Tea/Coffee", name: "teaCoffee" },
+            { label: "Tea/Coffee", name: "tea_coffee" },
             { label: "Snacks", name: "snacks" },
           ].map(({ label, name }) => (
             <Form.Item key={name} label={label} name={name}>
               <Radio.Group options={yesNoOptions} />
             </Form.Item>
           ))}
+
           {/* Timing */}
           {/* Breakfast  */}
-          <Form.Item label="Breakfast Timing" name="breakfastTiming">
+          <Form.Item label="Breakfast Timing" name="breakfast_timing">
             <Input
               style={{ width: "100%" }}
               placeholder="Enter Breakfast Timing"
             />
           </Form.Item>
           {/* Tea/Coffee Timing */}
-          <Form.Item label="Tea/Coffee Timing" name="teaCoffeeTiming">
+          <Form.Item label="Tea/Coffee Timing" name="tea_toffee_timing">
             <Input
               style={{ width: "100%" }}
               placeholder="Enter Tea/Coffee Timing"
             />
           </Form.Item>
           {/* Lunch Timing */}
-          <Form.Item label="Lunch Timing" name="lunchTiming">
+          <Form.Item label="Lunch Timing" name="lunch_timing">
             <Input style={{ width: "100%" }} placeholder="Enter Lunch Timing" />
           </Form.Item>
           {/* Snacks Timing */}
-          <Form.Item label="Snacks Timing" name="snacksTiming">
+          <Form.Item label="Snacks Timing" name="snacks_timing">
             <Input
               style={{ width: "100%" }}
               placeholder="Enter Snacks Timing"
             />
           </Form.Item>
           {/* Dinner Timing */}
-          <Form.Item label="Dinner Timing" name="dinnerTiming">
+          <Form.Item label="Dinner Timing" name="dinner_timing">
             <Input
               style={{ width: "100%" }}
               placeholder="Enter Dinner Timing"
             />
           </Form.Item>
-          {/* Document Required */}
-          <Form.Item label="Document Required" name="documentRequired">
+          {/* Gate Closing Timing */}
+          <Form.Item label="Gate Closing Timing" name="gate_closing_timing">
             <Input
               style={{ width: "100%" }}
-              placeholder="Enter Document Required"
+              placeholder="Enter Gate Closing Timing"
+            />
+          </Form.Item>
+          {/* Document Required */}
+          <Form.Item label="Document Required" name="documents_required">
+            <Input
+              style={{ width: "100%" }}
+              placeholder="Enter Document Required (eg. ID, Passport)"
             />
           </Form.Item>
           {/* Rules AND Policies */}
-          <Form.Item label="Rules & Policies" name="rulesPolicies">
+          {/* <Form.Item label="Rules & Policies" name="rules_policies">
             <Checkbox.Group options={rulesPoliciesOptions} />
+          </Form.Item> */}
+          {/* Rules and Polices */}
+          <Form.Item label="Rules & Policies" name="rules_policies">
+            <TextArea rows={2} placeholder="Enter Rules & Policies." />
+          </Form.Item>
+          {/* smoking policy */}
+          <Form.Item
+            label="Smoking & Alcohol Policy"
+            name="smoking_alcohol_policy"
+          >
+            <TextArea rows={2} placeholder="Enter Rules & Policies." />
+          </Form.Item>
+          {/* Deposit policy */}
+          <Form.Item
+            label="Deposit & Refund Policies"
+            name="deposit_refund_policy"
+          >
+            <TextArea rows={2} placeholder="Enter Deposit & Refund Policies." />
           </Form.Item>
           {/* Menue Images */}
           <Form.Item
             label="Menu Images (max 5)"
-            name="menuImages"
+            name="menu_images"
             valuePropName="fileList"
             getValueFromEvent={normFile}
           >

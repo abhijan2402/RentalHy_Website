@@ -8,9 +8,9 @@ export default function IconButtons() {
 
   const iconMap = {
     tolet: <FaHome />,
+    hostel: <FaRestroom />,
     convention: <FaBuilding />,
     resort: <FaTree />,
-    hostel: <FaRestroom />,
   };
 
   return (

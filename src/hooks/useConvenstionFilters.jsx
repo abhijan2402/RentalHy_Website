@@ -52,7 +52,6 @@ export function useConventionFilters(initialValues) {
     filterPayload,
     pageno,
   });
-  console.log(data?.data?.data);
 
   const toggleFilterValue = (category, value) => {
     setPendingFilters((prev) => {

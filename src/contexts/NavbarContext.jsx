@@ -5,18 +5,19 @@ const NavbarContext = createContext();
 
 const buttons = [
   { id: "tolet", label: "Home", path: "/" },
+  { id: "hostel", label: "Hostel", path: "/hostel" },
   { id: "convention", label: "Convention/Function Hall", path: "/convention" },
   { id: "resort", label: "Resort/Farm House", path: "/farm-resort" },
-  { id: "hostel", label: "Hostel", path: "/hostel" },
 ];
 
 const navItems = [
   { name: "Home", path: "/" },
+  { name: "Hostel", path: "/hostel" },
   { name: "Convention/Function Hall", path: "/convention" },
   { name: "Resort/Farm House", path: "/farm-resort" },
-  { name: "Hostel", path: "/hostel" },
   { name: "Support", path: "/support" },
   { name: "Profile", path: "/profile" },
+  { name: "Wishllist", path: "/wishlist" },
 ];
 
 export function NavbarProvider({ children }) {
@@ -30,12 +31,13 @@ export function NavbarProvider({ children }) {
       (item) => item.path === location.pathname
     );
 
+
     if (currentItem) {
       setActiveMain(currentItem.name);
 
       // map main nav to button
       if (currentItem.name === "Home") setActiveButton("tolet");
-      else if (currentItem.name === "Convention/Function Hall")
+      else if (currentItem.name === "Convention/Function Hall" )
         setActiveButton("convention");
       else if (currentItem.name === "Resort/Farm House")
         setActiveButton("resort");

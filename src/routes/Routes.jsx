@@ -17,6 +17,7 @@ import ProfilePage from "../pages/ProfilePage";
 import ConventionPage from "../pages/ConventionPage";
 import ResortFarmHousePage from "../pages/ResortFarmHousePage";
 import Hostel from "../pages/Hostel";
+import ConventionDetailsPage from "../pages/ConventionDetailsPage";
 
 export default function AppRoutes() {
   return (
@@ -24,10 +25,16 @@ export default function AppRoutes() {
       {/* Public Routes */}
       <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
+        <Route path="/propertydetails/:id" element={<PropertyDetailsPage />} />
+
         <Route path="/convention" element={<ConventionPage />} />
+        <Route
+          path="/conventiondetails/:id"
+          element={<ConventionDetailsPage />}
+        />
+
         <Route path="/farm-resort" element={<ResortFarmHousePage />} />
         <Route path="/hostel" element={<Hostel />} />
-        <Route path="/propertydetails/:id" element={<PropertyDetailsPage />} />
         <Route path="/support" element={<SupportPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />

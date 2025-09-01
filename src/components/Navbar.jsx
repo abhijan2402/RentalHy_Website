@@ -21,9 +21,9 @@ export default function Navbar() {
 
   const navItems = [
     { name: "Home", path: "/" },
+    { name: "Hostel", path: "/hostel" },
     { name: "Convention/Function Hall", path: "/convention" },
     { name: "Resort/Farm House", path: "/farm-resort" },
-    { name: "Hostel", path: "/hostel" },
     { name: "Support", path: "/support" },
   ];
 

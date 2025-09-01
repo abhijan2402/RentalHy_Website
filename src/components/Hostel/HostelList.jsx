@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useNavigate } from "react-router-dom";
 import { FaHeart, FaMapMarkerAlt, FaPlus, FaRestroom } from "react-icons/fa";
-import { BiBuilding, BiHomeAlt2 } from "react-icons/bi";
+import { BiBuilding, BiErrorCircle, BiHomeAlt2 } from "react-icons/bi";
 import { HiHome } from "react-icons/hi2";
 import { MdFilterList } from "react-icons/md";
 import { CgHome } from "react-icons/cg";
@@ -12,6 +12,13 @@ import { conventionhalldata } from "../../utils/conventionhall";
 import AddHostels from "./AddHostels";
 import { useAuth } from "../../contexts/AuthContext";
 import Pagination from "../Pagination";
+import { capitalizeFirstLetter, convertToIST } from "../../utils/utils";
+import { TbDatabaseOff } from "react-icons/tb";
+import CardLoader from "../CardLoader";
+import noimg from "/noimg.jpg";
+import { motion } from "framer-motion";
+
+const BASE_URL = import.meta.env.VITE_IMGBASE_URL;
 
 const sliderSettings = {
   dots: true,
@@ -23,70 +30,194 @@ const sliderSettings = {
   adaptiveHeight: true,
 };
 
-export default function HostelList({ setOpenFilters, openFilters }) {
+export default function HostelList({
+  setOpenFilters,
+  openFilters,
+  handleSearchInputChange,
+  handleSearchButton,
+  handleSortChange,
+  search,
+  searchKeyword,
+  sort,
+  data,
+  setPageNo,
+  isLoading,
+  error,
+}) {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const wishlist = !user ? "/signin" : "/wishlist";
-
   const [showModal, setShowModal] = useState(false);
 
-  const [search, setSearch] = useState("");
-  const [searchKeyword, setSearchKeyword] = useState(""); // triggered search
-  const [sort, setSort] = useState("");
+  const hostelList = data?.data ?? [];
+
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(8);
-
-  // Normalize prices for sorting
-  const normalizedProperties = conventionhalldata.map((p) => ({
-    ...p,
-    numPrice:
-      typeof p.price === "string" && p.price[0] === "$"
-        ? Number(p.price.replace(/[^0-9.-]+/g, ""))
-        : Number(p.price),
-  }));
-
-  // Triggered filtering
-  const sortedProperties = [...normalizedProperties]
-    .filter(
-      (p) =>
-        p.title.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-        p.location.toLowerCase().includes(searchKeyword.toLowerCase())
-    )
-    .sort((a, b) => {
-      if (sort === "low-high") return a.numPrice - b.numPrice;
-      if (sort === "high-low") return b.numPrice - a.numPrice;
-      if (sort === "nearest")
-        return new Date(b.date).getTime() - new Date(a.date).getTime();
-      if (sort === "farthest")
-        return new Date(a.date).getTime() - new Date(b.date).getTime();
-      return 0;
-    });
-
-  // Handler toggles
-  const isSearching = searchKeyword !== "";
-
-  function handleButton() {
-    if (!isSearching && search.trim() !== "") {
-      setSearchKeyword(search);
-    } else {
-      // Reset
-      setSearch("");
-      setSearchKeyword("");
+  const totalItems = data?.pagination?.total ?? 0;
+  const perPage = data?.pagination?.per_page ?? 20;
+  const totalPages = Math.max(1, Math.ceil(totalItems / perPage));
+  useEffect(() => {
+    if (data?.pagination?.current_page) {
+      setCurrentPage(data?.pagination?.current_page);
     }
-  }
+  }, [data]);
 
-  // Pagination Methods
-  const totalItems = sortedProperties.length;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  console.log(data?.data);
 
-  // Calculate items for current page
-  const startIdx = (currentPage - 1) * itemsPerPage;
-  const endIdx = currentPage * itemsPerPage;
-  const conventionhallPage = sortedProperties.slice(startIdx, endIdx);
+  const renderState = () => {
+    if (isLoading) {
+      return (
+        <>
+          <div className="mt-5">
+            <CardLoader count={9} />;
+          </div>
+        </>
+      );
+    }
+
+    if (error) {
+      return (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col items-center justify-center h-[60vh] text-red-600 gap-3"
+        >
+          <BiErrorCircle size={50} />
+          <p className="text-lg font-semibold">Something went wrong</p>
+          <p className="text-sm text-gray-500">Please try again later</p>
+        </motion.div>
+      );
+    }
+
+    if (hostelList?.length === 0) {
+      return (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="flex flex-col items-center justify-center h-[60vh] text-gray-500 gap-3"
+        >
+          <TbDatabaseOff size={50} />
+          <p className="text-lg font-medium">
+            No Convention/Fucniton Hall found
+          </p>
+        </motion.div>
+      );
+    }
+
+    return (
+      <div className="max-w-7xl mx-auto flex flex-col gap-6 w-full">
+        {/* Hostel List */}
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          {hostelList.map((property) => {
+            return (
+              <div
+                key={property.id}
+                className="border rounded-2xl shadow-lg cursor-pointer overflow-hidden hover:shadow-2xl transition-shadow flex flex-col"
+              >
+                <div className="relative">
+                  <Slider {...sliderSettings}>
+                    {property?.images.map((img, idx) => (
+                      <img
+                        key={idx}
+                        src={`${BASE_URL}${img?.image_path}`}
+                        alt={property.title}
+                        className="w-full h-56 object-cover"
+                        draggable="false"
+                        onClick={() =>
+                          !user
+                            ? navigate("/signin")
+                            : navigate(`/conventiondetails/${property.id}`)
+                        }
+                      />
+                    ))}
+                  </Slider>
+
+                  <span className="absolute top-2 left-2 bg-white/80 text-xs px-3 py-1 rounded shadow font-bold text-gray-700 flex items-center gap-1">
+                    <FaMapMarkerAlt className="text-red-500" />
+
+                    {property.location}
+                  </span>
+                </div>
+
+                <div className="flex-1 flex flex-col p-4">
+                  <div>
+                    <h3 className="font-bold text-lg text-gray-900 truncate">
+                      {capitalizeFirstLetter(property.title)}
+                    </h3>
+                  </div>
+
+                  <p className="font-medium text-sm px-2 py-1 text-gray-600 truncate">
+                    {property.description}
+                  </p>
+
+                  <div className="flex gap-4">
+                    <p className="text-xs text-gray-500 mb-2">
+                      <span className="text-black font-medium"> Type: </span>
+                      {capitalizeFirstLetter(property.hostel_type)}
+                    </p>
+                    <p className="text-xs text-gray-500 mb-2">
+                      <span className="text-black font-medium">Contact: </span>
+                      {property.contact_number}
+                    </p>
+                  </div>
+
+                  <div className="flex justify-between">
+                    <p className="text-xs text-gray-400 mb-2">
+                      Posted: {convertToIST(property.created_at)}
+                    </p>
+                  </div>
+
+                  {/* Button at bottom */}
+
+                  <div className="mt-auto w-full">
+                    <a
+                      onClick={() =>
+                        !user
+                          ? navigate("/signin")
+                          : alert("stilll to implement fucntionality")
+                      }
+                      className="w-full block text-center cursor-pointer bg-[#7C0902] text-white px-5 py-2 rounded-lg font-semibold text-sm shadow hover:bg-[#600601] transition-colors"
+                    >
+                      Book Now
+                    </a>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div className="flex flex-col md:flex-row mt-4 justify-between items-center gap-4">
+          {/* Items per page selector */}
+          <div className="flex items-center space-x-2">
+            <label htmlFor="per-page" className="text-[#7C0902] text-sm">
+              Items per page: {data?.pagination?.per_page}
+            </label>
+            {/* <select
+              id="per-page"
+              value={data?.data?.per_page}
+              // onChange={(e) => handleItemsPerPage(e.target.value)}
+              className="border border-gray-300 text-[#7C0902] rounded px-2 py-1 text-sm"
+            >
+              {[2, 5, 10, 20, 50].map((num) => (
+                <option key={num} value={num}>
+                  {num}
+                </option>
+              ))}
+            </select> */}
+          </div>
+
+          {/* Pagination Buttons */}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={(page) => setPageNo(page)}
+          />
+        </div>
+      </div>
+    );
+  };
 
   return (
-    <div className="flex-1 bg-gray-50 min-h-screen px-0">
+    <div className="flex-1 min-h-screen px-0">
       {/* Search and Sort */}
       <div className="flex flex-col sm:flex-row gap-3 mb-2 items-center w-full">
         {/* Search with dynamic button inside */}
@@ -96,18 +227,16 @@ export default function HostelList({ setOpenFilters, openFilters }) {
             placeholder="Search by title or location..."
             className="w-full border border-gray-300 rounded px-4 py-2 text-sm pr-20 focus:ring-1 focus:ring-[#7C0902] outline-none"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") handleButton();
-            }}
+            onChange={handleSearchInputChange}
+            onKeyDown={(e) => e.key === "Enter" && handleSearchButton()}
           />
           <button
-            onClick={handleButton}
+            onClick={handleSearchButton}
             className={`absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1 rounded 
-                  ${isSearching ? "bg-gray-400" : "bg-[#7C0902]"}
+                  ${searchKeyword ? "bg-gray-400" : "bg-[#7C0902]"}
                   text-white text-sm font-medium`}
           >
-            {isSearching ? "Reset" : "Search"}
+            {searchKeyword ? "Reset" : "Search"}
           </button>
         </div>
         {/* Sorting */}
@@ -115,13 +244,11 @@ export default function HostelList({ setOpenFilters, openFilters }) {
           <select
             className="w-full appearance-none border border-gray-300 rounded-lg px-4 py-2 text-sm text-gray-700 bg-white focus:ring-1 focus:ring-[#7C0902] focus:border-[#7C0902] outline-none pr-8"
             value={sort}
-            onChange={(e) => setSort(e.target.value)}
+            onChange={handleSortChange}
           >
             <option value="">Sort by</option>
-            <option value="low-high">Price: Low to High</option>
-            <option value="high-low">Price: High to Low</option>
-            <option value="nearest">Nearest</option>
-            <option value="farthest">Farthest</option>
+            <option value="price_low_high">Price: Low to High</option>
+            <option value="price_high_low">Price: High to Low</option>
           </select>
           {/* Custom dropdown icon */}
           <svg
@@ -155,88 +282,10 @@ export default function HostelList({ setOpenFilters, openFilters }) {
           </button>
         </div>
       </div>
-      {/* Property List */}
-      <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-2">
-        {conventionhallPage.map((property) => (
-          <div
-            key={property.id}
-            className="bg-white border rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow flex flex-col"
-          >
-            <div className="relative">
-              <Slider {...sliderSettings}>
-                {property.images.map((img, idx) => (
-                  <img
-                    key={idx}
-                    src={img}
-                    alt={property.title}
-                    className="w-full h-56 object-cover"
-                    draggable="false"
-                    onClick={() =>
-                      !user
-                        ? navigate("/signin")
-                        : navigate(`/propertydetails/${property.id}`)
-                    }
-                  />
-                ))}
-              </Slider>
-              <span className="absolute top-2 left-2 bg-white/80 text-xs px-3 py-1 rounded shadow font-bold text-gray-700 flex items-center gap-1">
-                <FaMapMarkerAlt className="text-red-500" />
-                {property.location}
-              </span>
-            </div>
-            <div className="flex-1 flex flex-col p-4">
-              <h3 className="font-bold text-lg text-gray-900 truncate">
-                {property.title}
-              </h3>
-              <p className="font-medium text-sm px-2 py-1 text-gray-600 truncate">
-                {property.description}
-              </p>
 
-              <div className="mb-2">
-                <span className="text-xl font-semibold text-[#7C0902]">
-                  {property.price >= 100000
-                    ? `$${property.price.toLocaleString()}`
-                    : `₹${property.price.toLocaleString()}`}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <p className="text-xs text-gray-400 mb-2">
-                  <span className="text-black"></span> {property.location}
-                </p>
-              </div>
-              <div className="flex justify-between">
-                <p className="text-xs text-gray-400 mb-2">
-                  Posted: {property.date}
-                </p>
-                <p className="text-xs text-[#7C0902] mb-2">
-                  {property.status === true ? " Verified" : null}
-                </p>
-              </div>
+      {/* Hostel List */}
+      {renderState()}
 
-              {/* Button at bottom */}
-              {/* <div className="mt-auto w-full">
-                <a
-                  onClick={() =>
-                    !user
-                      ? navigate("/signin")
-                      : navigate(`/propertydetails/${property.id}`)
-                  }
-                  className="w-full block text-center cursor-pointer bg-[#7C0902] text-white px-5 py-2 rounded-lg font-semibold text-sm shadow hover:bg-[#600601] transition-colors"
-                >
-                  Book Now
-                </a>
-              </div> */}
-            </div>
-          </div>
-        ))}
-      </div>
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={(page) => {
-          if (page >= 1 && page <= totalPages) setCurrentPage(page);
-        }}
-      />
       {/* Floating Add Button */}
       <button
         onClick={() => (!user ? navigate("/signin") : setShowModal(true))}

@@ -9,6 +9,12 @@ export default function HostelSpace() {
   const navigate = useNavigate();
   const [openFilters, setOpenFilters] = useState(false);
   const {
+    data,
+    isLoading,
+    error,
+    search,
+    searchKeyword,
+    sort,
     filters,
     setFilters,
     pendingFilters,
@@ -18,6 +24,10 @@ export default function HostelSpace() {
     resetFilters,
     applyFilters,
     isSelected,
+    handleSearchInputChange,
+    handleSearchButton,
+    handleSortChange,
+    setPageNo,
   } = useHostelFilters();
 
   return (
@@ -46,6 +56,16 @@ export default function HostelSpace() {
           <HostelList
             openFilters={openFilters}
             setOpenFilters={setOpenFilters}
+            handleSearchInputChange={handleSearchInputChange}
+            handleSearchButton={handleSearchButton}
+            handleSortChange={handleSortChange}
+            search={search}
+            searchKeyword={searchKeyword}
+            sort={sort}
+            data={data}
+            isLoading={isLoading}
+            error={error}
+            setPageNo={setPageNo}
           />
         </div>
       </div>

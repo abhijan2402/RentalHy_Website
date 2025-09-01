@@ -2,6 +2,19 @@ import React from "react";
 import "./FlagLoader.css";
 
 export default function FlagLoader() {
+  if (isLoading) {
+    return (
+      <div className="flex flex-col  items-center justify-center h-[60vh] text-gray-600 gap-3">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+        >
+          <FaSpinner size={40} className="text-[#7C0902]" />
+        </motion.div>
+        <p className="text-lg font-medium">Loading properties...</p>
+      </div>
+    );
+  }
   return (
     <div className="loader-container">
       <div className="loader-content">

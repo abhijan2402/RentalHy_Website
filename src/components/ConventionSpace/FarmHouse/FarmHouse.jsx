@@ -12,6 +12,12 @@ export default function FarmHouse() {
   const navigate = useNavigate();
   const [openFilters, setOpenFilters] = useState(false);
   const {
+    data,
+    isLoading,
+    error,
+    search,
+    searchKeyword,
+    sort,
     filters,
     setFilters,
     pendingFilters,
@@ -22,6 +28,10 @@ export default function FarmHouse() {
     applyFilters,
     isSelected,
     toggleYesNo,
+    handleSearchInputChange,
+    handleSearchButton,
+    handleSortChange,
+    setPageNo,
   } = useFarmFilters();
 
   const handleApplyFilters = () => {
@@ -55,6 +65,16 @@ export default function FarmHouse() {
           <FarmHouseList
             openFilters={openFilters}
             setOpenFilters={setOpenFilters}
+            handleSearchInputChange={handleSearchInputChange}
+            handleSearchButton={handleSearchButton}
+            handleSortChange={handleSortChange}
+            search={search}
+            searchKeyword={searchKeyword}
+            sort={sort}
+            data={data}
+            isLoading={isLoading}
+            error={error}
+            setPageNo={setPageNo}
           />
         </div>
       </div>

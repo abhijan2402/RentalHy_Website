@@ -15,6 +15,8 @@ import {
 } from "antd";
 import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import moment from "moment";
+import { useAddConventionMutation } from "../../../redux/api/conventionApi";
+import { toast } from "react-toastify";
 
 const { TextArea } = Input;
 const { RangePicker } = DatePicker;
@@ -29,25 +31,86 @@ const normFile = (e) => {
 const maxImages = 5;
 
 const standardPriceOptions = [
-  "Marriage",
-  "Reception",
+  "Wedding",
+  "Wedding Anniversary",
+  "Wedding Reception",
+  "Pre Wedding Mehendi Party",
+  "Birthday Party",
+  "Ring Ceremony",
   "Engagement",
-  "Birthday",
-  "21 Day Function",
-  "Saree Function",
-  "Meeting <250",
-  "Meeting >250",
-  "Corporate Outing/Meeting",
+  "Family Function",
+  "First Birthday Party",
+  "Naming Ceremony",
+  "Sangeet Ceremony",
+  "Baby Shower",
+  "Birda Shower",
+  "Kids Birthday Party",
+  "Dhoti Event",
+  "Upanayam",
+  "Corparate Event",
+  "Corporate Party",
+  "Farewell",
+  "Stage Event",
+  "Children Party",
+  "Annual Fest",
+  "Family Get Together",
+  "New Year Party",
+  "Freshers Party",
+  "Brand Promotion",
+  "Get Together",
+  "Meeting",
+  "Diwali Party",
+  "Conference",
+  "Kitty Party",
+  "Bachelor Party",
+  "Chritmas Party",
+  "Product Launch",
+  "Corprate Offsite",
+  "Lohri Party",
+  "Class Reunion",
+  "Valentine's Day",
+  "Dealers Meet",
+  "MICE",
+  "House Party",
+  "Group Dining",
+  "Adventure Party",
+  "Residential Conference",
+  "Corporate Traning",
+  "Business Dinner",
+  "Musical Concert",
+  "Exhibition",
+  "Cocktail Dinner",
+  "Holi Party",
+  "Team Outing",
+  "Social Mixer",
+  "Photo Shoots",
+  "Fashion Show",
+  "Team Building",
+  "Traning",
+  "Aqueeqa Ceremony",
+  "Video Shoots",
+  "Walkin Interview",
+  "Game Watch",
+  "Pool Party",
 ];
-
-const yesNoOptions = ["Yes", "No"];
+// convert into label/value objects
+const priceOptions = standardPriceOptions.map((opt) => ({
+  label: opt,
+  value: opt.toLowerCase().replace(/\s+/g, "_") + "_price",
+}));
+const yesNoOptions = [
+  { label: "Yes", value: "1" },
+  { label: "No", value: "0" },
+];
 
 const AddConventionHall = ({ showModal, onClose }) => {
   const [form] = Form.useForm();
+  const [addConvention, { error, isLoading }] = useAddConventionMutation();
 
   const [hallImages, setHallImages] = useState([]);
   const [kitchenImages, setKitchenImages] = useState([]);
   const [parkingImages, setParkingImages] = useState([]);
+  const [brideImages, setBrideImages] = useState([]);
   const [selectedDates, setSelectedDates] = useState([]);
   // Store unavailable dates as array of moments (can be individual or ranges)
   const [unavailableDatesRanges, setUnavailableDatesRanges] = useState([]);
@@ -153,40 +216,26 @@ const AddConventionHall = ({ showModal, onClose }) => {
     setAnyOtherPrices((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const onFinish = (values) => {
+  const onFinish = async (values) => {
+    console.log(values);
+
     // Validate image uploads
     if (!values.hallImages || !values.hallImages.length) {
-      message.error("Please upload at least one hall image.");
+      toast.error("Please upload at least one hall image.");
       return;
     }
     if (!values.kitchenImages || !values.kitchenImages.length) {
-      message.error("Please upload at least one kitchen image.");
+      toast.error("Please upload at least one kitchen image.");
       return;
     }
     if (!values.parkingImages || !values.parkingImages.length) {
-      message.error("Please upload at least one parking image.");
+      toast.error("Please upload at least one parking image.");
       return;
     }
 
-    // Validate price entries
-    const missingPriceTypes = standardPriceOptions.filter(
-      (opt) =>
-        values.priceOptions?.[opt] === undefined ||
-        values.priceOptions[opt] === null
-    );
-    if (missingPriceTypes.length > 0) {
-      message.error(
-        `Please enter price for options: ${missingPriceTypes.join(", ")}`
-      );
+    if (!values.brideImages || !values.brideImages.length) {
+      toast.error("Please upload at least one Bride/Groom Room image.");
       return;
-    }
-    for (const aop of anyOtherPrices) {
-      if (!aop.name || aop.price === undefined || aop.price === null) {
-        message.error(
-          "Please enter name and price for all 'Any Other' entries"
-        );
-        return;
-      }
     }
 
     // Prepare anyOtherPrices to simple array for submission
@@ -195,31 +244,79 @@ const AddConventionHall = ({ showModal, onClose }) => {
       price,
     }));
 
-    const prepareImagesInfo = (files) =>
-      files.map((file) => ({
-        name: file.name,
-        uid: file.uid,
-      }));
+    const formData = new FormData();
 
-    // Merge priceOptions and anyOtherPrices
-    const allPriceOptions = {
-      ...values.priceOptions,
-      anyOtherPrices: preparedAnyOtherPrices,
-    };
+    Object.entries(values).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        value.forEach((item, index) => {
+          if (key === "hallImages") {
+            formData.append(
+              `hall_images[${index}]`,
+              item?.originFileObj ?? item
+            );
+          } else if (key === "kitchenImages") {
+            formData.append(
+              `kitchen_images[${index}]`,
+              item?.originFileObj ?? item
+            );
+          } else if (key === "brideImages") {
+            formData.append(
+              `bride_images[${index}]`,
+              item?.originFileObj ?? item
+            );
+          } else if (key === "parkingImages") {
+            formData.append(
+              `parking_images[${index}]`,
+              item?.originFileObj ?? item
+            );
+          }
+        });
+      } else if (
+        key === "priceOptions" &&
+        typeof value === "object" &&
+        value !== null
+      ) {
+        Object.entries(value).forEach(([optionKey, optionValue]) => {
+          if (optionValue !== undefined) {
+            formData.append(optionKey, optionValue);
+          }
+        });
+      } else if (value !== null && value !== undefined) {
+        formData.append(key, value);
+      }
+    });
 
-    const submissionData = {
-      ...values,
-      priceOptions: allPriceOptions,
-      hallImages: prepareImagesInfo(values.hallImages),
-      kitchenImages: prepareImagesInfo(values.kitchenImages),
-      parkingImages: prepareImagesInfo(values.parkingImages),
-      unavailableDates: unavailableDatesRanges.map(({ start, end }) => ({
-        start: start.format("YYYY-MM-DD"),
-        end: end ? end.format("YYYY-MM-DD") : null,
-      })),
-    };
+    preparedAnyOtherPrices.forEach((item) => {
+      if (item.name && item.price !== undefined) {
+        formData.append(`other[${item.name}]`, item.price);
+      }
+    });
 
-    console.log("Submitted data:", submissionData);
+    formData.append("dates", JSON.stringify(values?.unavailableDates || []));
+
+    formData.append("lat", "");
+    formData.append("long", "");
+
+    // Debug: log all FormData values
+    for (let pair of formData.entries()) {
+      console.log(pair[0] + ": ", pair[1]);
+    }
+
+    await addConvention(formData)
+      .unwrap()
+      .then((response) => {
+        toast.success(
+          response?.message || "Convention hall created successfully"
+        );
+        console.log(response);
+      })
+      .catch((error) => {
+        const errMsg =
+          error?.data?.message ||
+          error?.error ||
+          "Failed to add Hall. Please try again.";
+        toast.error(errMsg);
+      });
 
     form.resetFields();
     setHallImages([]);
@@ -238,29 +335,37 @@ const AddConventionHall = ({ showModal, onClose }) => {
       onOk={() => form.submit()}
       okText="Upload Hall"
       okButtonProps={{
-        style: { backgroundColor: "#7C0902", borderColor: "#7C0902" },
+        style: {
+          backgroundColor: "#7C0902",
+          borderColor: "#7C0902",
+          color: "white",
+        },
+        disabled: isLoading,
+        loading: isLoading,
       }}
       cancelButtonProps={{
         style: { borderColor: "#7C0902", color: "#7C0902" },
       }}
       width="800px"
-      bodyStyle={{ maxHeight: "60vh", overflowY: "auto" }}
+      style={{ maxHeight: "60vh", borderRadius: "8px" }}
     >
-      <div className="px-4">
+      <div className="px-4 ">
         <Form
           form={form}
           layout="vertical"
           onFinish={onFinish}
           initialValues={{
-            acAvailable: "No",
-            royaltyDecoration: "No",
-            royaltyKitchen: "No",
-            generatorAvailable: "No",
-            normalWater: "No",
-            drinkingWater: "No",
-            cateringPersons: "No",
-            photographersRequired: "No",
-            parkingAvailable: "No",
+            acAvailable: "",
+            royaltyDecoration: "",
+            royaltyKitchen: "",
+            generatorAvailable: "",
+            normalWater: "",
+            drinkingWater: "",
+            cateringPersons: "",
+            photographersRequired: "",
+            parkingAvailable: "",
+            alcohol_allowed: "",
+            parking_guard: "",
             priceOptions: {},
           }}
           style={{ padding: "4px" }}
@@ -335,6 +440,32 @@ const AddConventionHall = ({ showModal, onClose }) => {
             </Upload>
           </Form.Item>
 
+          {/* Bride/Groom Room Images */}
+          <Form.Item
+            label="Bride/Groom Room Images (max 5)"
+            name="brideImages"
+            valuePropName="fileList"
+            getValueFromEvent={normFile}
+            rules={[{ required: true, message: "Upload kitchen images" }]}
+          >
+            <Upload
+              listType="picture-card"
+              multiple
+              beforeUpload={handleBeforeUpload}
+              onChange={handleChangeFactory(setBrideImages)}
+              fileList={brideImages}
+              maxCount={maxImages}
+              accept="image/*"
+            >
+              {brideImages.length >= maxImages ? null : (
+                <div>
+                  <PlusOutlined />
+                  <div style={{ marginTop: 8 }}>Upload</div>
+                </div>
+              )}
+            </Upload>
+          </Form.Item>
+
           {/* Parking Images */}
           <Form.Item
             label="Parking Images (max 5)"
@@ -361,22 +492,47 @@ const AddConventionHall = ({ showModal, onClose }) => {
             </Upload>
           </Form.Item>
 
+          {/* Seating Capacity */}
+          <Form.Item
+            label="Seating Capacity"
+            name="seating_capacity"
+            rules={[
+              { required: true, message: "Please enter seating capacity" },
+            ]}
+          >
+            <InputNumber
+              min={50}
+              max={2000}
+              style={{ width: "100%" }}
+              placeholder="Enter seating capacity (50-2000+)"
+            />
+          </Form.Item>
+
+          {/* Contact Details */}
+          <Form.Item
+            label="Contact Details"
+            name="contactDetails"
+            rules={[
+              { required: true, message: "Please enter contact details" },
+            ]}
+          >
+            <TextArea rows={2} placeholder="Enter contact details" />
+          </Form.Item>
+
           {/* Price Options with individual inputs*/}
           <Form.Item label="Price Options" style={{ marginBottom: 0 }}>
             <Row gutter={16}>
-              {standardPriceOptions.map((opt) => (
-                <Col key={opt} span={12} style={{ marginBottom: 12 }}>
+              {priceOptions.map((opt) => (
+                <Col key={opt.value} span={12} style={{ marginBottom: 12 }}>
                   <Form.Item
-                    name={["priceOptions", opt]}
-                    label={opt}
-                    rules={[{ required: true, message: "Please enter price" }]}
-                    noStyle
+                    label={opt.label}
+                    name={["priceOptions", opt.value]} // ✅ key goes here
+                    rules={[{ type: "number", min: 0 }]}
                   >
-                    <label htmlFor="">{opt}</label>
                     <InputNumber
                       min={0}
                       style={{ width: "100%" }}
-                      placeholder={`Price for ${opt}`}
+                      placeholder={`Price for ${opt.label}`}
                       formatter={(value) => (value ? `₹ ${value}` : "")}
                       parser={(value) => value.replace(/\₹\s?|(,*)/g, "")}
                     />
@@ -425,44 +581,22 @@ const AddConventionHall = ({ showModal, onClose }) => {
             </Button>
           </Form.Item>
 
-          {/* Seating Capacity */}
-          <Form.Item
-            label="Seating Capacity"
-            name="seatingCapacity"
-            rules={[
-              { required: true, message: "Please enter seating capacity" },
-            ]}
-          >
+          {/* Hall Decorator Name */}
+          <Form.Item label="Hall Decorator Name" name="hall_decorator_name">
+            <Input placeholder="Enter Hall Decorator Name" />
+          </Form.Item>
+
+          {/* Hall Decorator Name */}
+          <Form.Item label="Hall Decorator Number" name="hall_decorator_number">
             <InputNumber
-              min={50}
-              max={2000}
               style={{ width: "100%" }}
-              placeholder="Enter seating capacity (50-2000+)"
+              placeholder="Enter Hall Decorator Number"
             />
           </Form.Item>
-
-          {/* Contact Details */}
-          <Form.Item
-            label="Contact Details"
-            name="contactDetails"
-            rules={[
-              { required: true, message: "Please enter contact details" },
-            ]}
-          >
-            <TextArea rows={2} placeholder="Enter contact details" />
-          </Form.Item>
-
-          {/* Yes/No toggles for amenities */}
+          {/* Parking & Alcohol */}
           {[
-            { label: "A/C Available", name: "acAvailable" },
-            { label: "Royalty for Decoration", name: "royaltyDecoration" },
-            { label: "Royalty for Kitchen", name: "royaltyKitchen" },
-            { label: "Generator Available", name: "generatorAvailable" },
-            { label: "Normal Water for Cooking", name: "normalWater" },
-            { label: "Drinking Water Available", name: "drinkingWater" },
-            { label: "Provides Catering Persons", name: "cateringPersons" },
-            { label: "Photographers Required", name: "photographersRequired" },
-            { label: "Parking Available", name: "parkingAvailable" },
+            { label: "Parking Guard", name: "parking_guard" },
+            { label: "Alcohol Allowed", name: "alcohol_allowed" },
           ].map(({ label, name }) => (
             <Form.Item
               key={name}
@@ -475,6 +609,29 @@ const AddConventionHall = ({ showModal, onClose }) => {
                 },
               ]}
             >
+              <Radio.Group options={yesNoOptions} />
+            </Form.Item>
+          ))}
+
+          {/* Yes/No toggles for amenities */}
+          {[
+            { label: "A/C Available", name: "ac_available" },
+            { label: "Royalty for Decoration", name: "royalty_decoration" },
+            { label: "Royalty for Kitchen", name: "royalty_kitchen" },
+            { label: "Generator Available", name: "generator_available" },
+            { label: "Water for Cooking", name: "water_for_cooking" },
+            {
+              label: "Drinking Water Available",
+              name: "drinking_water_available",
+            },
+            {
+              label: "Provides Catering Persons",
+              name: "provieds_catering_persons",
+            },
+            { label: "Photographers Required", name: "photographers_required" },
+            { label: "Parking Available", name: "parking_available" },
+          ].map(({ label, name }) => (
+            <Form.Item key={name} label={label} name={name}>
               <Radio.Group options={yesNoOptions} />
             </Form.Item>
           ))}
@@ -519,7 +676,7 @@ const AddConventionHall = ({ showModal, onClose }) => {
           </Form.Item>
           <p className="mt-2">
             <span className="text-red-600">Note:</span> Please select only those
-            dates on whixh your hall is NOT available for booking. All other
+            dates on which your hall is NOT available for booking. All other
             dates will be considered available.
           </p>
         </Form>

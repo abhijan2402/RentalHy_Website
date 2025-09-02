@@ -97,8 +97,8 @@ export default function ConventionFilters({
                   onChange={(e) => toggleYesNo(key, e.target.value)}
                   value={pendingFilters.yesNoToggles[key]}
                   options={[
-                    { label: "Yes", value: "Yes" },
-                    { label: "No", value: "No" },
+                    { label: "Yes", value: "1" },
+                    { label: "No", value: "0" },
                   ]}
                 />
               </Form.Item>

@@ -18,6 +18,7 @@ import ConventionPage from "../pages/ConventionPage";
 import ResortFarmHousePage from "../pages/ResortFarmHousePage";
 import Hostel from "../pages/Hostel";
 import ConventionDetailsPage from "../pages/ConventionDetailsPage";
+import HostelDetailsPage from "../pages/HostelDetailsPage";
 
 export default function AppRoutes() {
   return (
@@ -34,7 +35,10 @@ export default function AppRoutes() {
         />
 
         <Route path="/farm-resort" element={<ResortFarmHousePage />} />
+
         <Route path="/hostel" element={<Hostel />} />
+        <Route path="/hosteldetails/:id" element={<HostelDetailsPage />} />
+
         <Route path="/support" element={<SupportPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />

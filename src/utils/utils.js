@@ -24,6 +24,12 @@ export function capitalizeFirstLetter(str) {
 }
 
 export async function getAddressFromLatLong(lat, long) {
+  // ✅ Guard clause
+  if (lat == null || long == null || lat === "" || long === "") {
+    console.warn("Lat/Long is missing, skipping API call.");
+    return "NA";
+  }
+
   const apiKey = `AIzaSyDzX3Hm6mNG2It5znswq-2waUHj8gVUCVk`;
   const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&key=${apiKey}`;
 
@@ -32,7 +38,6 @@ export async function getAddressFromLatLong(lat, long) {
     const data = await response.json();
 
     if (data.status === "OK" && data.results.length > 0) {
-      // Return the formatted address of the first result
       return data.results[0].formatted_address;
     } else {
       return "No address found for these coordinates.";
@@ -41,4 +46,31 @@ export async function getAddressFromLatLong(lat, long) {
     console.error("Error fetching address:", error);
     return null;
   }
+}
+
+
+export function cleanFormValues(obj) {
+  if (Array.isArray(obj)) {
+    return obj
+      .map(cleanFormValues) // clean nested values
+      .filter((v) => v !== null && v !== undefined && v !== ""); // remove empty
+  } else if (typeof obj === "object" && obj !== null) {
+    return Object.entries(obj).reduce((acc, [key, value]) => {
+      const cleanedValue = cleanFormValues(value);
+      if (
+        cleanedValue !== null &&
+        cleanedValue !== undefined &&
+        cleanedValue !== "" &&
+        !(
+          typeof cleanedValue === "object" &&
+          !Array.isArray(cleanedValue) &&
+          Object.keys(cleanedValue).length === 0
+        ) // remove empty objects
+      ) {
+        acc[key] = cleanedValue;
+      }
+      return acc;
+    }, {});
+  }
+  return obj;
 }

@@ -296,7 +296,7 @@ export default function ConventionHallList({
         className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-[#7C0902] text-white px-5 py-3 rounded-md shadow-lg hover:bg-[#600601] transition-colors animate-bounce"
       >
         <BiBuilding className="text-lg" />
-        <span className="">Upload Hall</span>
+        <span className="">Upload Convention/Fucntion Hall</span>
       </button>
 
       {/* Modal */}

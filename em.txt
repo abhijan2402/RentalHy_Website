@@ -1,0 +1,77 @@
+  const onFinish = (values) => {
+    console.log(values)
+    // Validate image uploads
+    if (!values.hallImages || !values.hallImages.length) {
+      message.error("Please upload at least one hall image.");
+      return;
+    }
+    if (!values.kitchenImages || !values.kitchenImages.length) {
+      message.error("Please upload at least one kitchen image.");
+      return;
+    }
+    if (!values.parkingImages || !values.parkingImages.length) {
+      message.error("Please upload at least one parking image.");
+      return;
+    }
+
+    // Validate price entries
+    const missingPriceTypes = standardPriceOptions.filter(
+      (opt) =>
+        values.priceOptions?.[opt] === undefined ||
+        values.priceOptions[opt] === null
+    );
+    if (missingPriceTypes.length > 0) {
+      message.error(
+        `Please enter price for options: ${missingPriceTypes.join(", ")}`
+      );
+      return;
+    }
+    for (const aop of anyOtherPrices) {
+      if (!aop.name || aop.price === undefined || aop.price === null) {
+        message.error(
+          "Please enter name and price for all 'Any Other' entries"
+        );
+        return;
+      }
+    }
+
+    // Prepare anyOtherPrices to simple array for submission
+    const preparedAnyOtherPrices = anyOtherPrices.map(({ name, price }) => ({
+      name,
+      price,
+    }));
+
+    const prepareImagesInfo = (files) =>
+      files.map((file) => ({
+        name: file.name,
+        uid: file.uid,
+      }));
+
+    // Merge priceOptions and anyOtherPrices
+    const allPriceOptions = {
+      ...values.priceOptions,
+      anyOtherPrices: preparedAnyOtherPrices,
+    };
+
+    const submissionData = {
+      ...values,
+      priceOptions: allPriceOptions,
+      hallImages: prepareImagesInfo(values.hallImages),
+      kitchenImages: prepareImagesInfo(values.kitchenImages),
+      parkingImages: prepareImagesInfo(values.parkingImages),
+      unavailableDates: unavailableDatesRanges.map(({ start, end }) => ({
+        start: start.format("YYYY-MM-DD"),
+        end: end ? end.format("YYYY-MM-DD") : null,
+      })),
+    };
+
+    console.log("Submitted data:", submissionData);
+
+    form.resetFields();
+    setHallImages([]);
+    setKitchenImages([]);
+    setParkingImages([]);
+    setAnyOtherPrices([]);
+    setUnavailableDatesRanges([]);
+    onClose();
+  };

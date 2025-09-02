@@ -125,7 +125,7 @@ export default function HostelList({
                         onClick={() =>
                           !user
                             ? navigate("/signin")
-                            : navigate(`/conventiondetails/${property.id}`)
+                            : navigate(`/hosteldetails/${property.id}`)
                         }
                       />
                     ))}

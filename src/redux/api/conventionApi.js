@@ -18,7 +18,6 @@ function filtersToFormData(filters = {}) {
   return formData;
 }
 
-
 export const conventionApi = createApi({
   reducerPath: "conventionApi",
   baseQuery: fetchBaseQuery({
@@ -69,6 +68,30 @@ export const conventionApi = createApi({
       }),
       invalidatesTags: ["conventionProperty"],
     }),
+
+    // 5. Get Convention properties (listing)
+    getResortFarmProperties: builder.query({
+      query: ({ filterPayload, pageno }) => {
+        const formData = filtersToFormData(filterPayload);
+
+        return {
+          url: `hall_listing?page=${pageno}`,
+          method: "POST",
+          body: formData,
+        };
+      },
+      providesTags: ["resortFarmProperty"],
+    }),
+
+    // 6.  Upload Resort/Farm
+    addResortFarm: builder.mutation({
+      query: (formdata) => ({
+        url: `hall_add/hall/resort`,
+        method: "POST",
+        body: formdata,
+      }),
+      invalidatesTags: ["conventionProperty"],
+    }),
   }),
 });
 
@@ -77,4 +100,6 @@ export const {
   useGetconventionDetailsQuery,
   useGetConventionPropertiesQuery,
   useAddConventionMutation,
+  useAddResortFarmMutation,
+  useGetResortFarmPropertiesQuery,
 } = conventionApi;

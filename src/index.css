@@ -65,3 +65,16 @@ lable {
 .ant-tabs-tab:hover .ant-tabs-tab-btn {
     color: #7C0902;
 }
+
+.custom-toast {
+    border-radius: 12px;
+    font-weight: 600;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    font-size: 14px;
+}
+
+.custom-toast .Toastify__progress-bar {
+    background: #ffdd57;
+}

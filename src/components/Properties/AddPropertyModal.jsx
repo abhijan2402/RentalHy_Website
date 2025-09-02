@@ -120,8 +120,20 @@ const AddPropertyModal = ({ showModal, onClose }) => {
         formData.append(`images[${idx}]`, file);
       });
 
-      await addProperty(formData).unwrap();
-      toast.success("Property added successfully!");
+      await addProperty(formData)
+        .unwrap()
+        .then((response) => {
+          toast.success(response?.message || "Property created successfully");
+          console.log(response);
+        })
+        .catch((error) => {
+          const errMsg =
+            error?.data?.message ||
+            error?.error ||
+            "Failed to add Property. Please try again.";
+          toast.error(errMsg);
+        });
+
       form.resetFields();
       setFileList([]);
       onClose();
@@ -315,13 +327,11 @@ const AddPropertyModal = ({ showModal, onClose }) => {
         {/* Facing */}
         <Form.Item label="Facing" name="facing_direction">
           <Radio.Group className={horizontalScrollClass}>
-            {["North", "East", "West", "South"].map(
-              (opt) => (
-                <Radio.Button key={opt} value={opt}>
-                  {opt}
-                </Radio.Button>
-              )
-            )}
+            {["North", "East", "West", "South"].map((opt) => (
+              <Radio.Button key={opt} value={opt}>
+                {opt}
+              </Radio.Button>
+            ))}
           </Radio.Group>
         </Form.Item>
 

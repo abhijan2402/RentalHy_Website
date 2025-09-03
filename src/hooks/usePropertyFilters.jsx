@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { useGetPropertiesQuery } from "../redux/api/propertyApi";
+import { useLocationCoord } from "../contexts/LocationContext";
 
 export function usePropertyFilters() {
+  const { latitude, longitude, city, area } = useLocationCoord();
   // _____________Manage States______________________
   const [filters, setFilters] = useState({
     bhk: [],
@@ -15,6 +17,8 @@ export function usePropertyFilters() {
     facing: [],
     advance: [],
     tenant: [],
+    lat: latitude,
+    long: longitude,
   });
   const [search, setSearch] = useState("");
   const [searchKeyword, setSearchKeyword] = useState("");

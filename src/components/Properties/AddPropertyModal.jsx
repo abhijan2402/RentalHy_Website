@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   Modal,
   Form,
@@ -15,7 +15,21 @@ import { PlusOutlined } from "@ant-design/icons";
 import { useAddPropertyMutation } from "../../redux/api/propertyApi";
 import { toast } from "react-toastify";
 import { usePropertyFilters } from "../../hooks/usePropertyFilters";
+import {
+  GoogleMap,
+  MarkerF,
+  Autocomplete,
+  useJsApiLoader,
+} from "@react-google-maps/api";
+import { useLocationCoord } from "../../contexts/LocationContext";
+import { useEffect } from "react";
+import { getLatLngFromAddress } from "../../utils/utils";
 
+const containerStyle = {
+  width: "100%",
+  height: "300px",
+  borderRadius: "12px",
+};
 const { Option } = Select;
 const { Group: CheckboxGroup } = Checkbox;
 const normFile = (e) => {
@@ -35,9 +49,124 @@ const AddPropertyModal = ({ showModal, onClose }) => {
   const horizontalScrollClass =
     "flex gap-2 overflow-x-auto flex-nowrap md:overflow-x-visible md:flex-wrap";
 
+  const { latitude, longitude, city, area } = useLocationCoord();
+  const [defaultCenter, setDefaultCenter] = useState({
+    lat: latitude || 20.5937,
+    lng: longitude || 78.9629,
+  });
+
+  useEffect(() => {
+    if (latitude != null && longitude != null) {
+      setDefaultCenter({ lat: latitude, lng: longitude });
+    }
+  }, [latitude, longitude]);
+
   const [addProperty, { isLoading }] = useAddPropertyMutation();
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
+  const [markerPos, setMarkerPos] = useState(null);
+  const [mapCenter, setMapCenter] = useState(defaultCenter);
+  const [searchText, setSearchText] = useState("");
+
+  const autocompleteRef = useRef(null);
+
+  const { isLoaded } = useJsApiLoader({
+    id: "google-map-script", // ✅ use same id everywhere
+    googleMapsApiKey: import.meta.env.VITE_MAP_KEY,
+    libraries: ["places"],
+  });
+
+  // Sync searchText when form.location changes
+  useEffect(() => {
+    setSearchText(form.getFieldValue("location") || "");
+  }, [form]);
+
+  // Detect user location on load
+  useEffect(() => {
+    if (isLoaded && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const pos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          };
+          setMarkerPos(pos);
+          setMapCenter(pos);
+          // form.setFieldsValue({ lat: pos.lat, long: pos.lng });
+
+          const geocoder = new window.google.maps.Geocoder();
+          geocoder.geocode({ location: pos }, (results, status) => {
+            if (status === "OK" && results[0]) {
+              form.setFieldsValue({ location: results[0].formatted_address });
+              setSearchText(results[0].formatted_address);
+            }
+          });
+        },
+        (err) => console.warn("Geolocation denied/unavailable:", err.message)
+      );
+    }
+  }, [isLoaded]);
+
+  // ✅ Autocomplete select
+  const handlePlaceChanged = () => {
+    const place = autocompleteRef.current?.getPlace();
+    if (place?.geometry?.location) {
+      const pos = {
+        lat: place.geometry.location.lat(),
+        lng: place.geometry.location.lng(),
+      };
+      setMarkerPos(pos);
+      setMapCenter(pos);
+      const address = place.formatted_address || place.name;
+
+      form.setFieldsValue({
+        location: address,
+        // lat: pos.lat,
+        // long: pos.lng,
+      });
+      setSearchText(address);
+    }
+  };
+
+  // ✅ Map click
+  const handleMapClick = (e) => {
+    const pos = { lat: e.latLng.lat(), lng: e.latLng.lng() };
+    setMarkerPos(pos);
+    setMapCenter(pos);
+
+    const geocoder = new window.google.maps.Geocoder();
+    geocoder.geocode({ location: pos }, (results, status) => {
+      if (status === "OK" && results[0]) {
+        const address = results[0].formatted_address;
+        form.setFieldsValue({
+          location: address,
+          // lat: pos.lat,
+          // long: pos.lng,
+        });
+        setSearchText(address);
+      }
+    });
+  };
+
+  // ✅ Marker drag
+  const handleMarkerDragEnd = (e) => {
+    const pos = { lat: e.latLng.lat(), lng: e.latLng.lng() };
+    setMarkerPos(pos);
+    setMapCenter(pos);
+
+    const geocoder = new window.google.maps.Geocoder();
+    geocoder.geocode({ location: pos }, (results, status) => {
+      if (status === "OK" && results[0]) {
+        const address = results[0].formatted_address;
+        form.setFieldsValue({
+          location: address,
+          // lat: pos.lat,
+          // long: pos.lng,
+        });
+        setSearchText(address);
+      }
+    });
+  };
 
   const handleBeforeUpload = (file) => {
     const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
@@ -57,25 +186,41 @@ const AddPropertyModal = ({ showModal, onClose }) => {
   };
 
   const onFinish = async (values) => {
-    console.log(values);
+    // console.log(values);
+    let coords = null;
+    if (values.location) {
+      coords = await getLatLngFromAddress(values.location);
+    }
+    console.log(coords);
     if (!values.images || values.images.length === 0) {
       toast.error("Please upload at least one property image.");
+
       return;
     }
 
     const validAvailabilityOptions = ["Ready to Move", "Under Construction"];
+
     const validAdvanceOptions = ["1 month", "2 months", "3 months+"];
 
     const formData = new FormData();
 
     try {
+      // ✅ first, fetch lat/long from location
+      let coords = null;
+      if (values.location) {
+        coords = await getLatLngFromAddress(values.location);
+      }
       // Add amenities (do this BEFORE looping other fields)
+
       if (values.amenities) {
         const amenityObj = {};
+
         values.amenities.forEach(({ amenityKey, amenityValue }) => {
           if (amenityKey) amenityObj[amenityKey] = amenityValue;
         });
+
         // Append as JSON string (for a key-value object)
+
         formData.append("amenities", JSON.stringify(amenityObj));
       }
 
@@ -90,7 +235,9 @@ const AddPropertyModal = ({ showModal, onClose }) => {
                 : validAdvanceOptions
               ).includes(v)
             );
+
             if (!firstValid) throw new Error(`Invalid ${key} selected`);
+
             formData.append(key, firstValid);
           } else {
             value.forEach((val, idx) => {
@@ -104,9 +251,11 @@ const AddPropertyModal = ({ showModal, onClose }) => {
           ) {
             throw new Error("Invalid availability selected");
           }
+
           if (key === "advance" && !validAdvanceOptions.includes(value)) {
             throw new Error("Invalid advance selected");
           }
+
           if (key === "price" || key === "area_sqft") {
             formData.append(key, value?.toString() || "");
           } else {
@@ -115,8 +264,13 @@ const AddPropertyModal = ({ showModal, onClose }) => {
         }
       });
 
+      if (coords) {
+        formData.append("lat", coords.lat.toString());
+        formData.append("long", coords.lng.toString());
+      }
       values.images.forEach((fileObj, idx) => {
         const file = fileObj.originFileObj || fileObj;
+
         formData.append(`images[${idx}]`, file);
       });
 
@@ -126,16 +280,21 @@ const AddPropertyModal = ({ showModal, onClose }) => {
           toast.success(response?.message || "Property created successfully");
           console.log(response);
         })
+
         .catch((error) => {
           const errMsg =
             error?.data?.message ||
             error?.error ||
             "Failed to add Property. Please try again.";
+
           toast.error(errMsg);
+          console.log(errMsg);
         });
 
       form.resetFields();
+
       setFileList([]);
+
       onClose();
     } catch (error) {
       toast.error(error.message || "Failed to add property. Please try again.");
@@ -230,15 +389,53 @@ const AddPropertyModal = ({ showModal, onClose }) => {
           />
         </Form.Item>
 
-        {/* Location
-         */}
+        {/* Location Picker */}
         <Form.Item
           label="Location"
           name="location"
-          rules={[{ required: true, message: "Please enter location" }]}
+          rules={[{ required: true, message: "Please select location" }]}
         >
-          <Input placeholder="Enter location" />
+          {isLoaded ? (
+            <Autocomplete
+              onLoad={(ac) => (autocompleteRef.current = ac)}
+              onPlaceChanged={handlePlaceChanged}
+            >
+              <Input
+                placeholder="Search location"
+                value={searchText}
+                onChange={(e) => {
+                  setSearchText(e.target.value);
+                  form.setFieldsValue({
+                    location: e.target.value,
+                    lat: null,
+                    long: null,
+                  });
+                }}
+                allowClear
+              />
+            </Autocomplete>
+          ) : (
+            <Input placeholder="Loading Google Maps..." disabled />
+          )}
         </Form.Item>
+
+        {/* Map */}
+        {isLoaded && (
+          <GoogleMap
+            mapContainerStyle={containerStyle}
+            center={mapCenter}
+            zoom={15}
+            onClick={handleMapClick}
+          >
+            {markerPos && (
+              <MarkerF
+                position={markerPos}
+                draggable
+                onDragEnd={handleMarkerDragEnd}
+              />
+            )}
+          </GoogleMap>
+        )}
 
         {/* Area Sq.ft */}
         <Form.Item
@@ -357,22 +554,10 @@ const AddPropertyModal = ({ showModal, onClose }) => {
                   key={key}
                   style={{ display: "flex", gap: 8, marginBottom: 8 }}
                 >
-                  <Form.Item
-                    {...restField}
-                    name={[name, "amenityKey"]}
-                    rules={[
-                      { required: true, message: "Amenity name required" },
-                    ]}
-                  >
+                  <Form.Item {...restField} name={[name, "amenityKey"]}>
                     <Input placeholder="Amenity Name (e.g. Death road)" />
                   </Form.Item>
-                  <Form.Item
-                    {...restField}
-                    name={[name, "amenityValue"]}
-                    rules={[
-                      { required: true, message: "Amenity value required" },
-                    ]}
-                  >
+                  <Form.Item {...restField} name={[name, "amenityValue"]}>
                     <Input placeholder="Value (e.g. yes)" />
                   </Form.Item>
                   <Button danger onClick={() => remove(name)}>

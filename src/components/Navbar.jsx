@@ -8,8 +8,15 @@ import { BiHeart } from "react-icons/bi";
 import { FaLocationPin, FaLocationPinLock } from "react-icons/fa6";
 import { useNavbar } from "../contexts/NavbarContext";
 import { useGetWishlistStatsQuery } from "../redux/api/propertyApi";
+import { useLocationCoord } from "../contexts/LocationContext";
+import LocationModal from "./LoactionModal/LocationModal";
 
 export default function Navbar() {
+  const { latitude, longitude, city, area } = useLocationCoord();
+
+  console.log(latitude, longitude, city, area);
+  const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
+
   const { user } = useAuth();
   const { data, isLoading, error } = useGetWishlistStatsQuery();
   const { activeMain, setActiveMain, activeButton, setActiveButton } =
@@ -108,18 +115,19 @@ export default function Navbar() {
               <FaUserCircle className="w-6 h-6" />
             </button>
             <div className="flex items-center space-x-3 bg-white rounded-lg px-0 py-0  ">
-              <div className="flex flex-col">
+              <div
+                onClick={() => setIsLocationModalOpen(true)}
+                className="flex flex-col cursor-pointer"
+              >
                 <div className="flex gap-1 items-center">
                   <div className="relative p-0 rounded-full  text-[#7C0902] transition duration-300">
                     <FaLocationPin className="w-4 h-4" />
                   </div>
                   <span className="font-semibold text-[#7C0902] text-[14px]">
-                    {"Jaipur"}
+                    {city}
                   </span>
                 </div>
-                <p className="text-[12px] pl-1 text-gray-600">
-                  {"Abc, Jaipur, Rajasthan"}
-                </p>
+                <p className="text-[12px] pl-1 text-gray-600">{area}</p>
               </div>
             </div>
           </div>
@@ -132,12 +140,10 @@ export default function Navbar() {
                   <FaLocationPin className="w-4 h-4" />
                 </div>
                 <span className="font-semibold text-[#7C0902] text-[14px]">
-                  {"Jaipur"}
+                  {city}
                 </span>
               </div>
-              <p className="text-[12px] pl-1 text-gray-600">
-                {"Abc, Jaipur, Rajasthan"}
-              </p>
+              <p className="text-[12px] pl-1 text-gray-600">{area}</p>
             </div>
           </div>
           <button
@@ -212,6 +218,11 @@ export default function Navbar() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <LocationModal
+        isOpen={isLocationModalOpen}
+        onClose={() => setIsLocationModalOpen(false)}
+      />
     </>
   );
 }

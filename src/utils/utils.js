@@ -10,9 +10,6 @@ export function convertToIST(utcDateString) {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
-    // hour: "2-digit",
-    // minute: "2-digit",
-    // second: "2-digit",
   });
 
   return istDate;
@@ -23,6 +20,7 @@ export function capitalizeFirstLetter(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
+// Function to get Location
 export async function getAddressFromLatLong(lat, long) {
   // ✅ Guard clause
   if (lat == null || long == null || lat === "" || long === "") {
@@ -48,6 +46,29 @@ export async function getAddressFromLatLong(lat, long) {
   }
 }
 
+// Function to get Lat $ Long
+export async function getLatLngFromAddress(address) {
+  const apiKey = import.meta.env.VITE_MAP_KEY;
+  const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
+    address
+  )}&key=${apiKey}`;
+
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data.status === "OK" && data.results.length > 0) {
+      const location = data.results[0].geometry.location;
+      return { lat: location.lat, lng: location.lng };
+    } else {
+      console.error("Geocoding failed:", data.status, data.error_message);
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching geocode:", error);
+    return null;
+  }
+}
 
 export function cleanFormValues(obj) {
   if (Array.isArray(obj)) {

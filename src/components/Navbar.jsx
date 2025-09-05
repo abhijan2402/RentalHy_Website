@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
-import { FaUserCircle, FaHeart } from "react-icons/fa";
+import { FaUserCircle, FaHeart, FaChevronDown } from "react-icons/fa";
 import { useAuth } from "../contexts/AuthContext";
 import logo from "../assets/clogo.png";
 import { BiHeart } from "react-icons/bi";
@@ -10,11 +10,11 @@ import { useNavbar } from "../contexts/NavbarContext";
 import { useGetWishlistStatsQuery } from "../redux/api/propertyApi";
 import { useLocationCoord } from "../contexts/LocationContext";
 import LocationModal from "./LoactionModal/LocationModal";
+import { MdOutlineMyLocation } from "react-icons/md";
 
 export default function Navbar() {
   const { latitude, longitude, city, area } = useLocationCoord();
 
-  console.log(latitude, longitude, city, area);
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
 
   const { user } = useAuth();
@@ -55,7 +55,6 @@ export default function Navbar() {
   }, [activeMain, setActiveButton]);
 
   const handleClickMain = (item) => {
-    console.log(item);
     setActiveMain(item.name);
     setActiveButton(null);
     navigate(item.path);
@@ -114,44 +113,73 @@ export default function Navbar() {
             >
               <FaUserCircle className="w-6 h-6" />
             </button>
-            <div className="flex items-center space-x-3 bg-white rounded-lg px-0 py-0  ">
-              <div
-                onClick={() => setIsLocationModalOpen(true)}
-                className="flex flex-col cursor-pointer"
-              >
-                <div className="flex gap-1 items-center">
-                  <div className="relative p-0 rounded-full  text-[#7C0902] transition duration-300">
-                    <FaLocationPin className="w-4 h-4" />
-                  </div>
+            <div
+              onClick={() => setIsLocationModalOpen(true)}
+              role="button"
+              tabIndex={0}
+              onKeyPress={(e) =>
+                (e.key === "Enter" || e.key === " ") &&
+                setIsLocationModalOpen(true)
+              }
+              className="flex items-center space-x-3 bg-white rounded-lg px-4 py-2 border border-gray-300 hover:shadow-md transition-shadow duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#7C0902]"
+              title="Click to select a different location"
+            >
+              <div className="flex items-center space-x-2">
+                <MdOutlineMyLocation
+                  className="w-5 h-5 text-[#7C0902]  "
+                  aria-hidden="true"
+                />
+                <div className="flex flex-col leading-none">
                   <span className="font-semibold text-[#7C0902] text-[14px]">
                     {city}
                   </span>
+                  <p className="text-[10px] mt-1 text-gray-600">{area}</p>
                 </div>
-                <p className="text-[12px] pl-1 text-gray-600">{area}</p>
               </div>
+              <FaChevronDown
+                className="w-4 h-4 text-gray-400 ml-auto"
+                aria-hidden="true"
+              />
             </div>
           </div>
 
-          {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center space-x-3 bg-white rounded-lg px-0 py-0  ">
-            <div className="flex flex-col">
-              <div className="flex gap-1 items-center">
-                <div className="relative p-0 rounded-full  text-[#7C0902] transition duration-300">
-                  <FaLocationPin className="w-4 h-4" />
+          <div className="flex gap-6">
+            {/* Mobile Menu Button */}
+            <div
+              onClick={() => setIsLocationModalOpen(true)}
+              role="button"
+              tabIndex={0}
+              onKeyPress={(e) =>
+                (e.key === "Enter" || e.key === " ") &&
+                setIsLocationModalOpen(true)
+              }
+              className="md:hidden flex items-center space-x-3 bg-white rounded-lg px-4 py-2 border border-gray-300 hover:shadow-md transition-shadow duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#7C0902]"
+              title="Click to select a different location"
+            >
+              <div className="flex items-center space-x-2">
+                <MdOutlineMyLocation
+                  className="w-5 h-5 text-[#7C0902]  "
+                  aria-hidden="true"
+                />
+                <div className="flex flex-col leading-none">
+                  <span className="font-semibold text-[#7C0902] text-[14px]">
+                    {city}
+                  </span>
+                  <p className="text-[10px] mt-1 text-gray-600">{area}</p>
                 </div>
-                <span className="font-semibold text-[#7C0902] text-[14px]">
-                  {city}
-                </span>
               </div>
-              <p className="text-[12px] pl-1 text-gray-600">{area}</p>
+              <FaChevronDown
+                className="w-4 h-4 text-gray-400 ml-auto"
+                aria-hidden="true"
+              />
             </div>
+            <button
+              className="md:hidden text-black text-3xl"
+              onClick={() => setIsMobileMenuOpen(true)}
+            >
+              ☰
+            </button>
           </div>
-          <button
-            className="md:hidden text-black text-3xl"
-            onClick={() => setIsMobileMenuOpen(true)}
-          >
-            ☰
-          </button>
         </div>
       </motion.nav>
 
@@ -194,9 +222,9 @@ export default function Navbar() {
                     }}
                   >
                     <span className="text-lg font-medium">Wishlist</span>
-                    {wishlistCount > 0 && (
+                    {data?.data?.length > 0 && (
                       <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
-                        {wishlistCount}
+                        {data?.data?.length}
                       </span>
                     )}
                   </div>

@@ -187,11 +187,7 @@ const AddPropertyModal = ({ showModal, onClose }) => {
 
   const onFinish = async (values) => {
     // console.log(values);
-    let coords = null;
-    if (values.location) {
-      coords = await getLatLngFromAddress(values.location);
-    }
-    console.log(coords);
+   
     if (!values.images || values.images.length === 0) {
       toast.error("Please upload at least one property image.");
 

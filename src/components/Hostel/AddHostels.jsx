@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Modal,
   Form,
@@ -18,9 +18,23 @@ import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import moment from "moment";
 import { useAddHostelMutation } from "../../redux/api/hostelApi";
 import { toast } from "react-toastify";
+import {
+  GoogleMap,
+  MarkerF,
+  Autocomplete,
+  useJsApiLoader,
+} from "@react-google-maps/api";
+import { useLocationCoord } from "../../contexts/LocationContext";
+import { getLatLngFromAddress } from "../../utils/utils";
 
 const { TextArea } = Input;
 const { RangePicker } = DatePicker;
+
+const containerStyle = {
+  width: "100%",
+  height: "300px",
+  borderRadius: "12px",
+};
 
 const normFile = (e) => {
   if (Array.isArray(e)) return e;
@@ -123,10 +137,140 @@ function cleanObject(obj) {
 }
 
 const AddHostels = ({ showModal, onClose }) => {
+  const { latitude, longitude, city, area } = useLocationCoord();
+  const [defaultCenter, setDefaultCenter] = useState({
+    lat: latitude || 20.5937,
+    lng: longitude || 78.9629,
+  });
+
+  useEffect(() => {
+    if (latitude != null && longitude != null) {
+      setDefaultCenter({ lat: latitude, lng: longitude });
+    }
+  }, [latitude, longitude]);
+
   const [form] = Form.useForm();
   const [addHostel, { error, isLoading }] = useAddHostelMutation();
   const [hostelImgae, setHostelImgae] = useState([]);
   const [MenuImages, setMenuImages] = useState([]);
+  const [markerPos, setMarkerPos] = useState(null);
+  const [mapCenter, setMapCenter] = useState(defaultCenter);
+  const [searchText, setSearchText] = useState("");
+
+  const autocompleteRef = useRef(null);
+
+  const { isLoaded } = useJsApiLoader({
+    id: "google-map-script", // ✅ use same id everywhere
+    googleMapsApiKey: import.meta.env.VITE_MAP_KEY,
+    libraries: ["places"],
+  });
+
+  // Sync searchText when form.location changes
+  useEffect(() => {
+    setSearchText(form.getFieldValue("location") || "");
+  }, [form]);
+
+  // Detect user location on load
+  useEffect(() => {
+    if (isLoaded && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const pos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          };
+          setMarkerPos(pos);
+          setMapCenter(pos);
+          // form.setFieldsValue({ lat: pos.lat, long: pos.lng });
+
+          const geocoder = new window.google.maps.Geocoder();
+          geocoder.geocode({ location: pos }, (results, status) => {
+            if (status === "OK" && results[0]) {
+              form.setFieldsValue({ location: results[0].formatted_address });
+              setSearchText(results[0].formatted_address);
+            }
+          });
+        },
+        (err) => console.warn("Geolocation denied/unavailable:", err.message)
+      );
+    }
+  }, [isLoaded]);
+
+  // ✅ Autocomplete select
+  const handlePlaceChanged = () => {
+    const place = autocompleteRef.current?.getPlace();
+    if (place?.geometry?.location) {
+      const pos = {
+        lat: place.geometry.location.lat(),
+        lng: place.geometry.location.lng(),
+      };
+      setMarkerPos(pos);
+      setMapCenter(pos);
+      const address = place.formatted_address || place.name;
+      const mapsUrl = `https://www.google.com/maps?q=${pos.lat},${pos.lng}`;
+      form.setFieldsValue({
+        location: address,
+        map_link: mapsUrl,
+        // lat: pos.lat,
+        // long: pos.lng,
+      });
+      setSearchText(address);
+    }
+  };
+
+  // ✅ Map click
+  const handleMapClick = (e) => {
+    const pos = { lat: e.latLng.lat(), lng: e.latLng.lng() };
+    setMarkerPos(pos);
+    setMapCenter(pos);
+
+    const mapsUrl = `https://www.google.com/maps?q=${pos.lat},${pos.lng}`;
+
+    console.log(mapsUrl);
+
+    const geocoder = new window.google.maps.Geocoder();
+    geocoder.geocode({ location: pos }, (results, status) => {
+      if (status === "OK" && results[0]) {
+        const address = results[0].formatted_address;
+        form.setFieldsValue({
+          location: address,
+          map_link: mapsUrl,
+          // lat: pos.lat,
+          // long: pos.lng,
+        });
+        setSearchText(address);
+      } else {
+        form.setFieldsValue({
+          map_link: mapsUrl,
+        });
+      }
+    });
+  };
+
+  // ✅ Marker drag
+  const handleMarkerDragEnd = (e) => {
+    const pos = { lat: e.latLng.lat(), lng: e.latLng.lng() };
+    setMarkerPos(pos);
+    setMapCenter(pos);
+    const mapsUrl = `https://www.google.com/maps?q=${pos.lat},${pos.lng}`;
+    const geocoder = new window.google.maps.Geocoder();
+    geocoder.geocode({ location: pos }, (results, status) => {
+      if (status === "OK" && results[0]) {
+        const address = results[0].formatted_address;
+        form.setFieldsValue({
+          location: address,
+          map_link: mapsUrl,
+          // lat: pos.lat,
+          // long: pos.lng,
+        });
+        setSearchText(address);
+      } else {
+        form.setFieldsValue({
+          map_link: mapsUrl,
+        });
+      }
+    });
+  };
 
   const handleBeforeUpload = (file) => {
     const isImage = file.type.startsWith("image/");
@@ -143,6 +287,11 @@ const AddHostels = ({ showModal, onClose }) => {
 
   const onFinish = async (values) => {
     // Validate mandatory uploads
+    let coords = null;
+    if (values.location) {
+      coords = await getLatLngFromAddress(values.location);
+    }
+    console.log(coords, values?.map_link);
     if (!values.images || values.images.length === 0) {
       message.error("Please upload at least one hall image.");
       return;
@@ -177,6 +326,11 @@ const AddHostels = ({ showModal, onClose }) => {
         formData.append(key, value);
       }
     });
+
+    if (coords) {
+      formData.append("lat", coords.lat.toString());
+      formData.append("long", coords.lng.toString());
+    }
 
     // Debug: log all FormData values
     for (let pair of formData.entries()) {
@@ -213,6 +367,8 @@ const AddHostels = ({ showModal, onClose }) => {
       okText="Upload Hall"
       okButtonProps={{
         style: { backgroundColor: "#7C0902", borderColor: "#7C0902" },
+        disabled: isLoading,
+        loading: isLoading,
       }}
       cancelButtonProps={{
         style: { borderColor: "#7C0902", color: "#7C0902" },
@@ -372,19 +528,72 @@ const AddHostels = ({ showModal, onClose }) => {
             </Row>
           </Form.Item>
 
+          {/* Location Picker */}
+          <Form.Item
+            label="Location"
+            name="location"
+            rules={[{ required: true, message: "Please select location" }]}
+          >
+            {isLoaded ? (
+              <Autocomplete
+                onLoad={(ac) => (autocompleteRef.current = ac)}
+                onPlaceChanged={handlePlaceChanged}
+              >
+                <Input
+                  placeholder="Search location"
+                  value={searchText}
+                  onChange={(e) => {
+                    setSearchText(e.target.value);
+                    form.setFieldsValue({
+                      location: e.target.value,
+                      lat: null,
+                      long: null,
+                    });
+                  }}
+                  allowClear
+                />
+              </Autocomplete>
+            ) : (
+              <Input placeholder="Loading Google Maps..." disabled />
+            )}
+          </Form.Item>
+
+          {/* Map */}
+          {isLoaded && (
+            <GoogleMap
+              mapContainerStyle={containerStyle}
+              center={mapCenter}
+              zoom={15}
+              onClick={handleMapClick}
+            >
+              {markerPos && (
+                <MarkerF
+                  position={markerPos}
+                  draggable
+                  onDragEnd={handleMarkerDragEnd}
+                />
+              )}
+            </GoogleMap>
+          )}
+
           {/* Map Link  */}
-          <Form.Item label="Map Link" name="map_link">
+          <Form.Item
+            label="Map Link"
+            name="map_link"
+            style={{ marginTop: "16px" }}
+          >
             <Input
               style={{ width: "100%" }}
               placeholder="Enter Security Deposit"
             />
           </Form.Item>
-          {/* Location  */}
-          <Form.Item label="Location" name="location">
-            <Input style={{ width: "100%" }} placeholder="Enter Location" />
-          </Form.Item>
+
           {/* Landmark  */}
-          <Form.Item label="Land Mark" name="landmark">
+          <Form.Item
+            label="Land Mark"
+            name="landmark"
+            style={{ marginTop: "16px" }}
+          >
             <Input style={{ width: "100%" }} placeholder="Enter Landmark" />
           </Form.Item>
           {/* Room Size (sq.ft) */}

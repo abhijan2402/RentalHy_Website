@@ -1,9 +1,9 @@
 import React, { useState, useCallback } from "react";
-import { Modal, Button } from "antd";
+import { Modal, Button, Typography } from "antd";
 import { useJsApiLoader, Autocomplete } from "@react-google-maps/api";
 import { useLocationCoord as useLocContext } from "../../contexts/LocationContext";
 
-const libraries = ["places"];
+const { Title, Text } = Typography;
 
 export default function LocationModal({ isOpen, onClose }) {
   const { setLocation } = useLocContext();
@@ -67,20 +67,33 @@ export default function LocationModal({ isOpen, onClose }) {
 
   return (
     <Modal
-      title="Select your location"
+      title={null}
       open={isOpen}
       onCancel={onClose}
       footer={[
-        <Button key="cancel" onClick={onClose}>
+        <Button key="cancel" onClick={onClose} className="font-semibold">
           Cancel
         </Button>,
       ]}
+      maskStyle={{ backgroundColor: "rgba(0, 0, 0, 0.75)" }} // Darker overlay
+      centered
     >
+      <div className="mb-6 text-center">
+        <Title level={3} style={{ color: "#7C0902", fontWeight: "bold" }}>
+          Choose Your Perfect Spot
+        </Title>
+        <Text italic style={{ color: "#5a5a5a", fontSize: 16 }}>
+          Search for your city, neighborhood, or a specific address to get
+          started.
+        </Text>
+      </div>
+
       <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>
         <input
           type="text"
-          placeholder="Search location"
-          className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#7C0902]"
+          placeholder="Start typing location..."
+          className="w-full border border-gray-300 rounded px-4 py-3 text-lg placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-[#7C0902] transition"
+          autoFocus
         />
       </Autocomplete>
     </Modal>

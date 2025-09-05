@@ -4,18 +4,25 @@ export const ticketListApi = createApi({
   reducerPath: "ticketListApi",
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_BASE_URL,
+    prepareHeaders: (headers) => {
+      const token = localStorage.getItem("authToken");
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
+      }
+      return headers;
+    },
   }),
   tagTypes: ["ticketList"],
   endpoints: (builder) => ({
     getTicketList: builder.query({
-      query: () => "admin/tickets-list",
+      query: () => "support/issues",
       providesTags: ["ticketList"],
     }),
     replyToTicket: builder.mutation({
-      query: ({ id, message }) => ({
-        url: `admin/tickets/${id}/reply`,
+      query: ({ formdata }) => ({
+        url: `support/issues`,
         method: "POST",
-        body: { message },
+        body: formdata,
       }),
       invalidatesTags: ["ticketList"],
     }),

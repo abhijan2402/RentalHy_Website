@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaTimes, FaPlusCircle, FaCheckCircle, FaClock } from "react-icons/fa";
+import { useGetTicketListQuery } from "../redux/api/ticketListApi";
+import { convertToIST } from "../utils/utils";
 
 export default function SupportPage() {
+  const { data, isLoading, error } = useGetTicketListQuery();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tickets, setTickets] = useState([
     {
@@ -63,10 +66,10 @@ export default function SupportPage() {
 
       {/* Tickets List */}
       <div className="grid gap-5">
-        {tickets.map((ticket) => (
+        {data?.data?.data?.map((ticket) => (
           <motion.div
             key={ticket.id}
-            className="bg-white p-5 rounded-xl shadow-sm hover:shadow-lg transition-shadow flex justify-between items-start gap-4"
+            className="bg-gray-100 p-5 rounded-xl shadow-sm hover:shadow-lg transition-shadow flex justify-between items-start gap-4"
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
           >
@@ -76,6 +79,9 @@ export default function SupportPage() {
               </h3>
               <p className="text-gray-500 text-sm line-clamp-2 leading-relaxed">
                 {ticket.description}
+              </p>
+              <p className="text-gray-500 text-[12px] mt-2">
+                Raised On: {convertToIST(ticket?.created_at)}
               </p>
             </div>
             <div className="flex items-center gap-2">

@@ -1,11 +1,24 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaTimes, FaPlusCircle, FaCheckCircle, FaClock } from "react-icons/fa";
+import {
+  FaTimes,
+  FaPlusCircle,
+  FaCheckCircle,
+  FaClock,
+  FaExclamationCircle,
+  FaRedoAlt,
+} from "react-icons/fa";
 import { useGetTicketListQuery } from "../redux/api/ticketListApi";
 import { convertToIST } from "../utils/utils";
+import { Spin, Button as AntButton } from "antd";
+import { LoadingOutlined } from "@ant-design/icons";
+
+const customIndicator = (
+  <LoadingOutlined style={{ fontSize: 48, color: "#7C0902" }} spin />
+);
 
 export default function SupportPage() {
-  const { data, isLoading, error } = useGetTicketListQuery();
+  const { data, isLoading, error, refetch } = useGetTicketListQuery();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tickets, setTickets] = useState([
     {
@@ -58,51 +71,103 @@ export default function SupportPage() {
         <motion.button
           onClick={() => setIsModalOpen(true)}
           whileHover={{ scale: 1.05 }}
-          className="flex items-center gap-2 bg-gradient-to-r from-[#7C0902] to-[#a1120b] text-white px-5 py-3 rounded-lg shadow-lg hover:opacity-90 transition"
+          disabled={isLoading}
+          className={`flex items-center gap-2 bg-gradient-to-r from-[#7C0902] to-[#a1120b] text-white px-5 py-3 rounded-lg shadow-lg hover:opacity-90 transition ${
+            isLoading ? "opacity-60 cursor-not-allowed" : ""
+          }`}
+          aria-label="Raise a ticket"
         >
-          <FaPlusCircle /> Raise a Ticket
+          <FaPlusCircle />
+          Raise a Ticket
         </motion.button>
       </div>
 
-      {/* Tickets List */}
-      <div className="grid gap-5">
-        {data?.data?.data?.map((ticket) => (
+      {/* Loading State */}
+      <AnimatePresence>
+        {isLoading && (
           <motion.div
-            key={ticket.id}
-            className="bg-gray-100 p-5 rounded-xl shadow-sm hover:shadow-lg transition-shadow flex justify-between items-start gap-4"
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="flex justify-center items-center py-20"
+            aria-live="polite"
+            aria-busy="true"
           >
-            <div>
-              <h3 className="font-semibold text-lg text-gray-800 mb-1">
-                {ticket.title}
-              </h3>
-              <p className="text-gray-500 text-sm line-clamp-2 leading-relaxed">
-                {ticket.description}
-              </p>
-              <p className="text-gray-500 text-[12px] mt-2">
-                Raised On: {convertToIST(ticket?.created_at)}
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              {ticket.status === "Resolved" ? (
-                <FaCheckCircle className="text-green-600" />
-              ) : (
-                <FaClock className="text-yellow-500" />
-              )}
-              <span
-                className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  ticket.status === "Resolved"
-                    ? "bg-green-100 text-green-700"
-                    : "bg-yellow-100 text-yellow-700"
-                }`}
-              >
-                {ticket.status}
-              </span>
-            </div>
+            <Spin indicator={customIndicator} tip="Loading tickets..." />
           </motion.div>
-        ))}
-      </div>
+        )}
+      </AnimatePresence>
+
+      {/* Error State */}
+      <AnimatePresence>
+        {error && !isLoading && (
+          <motion.div
+            initial={{ opacity: 0, y: -15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            className="flex flex-col items-center border  text-red-700 p-6 rounded-lg my-12 max-w-7xl mx-auto"
+            role="alert"
+          >
+            <FaExclamationCircle
+              className="text-red-600 w-10 h-12 mb-2"
+              aria-hidden="true"
+            />
+            <p className="mb-4 text-center text-md font-semibold">
+              Failed to load tickets.
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Tickets List */}
+      {!isLoading && !error && (
+        <div
+          className="grid gap-5"
+          role="list"
+          aria-label="Support tickets list"
+        >
+          {(data?.data?.data || tickets).map((ticket) => (
+            <motion.div
+              key={ticket.id}
+              className="bg-gray-100 p-5 rounded-xl shadow-sm hover:shadow-lg transition-shadow flex justify-between items-start gap-4"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              role="listitem"
+            >
+              <div>
+                <h3 className="font-semibold text-lg text-gray-800 mb-1">
+                  {ticket.title}
+                </h3>
+                <p className="text-gray-500 text-sm line-clamp-2 leading-relaxed">
+                  {ticket.description}
+                </p>
+                <p className="text-gray-500 text-[12px] mt-2">
+                  Raised On: {convertToIST(ticket?.created_at)}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                {ticket.status === "Resolved" ? (
+                  <FaCheckCircle
+                    className="text-green-600"
+                    aria-label="Resolved"
+                  />
+                ) : (
+                  <FaClock className="text-yellow-500" aria-label="Open" />
+                )}
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    ticket.status === "Resolved"
+                      ? "bg-green-100 text-green-700"
+                      : "bg-yellow-100 text-yellow-700"
+                  }`}
+                >
+                  {ticket.status}
+                </span>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      )}
 
       {/* Modal */}
       <AnimatePresence>
@@ -112,6 +177,9 @@ export default function SupportPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            aria-modal="true"
+            role="dialog"
+            aria-labelledby="modal-title"
           >
             <motion.div
               className="bg-white p-6 rounded-xl max-w-md w-full shadow-xl relative"
@@ -123,40 +191,56 @@ export default function SupportPage() {
               <button
                 className="absolute top-3 right-3 text-gray-400 hover:text-gray-800"
                 onClick={() => setIsModalOpen(false)}
+                aria-label="Close modal"
               >
                 <FaTimes size={18} />
               </button>
 
-              <h3 className="text-2xl font-bold mb-5 text-[#7C0902]">
+              <h3
+                id="modal-title"
+                className="text-2xl font-bold mb-5 text-[#7C0902]"
+              >
                 Raise a Ticket
               </h3>
 
-              <label className="block mb-2 text-sm font-medium text-gray-700">
+              <label
+                className="block mb-2 text-sm font-medium text-gray-700"
+                htmlFor="ticket-title"
+              >
                 Title
               </label>
               <input
+                id="ticket-title"
                 type="text"
                 placeholder="Enter ticket title"
                 className="w-full text-black border p-2 rounded-md mb-4 focus:outline-none focus:ring-2 focus:ring-[#7C0902]/50"
                 value={form.title}
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
+                aria-required="true"
               />
 
-              <label className="block mb-2 text-sm font-medium text-gray-700">
+              <label
+                className="block mb-2 text-sm font-medium text-gray-700"
+                htmlFor="ticket-description"
+              >
                 Description
               </label>
               <textarea
+                id="ticket-description"
                 placeholder="Describe your issue"
                 className="w-full border p-2 text-black rounded-md mb-4 h-24 resize-none focus:outline-none focus:ring-2 focus:ring-[#7C0902]/50"
                 value={form.description}
                 onChange={(e) =>
                   setForm({ ...form, description: e.target.value })
                 }
+                aria-required="true"
               />
 
               <button
                 onClick={handleSubmit}
                 className="w-full bg-[#7C0902] text-white py-2 rounded-md font-semibold hover:bg-[#600601] transition"
+                aria-disabled={!form.title || !form.description}
+                disabled={!form.title || !form.description}
               >
                 Submit Ticket
               </button>

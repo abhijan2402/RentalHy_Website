@@ -20,6 +20,9 @@ import {
   useUpdateProfileMutation,
   useUploadProfileImageMutation,
 } from "../redux/api/profileApi";
+import MyBookings from "../components/MyBookings";
+import Bookings from "../components/Bookings";
+import Account from "../components/Account";
 
 const { TabPane } = Tabs;
 
@@ -173,24 +176,30 @@ export default function ProfilePage() {
           <TabPane tab="My Property" key="myProperty">
             <PropertyAnalytics />
           </TabPane>
-          <TabPane tab="Convention / Function Hall" key="conventionHall">
+          <TabPane tab="My Bookings" key="myBookings">
+            <MyBookings />
+          </TabPane>
+          <TabPane tab="Bookings" key="bookings">
+            <Bookings />
+          </TabPane>
+          <TabPane tab="Account" key="account">
+            <Account />
+          </TabPane>
+          {/* <TabPane tab="Convention / Function Hall" key="conventionHall">
             <div className="flex border border-dashed border-[#7C0902] rounded text-[#7C0902] justify-center items-center h-[100px]">
               Coming Soon..
             </div>
-            {/* <ConventionHallComponent /> */}
           </TabPane>
           <TabPane tab="Resort / Farm House" key="resortFarmHouse">
             <div className="flex border border-dashed border-[#7C0902] rounded text-[#7C0902] justify-center items-center h-[100px]">
               Coming Soon..
             </div>
-            {/* <ResortFarmHouseComponent /> */}
           </TabPane>
           <TabPane tab="Hotels" key="hotels">
             <div className="flex border border-dashed border-[#7C0902] rounded text-[#7C0902] justify-center items-center h-[100px]">
               Coming Soon..
             </div>
-            {/* <HotelsComponent /> */}
-          </TabPane>
+          </TabPane> */}
         </Tabs>
       </div>
 

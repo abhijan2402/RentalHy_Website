@@ -4,10 +4,12 @@ import ConventionHallList from "./ConventionHallList";
 import ConventionFilters from "./ConventionFilters";
 import IconButtons from "../../IconButtons";
 import { useConventionFilters } from "../../../hooks/useConvenstionFilters";
+import BookConventionSpace from "./BookConventionSpace/BookConventionSpace";
 
 export default function ConventionHall() {
   const navigate = useNavigate();
   const [openFilters, setOpenFilters] = useState(false);
+  const [openBookingModal, setOpenBookingModal] = useState(false);
   const {
     data,
     isLoading,
@@ -60,6 +62,8 @@ export default function ConventionHall() {
       <div className=" flex flex-col from-white via-gray-50 to-gray-100 min-h-screen px-3 sm:px-4 md:px-6 py-6">
         <div className="max-w-7xl mx-auto flex flex-col gap-6 w-full">
           <ConventionHallList
+            openBookingModal={openBookingModal}
+            setOpenBookingModal={setOpenBookingModal}
             openFilters={openFilters}
             setOpenFilters={setOpenFilters}
             handleSearchInputChange={handleSearchInputChange}
@@ -91,6 +95,12 @@ export default function ConventionHall() {
         applyFilters={applyFilters}
         isSelected={isSelected}
         onApply={handleApplyFilters}
+      />
+
+      {/* Booking Modal */}
+      <BookConventionSpace
+        isOpen={openBookingModal}
+        onClose={() => setOpenBookingModal(false)}
       />
     </>
   );

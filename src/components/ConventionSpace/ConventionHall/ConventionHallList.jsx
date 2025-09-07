@@ -17,6 +17,7 @@ import noimg from "/noimg.jpg";
 import { TbDatabaseOff } from "react-icons/tb";
 import { motion } from "framer-motion";
 import CardLoader from "../../CardLoader";
+import BookConventionSpace from "./BookConventionSpace/BookConventionSpace";
 
 const sliderSettings = {
   dots: true,
@@ -45,8 +46,9 @@ export default function ConventionHallList({
   const navigate = useNavigate();
   const { user } = useAuth();
 
-
   const [showModal, setShowModal] = useState(false);
+  const [openBookingModal, setOpenBookingModal] = useState(false);
+  const [property_id, setProperty_id] = useState(null);
 
   const conventionList = data?.data?.data ?? [];
 
@@ -59,6 +61,11 @@ export default function ConventionHallList({
       setCurrentPage(data?.data?.current_page);
     }
   }, [data]);
+
+  const handelBooking = (id) => {
+    setProperty_id(id);
+    setOpenBookingModal(true);
+  };
 
   console.log(conventionList);
   const renderState = () => {
@@ -177,7 +184,7 @@ export default function ConventionHallList({
                       onClick={() =>
                         !user
                           ? navigate("/signin")
-                          : alert("stilll to implement fucntionality")
+                          : handelBooking(property?.id)
                       }
                       className="w-full block text-center cursor-pointer bg-[#7C0902] text-white px-5 py-2 rounded-lg font-semibold text-sm shadow hover:bg-[#600601] transition-colors"
                     >
@@ -306,6 +313,14 @@ export default function ConventionHallList({
           onClose={() => setShowModal(false)}
         />
       )}
+
+      {/* Booking Modal */}
+      <BookConventionSpace
+        openBookingModal={openBookingModal}
+        onClose={() => setOpenBookingModal(false)}
+        property_id={property_id}
+        head_title={"Convention/Function Hall"}
+      />
     </div>
   );
 }

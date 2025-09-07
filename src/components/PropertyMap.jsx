@@ -13,13 +13,13 @@ const center = {
 
 export default function PropertyMap({ lat, lng }) {
   const { isLoaded } = useJsApiLoader({
-    id: "google-map-script",
+    id: "google-map-script", // ✅ use same id everywhere
     googleMapsApiKey: import.meta.env.VITE_MAP_KEY,
+    libraries: ["places"],
   });
 
   return (
     <div className="mb-6">
-      <h2 className="text-lg font-bold mb-2">Location Map</h2>
       {isLoaded ? (
         <GoogleMap
           mapContainerStyle={containerStyle}

@@ -5,6 +5,7 @@ import { profileApi } from "../api/profileApi";
 import { propertyApi } from "../api/propertyApi";
 import { conventionApi } from "../api/conventionApi";
 import { hostelApi } from "../api/hostelApi";
+import { paymentApi } from "../api/paymnetApi";
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ export const store = configureStore({
     [ticketListApi.reducerPath]: ticketListApi.reducer,
     [conventionApi.reducerPath]: conventionApi.reducer,
     [hostelApi.reducerPath]: hostelApi.reducer,
+    [paymentApi.reducerPath]: paymentApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
@@ -22,5 +24,6 @@ export const store = configureStore({
       .concat(profileApi.middleware)
       .concat(propertyApi.middleware)
       .concat(conventionApi.middleware)
-      .concat(hostelApi.middleware),
+      .concat(hostelApi.middleware)
+      .concat(paymentApi.middleware),
 });

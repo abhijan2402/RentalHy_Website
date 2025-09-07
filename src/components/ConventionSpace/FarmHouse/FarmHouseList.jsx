@@ -17,6 +17,7 @@ import { TbDatabaseOff } from "react-icons/tb";
 import { motion } from "framer-motion";
 import CardLoader from "../../CardLoader";
 import AddFarmHouse from "./AddFarmHouse";
+import BookConventionSpace from "../ConventionHall/BookConventionSpace/BookConventionSpace";
 
 const sliderSettings = {
   dots: true,
@@ -46,11 +47,13 @@ export default function FarmHouseList({
   const { user } = useAuth();
 
   const [showModal, setShowModal] = useState(false);
+  const [openBookingModal, setOpenBookingModal] = useState(false);
+  const [property_id, setProperty_id] = useState(null);
 
   const farmHouseList = data?.data?.data ?? [];
 
   const [currentPage, setCurrentPage] = useState(1);
-  console.log(data)
+  console.log(data);
   const totalItems = data?.data?.total ?? 0;
   const perPage = data?.data?.per_page ?? 20;
   const totalPages = Math.max(1, Math.ceil(totalItems / perPage));
@@ -61,6 +64,12 @@ export default function FarmHouseList({
   }, [data]);
 
   console.log(farmHouseList);
+
+  const handelBooking = (id) => {
+    setProperty_id(id);
+    setOpenBookingModal(true);
+  };
+
   const renderState = () => {
     if (isLoading) {
       return (
@@ -177,7 +186,7 @@ export default function FarmHouseList({
                       onClick={() =>
                         !user
                           ? navigate("/signin")
-                          : alert("stilll to implement fucntionality")
+                          : handelBooking(property?.id)
                       }
                       className="w-full block text-center cursor-pointer bg-[#7C0902] text-white px-5 py-2 rounded-lg font-semibold text-sm shadow hover:bg-[#600601] transition-colors"
                     >
@@ -306,6 +315,14 @@ export default function FarmHouseList({
           onClose={() => setShowModal(false)}
         />
       )}
+
+      {/* Booking Modal */}
+      <BookConventionSpace
+        openBookingModal={openBookingModal}
+        onClose={() => setOpenBookingModal(false)}
+        property_id={property_id}
+        head_title={"Farm/Resort House"}
+      />
     </div>
   );
 }

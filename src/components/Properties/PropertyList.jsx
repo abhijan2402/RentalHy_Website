@@ -173,7 +173,7 @@ export default function PropertyList({ setOpenFilters, openFilters }) {
                     />
                   ))}
                 </Slider>
-                <span className="absolute top-2 left-2 right-2 bg-white/80 text-[10px] px-3 py-1 rounded shadow font-bold text-gray-700 flex items-center gap-1 max-w-max">
+                <span className="absolute top-2 left-2 right-2 bg-white/100 text-[10px] px-3 py-1 rounded shadow font-bold text-gray-700 flex items-center gap-1 max-w-max">
                   <FaMapMarkerAlt className="text-red-500" />
                   {property.location}
                 </span>

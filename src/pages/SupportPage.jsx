@@ -8,17 +8,24 @@ import {
   FaExclamationCircle,
   FaRedoAlt,
 } from "react-icons/fa";
-import { useGetTicketListQuery } from "../redux/api/ticketListApi";
+import {
+  useGetTicketListQuery,
+  useReplyToTicketMutation,
+} from "../redux/api/ticketListApi";
 import { convertToIST } from "../utils/utils";
 import { Spin, Button as AntButton } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
+import { useAuth } from "../contexts/AuthContext";
+import { toast } from "react-toastify";
 
 const customIndicator = (
   <LoadingOutlined style={{ fontSize: 48, color: "#7C0902" }} spin />
 );
 
 export default function SupportPage() {
+  const { user } = useAuth();
   const { data, isLoading, error, refetch } = useGetTicketListQuery();
+  const [replyToTicket, { isLoading: Submiting }] = useReplyToTicketMutation();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tickets, setTickets] = useState([
     {
@@ -38,18 +45,28 @@ export default function SupportPage() {
   ]);
   const [form, setForm] = useState({ title: "", description: "" });
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!form.title || !form.description) return;
-    setTickets([
-      ...tickets,
-      {
-        id: tickets.length + 1,
-        title: form.title,
-        description: form.description,
-        status: "Open",
-      },
-    ]);
-    setForm({ title: "", description: "" });
+
+    // Create a FormData object and append fields
+    const formData = new FormData();
+    formData.append("title", form.title);
+    formData.append("description", form.description);
+    formData.append("user_id", user?.id || "");
+    formData.append("user_type", user !== null ? "existing" : "new");
+
+    // Send FormData instead of JS object
+    await replyToTicket({ formdata: formData })
+      .unwrap()
+      .then(() => {
+        toast.success("Ticket raised Successfully");
+        setForm({ title: "", description: "" });
+        setIsModalOpen(false);
+      })
+      .catch(() => {
+        toast.error("Something went wrong please try again later");
+      });
+
     setIsModalOpen(false);
   };
 
@@ -146,7 +163,7 @@ export default function SupportPage() {
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                {ticket.status === "Resolved" ? (
+                {ticket.status === "closed" ? (
                   <FaCheckCircle
                     className="text-green-600"
                     aria-label="Resolved"
@@ -156,7 +173,7 @@ export default function SupportPage() {
                 )}
                 <span
                   className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    ticket.status === "Resolved"
+                    ticket.status === "closed"
                       ? "bg-green-100 text-green-700"
                       : "bg-yellow-100 text-yellow-700"
                   }`}
@@ -239,8 +256,8 @@ export default function SupportPage() {
               <button
                 onClick={handleSubmit}
                 className="w-full bg-[#7C0902] text-white py-2 rounded-md font-semibold hover:bg-[#600601] transition"
-                aria-disabled={!form.title || !form.description}
-                disabled={!form.title || !form.description}
+                aria-disabled={!form.title || !form.description || Submiting}
+                disabled={!form.title || !form.description || Submiting}
               >
                 Submit Ticket
               </button>

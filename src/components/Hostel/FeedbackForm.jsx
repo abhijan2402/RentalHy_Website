@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import { FaThumbsUp } from "react-icons/fa";
+import { useAuth } from "../../contexts/AuthContext";
+import { toast } from "react-toastify";
+import { useSubmitFeedbackMutation } from "../../redux/api/feedbackApi";
 
 // Feedback keys from your schema
 const FEEDBACK_FIELDS = [
@@ -14,7 +17,10 @@ const defaultFeedbackState = FEEDBACK_FIELDS.reduce(
   {}
 );
 
-export const FeedbackForm = ({ hostelId, onSubmit }) => {
+export const FeedbackForm = ({ hostelId }) => {
+  const { user } = useAuth();
+  const [submitFeedback, { isLoading: Submiting }] =
+    useSubmitFeedbackMutation();
   const [feedback, setFeedback] = useState(defaultFeedbackState);
   const [additionalFeedback, setAdditionalFeedback] = useState("");
 
@@ -25,15 +31,38 @@ export const FeedbackForm = ({ hostelId, onSubmit }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
     const payload = {
       hostel_id: hostelId,
-      ...feedback,
+      food_good: feedback.food_good,
+      room_clean: feedback.room_clean,
+      staff_good: feedback.staff_good,
+      safe_stay: feedback.safe_stay,
       additional_feedback: additionalFeedback,
+      user_id: user?.id,
     };
-    if (onSubmit) onSubmit(payload);
-    // You can put API call here!
+    console.log(payload);
+    const formdata = new FormData();
+    Object.entries(payload).forEach(([key, value]) => {
+      formdata.append(key, String(value));
+    });
+
+    for (let [key, value] of formdata.entries()) {
+      console.log(key, value);
+    }
+
+    await submitFeedback(formdata)
+      .unwrap()
+      .then(() => {
+        toast.success("Feedback raised Successfully");
+      })
+      .catch(() => {
+        toast.error("Something went wrong please try again later");
+      });
+
+      setAdditionalFeedback("");
   };
 
   return (
@@ -85,7 +114,6 @@ export const FeedbackForm = ({ hostelId, onSubmit }) => {
           </label>
         </div>
         <button
-          type="submit"
           style={{
             backgroundColor: "#7C0902",
             color: "#fff",
@@ -96,9 +124,11 @@ export const FeedbackForm = ({ hostelId, onSubmit }) => {
             cursor: "pointer",
             width: "100%",
             fontSize: "14px",
+            marginBottom: "8px",
           }}
+          disabled={Submiting}
         >
-          Submit Feedback
+          {Submiting ? "Submiting" : "Submit Feedback"}
         </button>
       </form>
     </div>

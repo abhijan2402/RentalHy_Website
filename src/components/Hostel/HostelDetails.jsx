@@ -193,7 +193,7 @@ export default function HostelDetails({ property, error, isLoading }) {
           {/* Map Section */}
           <div className="sticky top-24">
             <PropertyMap lat={property?.lat} lng={property?.long} />
-            <FeedbackForm />
+            <FeedbackForm hostelId={property?.id} />
           </div>
         </div>
       </div>

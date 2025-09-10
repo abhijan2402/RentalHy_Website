@@ -10,6 +10,7 @@ import {
   message,
   Radio,
   Checkbox,
+  Card,
 } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { useAddPropertyMutation } from "../../redux/api/propertyApi";
@@ -39,7 +40,17 @@ const normFile = (e) => {
   }
   return e && e.fileList;
 };
-const bhkOptions = ["1RK", "1BHK", "2BHK", "3BHK", "4BHK+", "5BHK+"];
+
+const commercialOptions = [
+  "Shop",
+  "Office",
+  "Showroom",
+  "Hotel",
+  "Restaurant",
+  "Any Other",
+];
+
+const bhkOptions = ["1RK", "1BHK", "2BHK", "3BHK", "4BHK", "5BHK+"];
 
 const furnishingOptions = ["Furnished", "Semi-Furnished", "Unfurnished"];
 
@@ -67,6 +78,8 @@ const AddPropertyModal = ({ showModal, onClose }) => {
   const [markerPos, setMarkerPos] = useState(null);
   const [mapCenter, setMapCenter] = useState(defaultCenter);
   const [searchText, setSearchText] = useState("");
+  const [customPropertyType, setCustomPropertyType] = useState("");
+  const [customCommercial, setCustomCommercial] = useState("");
 
   const autocompleteRef = useRef(null);
 
@@ -186,42 +199,62 @@ const AddPropertyModal = ({ showModal, onClose }) => {
   };
 
   const onFinish = async (values) => {
-    // console.log(values);
-   
-    if (!values.images || values.images.length === 0) {
-      toast.error("Please upload at least one property image.");
-
-      return;
-    }
-
-    const validAvailabilityOptions = ["Ready to Move", "Under Construction"];
-
-    const validAdvanceOptions = ["1 month", "2 months", "3 months+"];
-
-    const formData = new FormData();
-
     try {
-      // ✅ first, fetch lat/long from location
+      if (!values.images || values.images.length === 0) {
+        toast.error("Please upload at least one property image.");
+
+        return;
+      }
+
+      if (values.maintains_charges === "0") {
+        values.maintains_amount = "";
+      }
+
+      const validAvailabilityOptions = ["Ready to Move", "Under Construction"];
+      const validAdvanceOptions = ["1 month", "2 months", "3 months+"];
+
+      // ✅ Handle custom commercial space
+      if (values.commercial_space?.includes("Any Other") && customCommercial) {
+        values.commercial_space = values.commercial_space.map((c) =>
+          c === "Any Other" ? customCommercial : c
+        );
+      }
+
+      // ✅ Handle custom floor (replace floor=other with custom_floor)
+      if (values.floor === "other" && values.custom_floor) {
+        values.floor = values.custom_floor; // replace with actual input
+      }
+
+      // ✅ Handle custom property type
+      if (values.property_type === "custom" && customPropertyType) {
+        values.property_type = customPropertyType;
+      }
+
+      // 🧹 Remove unwanted keys BEFORE appending
+      delete values.custom_floor;
+      delete values.custom_commercial_space;
+
+      // ✅ Prepare formData
+      const formData = new FormData();
+
+      // Geocode
       let coords = null;
       if (values.location) {
         coords = await getLatLngFromAddress(values.location);
       }
-      // Add amenities (do this BEFORE looping other fields)
 
+      // Amenities
       if (values.amenities) {
         const amenityObj = {};
-
         values.amenities.forEach(({ amenityKey, amenityValue }) => {
           if (amenityKey) amenityObj[amenityKey] = amenityValue;
         });
-
-        // Append as JSON string (for a key-value object)
-
         formData.append("amenities", JSON.stringify(amenityObj));
       }
 
+      // Loop through values
       Object.entries(values).forEach(([key, value]) => {
-        if (key === "images" || key === "amenities") return; // skip amenities/images, already added
+        if (key === "images" || key === "amenities") return;
 
         if (Array.isArray(value)) {
           if (key === "availability" || key === "advance") {
@@ -231,9 +264,7 @@ const AddPropertyModal = ({ showModal, onClose }) => {
                 : validAdvanceOptions
               ).includes(v)
             );
-
             if (!firstValid) throw new Error(`Invalid ${key} selected`);
-
             formData.append(key, firstValid);
           } else {
             value.forEach((val, idx) => {
@@ -247,11 +278,9 @@ const AddPropertyModal = ({ showModal, onClose }) => {
           ) {
             throw new Error("Invalid availability selected");
           }
-
           if (key === "advance" && !validAdvanceOptions.includes(value)) {
             throw new Error("Invalid advance selected");
           }
-
           if (key === "price" || key === "area_sqft") {
             formData.append(key, value?.toString() || "");
           } else {
@@ -260,15 +289,24 @@ const AddPropertyModal = ({ showModal, onClose }) => {
         }
       });
 
+      // Lat/Long
       if (coords) {
         formData.append("lat", coords.lat.toString());
         formData.append("long", coords.lng.toString());
       }
-      values.images.forEach((fileObj, idx) => {
-        const file = fileObj.originFileObj || fileObj;
 
-        formData.append(`images[${idx}]`, file);
-      });
+      // values.images.forEach((fileObj, idx) => {
+      //   const file = fileObj.originFileObj || fileObj;
+
+      //   formData.append(`images[${idx}]`, file);
+      // });
+
+      // Debug log
+      const dataObj = {};
+      for (const [key, value] of formData.entries()) {
+        dataObj[key] = value;
+      }
+      console.log("🚀 Final Data Sent:", dataObj);
 
       await addProperty(formData)
         .unwrap()
@@ -276,24 +314,20 @@ const AddPropertyModal = ({ showModal, onClose }) => {
           toast.success(response?.message || "Property created successfully");
           console.log(response);
         })
-
         .catch((error) => {
           const errMsg =
             error?.data?.message ||
             error?.error ||
             "Failed to add Property. Please try again.";
-
           toast.error(errMsg);
           console.log(errMsg);
         });
-
       form.resetFields();
-
       setFileList([]);
-
       onClose();
     } catch (error) {
       toast.error(error.message || "Failed to add property. Please try again.");
+      console.log(error.message);
     }
   };
 
@@ -310,8 +344,8 @@ const AddPropertyModal = ({ showModal, onClose }) => {
           borderColor: "#7C0902",
           color: "white",
         },
-        disabled: isLoading, // disables button when loading
-        loading: isLoading, // shows loading spinner on button when loading
+        disabled: isLoading,
+        loading: isLoading,
       }}
       cancelButtonProps={{
         style: { borderColor: "#7C0902", color: "#7C0902" },
@@ -438,6 +472,7 @@ const AddPropertyModal = ({ showModal, onClose }) => {
           label="Area (sq ft)"
           name="area_sqft"
           rules={[{ type: "number", min: 0, message: "Area must be positive" }]}
+          style={{ marginTop: "8px" }}
         >
           <InputNumber
             style={{ width: "100%" }}
@@ -446,31 +481,190 @@ const AddPropertyModal = ({ showModal, onClose }) => {
           />
         </Form.Item>
 
+        {/* ------------------------------------ */}
+
+        {/* Commercial Space */}
+        <Form.Item label="Commercial Space" name="commercial_space">
+          <CheckboxGroup options={commercialOptions} />
+        </Form.Item>
+
+        {/* If Any Other selected → show input */}
+        <Form.Item shouldUpdate noStyle>
+          {({ getFieldValue }) =>
+            getFieldValue("commercial_space")?.includes("Any Other") ? (
+              <Form.Item
+                label="Custom Commercial Space"
+                name="custom_commercial_space"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter custom commercial space",
+                  },
+                ]}
+              >
+                <Input
+                  placeholder="Enter custom commercial space"
+                  value={customCommercial}
+                  onChange={(e) => setCustomCommercial(e.target.value)}
+                />
+              </Form.Item>
+            ) : null
+          }
+        </Form.Item>
+
         {/* BHK */}
         <Form.Item
-          label="BHK"
-          name="bhk"
-          rules={[
-            { required: true, message: "Please select at least one BHK" },
-          ]}
+          shouldUpdate={(prev, curr) =>
+            prev.commercial_space !== curr.commercial_space
+          }
+          noStyle
         >
-          <CheckboxGroup options={bhkOptions} />
+          {({ getFieldValue }) =>
+            getFieldValue("commercial_space")?.length ? null : (
+              <Form.Item
+                label="BHK"
+                name="bhk"
+                rules={[
+                  { required: true, message: "Please select at least one BHK" },
+                ]}
+              >
+                <CheckboxGroup options={bhkOptions} />
+              </Form.Item>
+            )
+          }
         </Form.Item>
 
         {/* Property Type */}
+        <Form.Item shouldUpdate noStyle>
+          {({ getFieldValue }) =>
+            getFieldValue("commercial_space")?.length ? null : (
+              <Form.Item
+                label="Property Type"
+                name="property_type"
+                rules={[
+                  { required: true, message: "Please select property type" },
+                ]}
+              >
+                <Radio.Group className={horizontalScrollClass}>
+                  {[
+                    "Apartment",
+                    "Flat",
+                    "Villa",
+                    "Independent House",
+                    "Duplex",
+                    "Roof sheets",
+                    "Tiled House",
+                  ].map((opt) => (
+                    <Radio.Button key={opt} value={opt}>
+                      {opt}
+                    </Radio.Button>
+                  ))}
+                  <Radio.Button value="custom">+ Add</Radio.Button>
+                </Radio.Group>
+              </Form.Item>
+            )
+          }
+        </Form.Item>
+
+        {/* Show input if custom selected */}
+        <Form.Item shouldUpdate noStyle>
+          {({ getFieldValue }) =>
+            getFieldValue("property_type") === "custom" ? (
+              <Form.Item
+                label="Custom Property Type"
+                name="custom_property_type"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter custom property type",
+                  },
+                ]}
+              >
+                <Input
+                  placeholder="Enter custom property type"
+                  value={customPropertyType}
+                  onChange={(e) => setCustomPropertyType(e.target.value)}
+                />
+              </Form.Item>
+            ) : null
+          }
+        </Form.Item>
+
+        {/* Which Floor */}
         <Form.Item
-          label="Property Type"
-          name="property_type"
-          rules={[{ required: true, message: "Please select property type" }]}
+          label="Which Floor"
+          name="floor"
+          rules={[{ required: true, message: "Please select floor" }]}
         >
-          <Radio.Group className={horizontalScrollClass}>
-            {["Apartment", "Flat", "Villa"].map((opt) => (
-              <Radio.Button key={opt} value={opt}>
-                {opt}
-              </Radio.Button>
-            ))}
+          <Radio.Group>
+            <Radio value="0">Ground (0)</Radio>
+            <Radio value="1">1</Radio>
+            <Radio value="2">2</Radio>
+            <Radio value="3">3</Radio>
+            <Radio value="4">4</Radio>
+            <Radio value="5">5</Radio>
+            <Radio value="6">6+</Radio>
+            <Radio value="other">Other</Radio>
           </Radio.Group>
         </Form.Item>
+
+        {/* Custom floor if "Other" is selected */}
+        <Form.Item
+          noStyle
+          shouldUpdate={(prev, curr) => prev.floor !== curr.floor}
+        >
+          {({ getFieldValue }) =>
+            getFieldValue("floor") === "other" ? (
+              <Form.Item
+                label="Enter Floor Number"
+                name="custom_floor"
+                rules={[
+                  { required: true, message: "Please enter floor number" },
+                  { pattern: /^[0-9]+$/, message: "Only numbers allowed" },
+                ]}
+              >
+                <Input placeholder="Enter floor number (e.g., 7, 12, 20)" />
+              </Form.Item>
+            ) : null
+          }
+        </Form.Item>
+
+        {/* Maintenance Charges */}
+        <Form.Item label="Maintenance Charges" name="maintains_charges">
+          <Radio.Group>
+            <Radio value="1">Yes</Radio>
+            <Radio value="0">No</Radio>
+          </Radio.Group>
+        </Form.Item>
+
+        {/* If Yes → show amount input */}
+        <Form.Item shouldUpdate noStyle>
+          {({ getFieldValue }) =>
+            getFieldValue("maintains_charges") === "1" ? (
+              <Form.Item label="Maintenance Amount" name="maintains_amount">
+                <Input placeholder="Enter maintenance amount" />
+              </Form.Item>
+            ) : null
+          }
+        </Form.Item>
+
+        {/* Security Available */}
+        <Form.Item label="Security Available" name="security_avl">
+          <Radio.Group>
+            <Radio value="1">Yes</Radio>
+            <Radio value="0">No</Radio>
+          </Radio.Group>
+        </Form.Item>
+
+        {/* Water Filter Available */}
+        <Form.Item label="Water Filter Available" name="filter_avl">
+          <Radio.Group>
+            <Radio value="1">Yes</Radio>
+            <Radio value="0">No</Radio>
+          </Radio.Group>
+        </Form.Item>
+
+        {/* ----------------------------------------------- */}
 
         {/* Furnishing Status */}
         <Form.Item
@@ -576,20 +770,20 @@ const AddPropertyModal = ({ showModal, onClose }) => {
           name="images"
           valuePropName="fileList"
           getValueFromEvent={normFile}
-          rules={[
-            {
-              required: true,
-              message: "Please upload at least one image.",
-            },
-            {
-              validator: (_, value) =>
-                value && value.length > 10
-                  ? Promise.reject(
-                      new Error("You can upload up to 10 images only.")
-                    )
-                  : Promise.resolve(),
-            },
-          ]}
+          // rules={[
+          //   {
+          //     required: true,
+          //     message: "Please upload at least one image.",
+          //   },
+          //   {
+          //     validator: (_, value) =>
+          //       value && value.length > 10
+          //         ? Promise.reject(
+          //             new Error("You can upload up to 10 images only.")
+          //           )
+          //         : Promise.resolve(),
+          //   },
+          // ]}
         >
           <Upload
             listType="picture-card"

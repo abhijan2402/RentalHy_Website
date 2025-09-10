@@ -36,6 +36,9 @@ export default function PropertyFilters({
   filters,
   setFilters,
 }) {
+  // inside PropertyFilters component
+  const [customFloor, setCustomFloor] = useState("");
+
   const [sections, setSections] = useState({
     bhk: true,
     propertyType: true,
@@ -48,6 +51,7 @@ export default function PropertyFilters({
     facing: true,
     advance: true,
     tenant: true,
+    floor: true,
   });
 
   const resetFilters = () => {
@@ -63,6 +67,7 @@ export default function PropertyFilters({
       facing: [],
       advance: [],
       tenant: [],
+      floor: [],
     };
     setFilters(resetState);
     console.log("Filters reset:", resetState);
@@ -143,6 +148,66 @@ export default function PropertyFilters({
                 </label>
               ))}
             </FilterSection>
+            {/* Floor Type */}
+            <FilterSection
+              title="Floor"
+              open={sections.floor}
+              setOpen={(v) => setSections((p) => ({ ...p, floor: v }))}
+            >
+              {[
+                { label: "Ground", value: "0" },
+                { label: "1st", value: "1" },
+                { label: "2nd", value: "2" },
+                { label: "3rd", value: "3" },
+                { label: "4th", value: "4" },
+                { label: "5th", value: "5" },
+                { label: "6+", value: "6" },
+                { label: "Other", value: "other" },
+              ].map((floor) => (
+                <label
+                  key={floor.value}
+                  className="flex text-black items-center gap-2"
+                >
+                  <input
+                    type="checkbox"
+                    checked={filters.floor.includes(floor.value)}
+                    onChange={() => handleCheckboxChange("floor", floor.value)}
+                  />
+                  {floor.label}
+                </label>
+              ))}
+
+              {/* If "other" is selected, show custom input */}
+              {filters.floor.includes("other") && (
+                <div className="mt-2 flex items-center gap-2">
+                  <input
+                    type="number"
+                    placeholder="Enter custom floor"
+                    className="border px-2 py-1 rounded w-32"
+                    value={customFloor}
+                    onChange={(e) => setCustomFloor(e.target.value)}
+                  />
+                  <button
+                    className="px-3 py-1 bg-[#7C0902] text-white rounded"
+                    onClick={() => {
+                      if (customFloor.trim()) {
+                        setFilters((prev) => ({
+                          ...prev,
+                          floor: [
+                            ...prev.floor.filter((f) => f !== "other"),
+                            customFloor,
+                          ],
+                        }));
+                        setCustomFloor(""); // reset input
+                      }
+                    }}
+                  >
+                    Add
+                  </button>
+                </div>
+              )}
+            </FilterSection>
+
             {/* Preferred Tenant Type */}
             <FilterSection
               title="Preferred Tenant Type"

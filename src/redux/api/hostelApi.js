@@ -46,7 +46,7 @@ export const hostelApi = createApi({
 
     // 2. Get Hostel Details
     getHostelDetails: builder.query({
-      query: (id) => `hall_details/${id}`,
+      query: (id) => `hostels/${id}`,
     }),
 
     // 3. Upload Hostel

@@ -3,8 +3,8 @@ import { useGetConventionPropertiesQuery } from "../redux/api/conventionApi";
 
 export function useConventionFilters(initialValues) {
   const defaultFilters = {
-    priceRange: [],
-    seatingCapacity: [],
+    priceRange: [1000, 1000000],
+    seatingCapacity: [0, 500000],
 
     yesNoToggles: {
       valetParking: "",
@@ -19,6 +19,10 @@ export function useConventionFilters(initialValues) {
       alcoholAllowed: "",
       photoShootsAllowed: "",
       childrenGames: "",
+      swimmingPoll: "",
+      waterForCooking: "",
+      providesCateringPerson: "",
+      photographersRequired: "",
     },
     timeOfOccasion: [],
   };
@@ -31,22 +35,40 @@ export function useConventionFilters(initialValues) {
   const [perpage, setPerPage] = useState("");
   const [pageno, setPageNo] = useState(1);
 
-
   // Prepare filters for API call
   const filterPayload = {
     search: searchKeyword || search || "",
     location: "",
     price_min: filters.priceRange?.[0] || "",
     price_max: filters.priceRange?.[1] || "",
-    seating_capacity_min: filters.seatingCapacity?.[0] || "",
-    seating_capacity_max: filters.seatingCapacity?.[1] || "",
+    seating_capacity_min:
+      filters.seatingCapacity?.[0] > 0 ? filters.seatingCapacity[0] : "",
+    seating_capacity_max:
+      filters.seatingCapacity?.[1] > 0 ? filters.seatingCapacity[1] : "",
+
     min_area: filters.roomSize?.min || "",
     max_area: filters.roomSize?.max || "",
     sort_by: sort || "",
     per_page: perpage || "",
+    valet_parking: filters?.yesNoToggles?.valetParking,
     ac_available: filters?.yesNoToggles?.acAvailable,
+    rooms_available: filters?.yesNoToggles?.roomsAvailable,
+    royalty_decoration: filters?.yesNoToggles?.royaltyDecoration,
+    royalty_kitchen: filters?.yesNoToggles?.royaltyKitchen,
+    generator_available: filters?.yesNoToggles?.generatorAvailable,
+    normal_water_cooking: filters?.yesNoToggles?.normalWaterCooking,
+    drinking_water_available: filters?.yesNoToggles?.drinkingWaterAvailable,
+    catering_persons: filters?.yesNoToggles?.cateringPersons,
+    alcohol_allowed: filters?.yesNoToggles?.alcoholAllowed,
+    photo_shoots_allowed: filters?.yesNoToggles?.photoShootsAllowed,
+    children_games: filters?.yesNoToggles?.childrenGames,
+    swimming_poll: filters?.yesNoToggles?.swimmingPoll,
+    water_for_cooking: filters?.yesNoToggles?.waterForCooking,
+    provides_catering_person: filters?.yesNoToggles?.providesCateringPerson,
+    photographers_required: filters?.yesNoToggles?.photographersRequired,
+    time_of_occasion: filters.timeOfOccasion || [],
   };
-
+  console.log(filterPayload);
   // Fetch data
   const { data, isLoading, error } = useGetConventionPropertiesQuery({
     filterPayload,
@@ -70,9 +92,12 @@ export function useConventionFilters(initialValues) {
     }));
   }; // Range slider change
 
-  const handleRangeChange = (key, range) => {
-    setPendingFilters((prev) => ({ ...prev, [key]: range }));
-  }; // Apply filters (commit)
+  const handleRangeChange = (key, value) => {
+    setPendingFilters((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
 
   const applyFilters = () => {
     setFilters(pendingFilters);

@@ -259,8 +259,8 @@ export default function ConventionHallList({
             <option value="">Sort by</option>
             <option value="low-high">Price: Low to High</option>
             <option value="high-low">Price: High to Low</option>
-            <option value="newest">Newest First</option>
-            <option value="oldest">Oldest First</option>
+            <option value="nearby">Near By</option>
+            <option value="relavance">Relavance</option>
           </select>
           {/* Custom dropdown icon */}
           <svg

@@ -22,6 +22,7 @@ const PricesSection = ({ property }) => {
       "long",
       "seating_capacity",
       "images",
+      "contact_number"
     ];
 
     return isNumber && !excludedKeys.includes(key);
@@ -39,10 +40,10 @@ const PricesSection = ({ property }) => {
         {priceFields.map(([key, value], idx) => (
           <div
             key={idx}
-            className="p-4 rounded-xl flex justify-between items-center border bg-blue-50 border-blue-300 text-blue-800 shadow-sm"
+            className="p-2 rounded-xl flex justify-between items-center border bg-blue-50 border-blue-300 text-blue-800 shadow-sm"
           >
-            <p className="text-sm font-medium text-black">{formatLabel(key)}</p>
-            <p className="text-sm font-bold text-black">
+            <p className="text-[12px] font-medium text-black">{formatLabel(key)}</p>
+            <p className="text-[12px] font-bold text-black">
               ₹ {parseFloat(value).toLocaleString()}
             </p>
           </div>

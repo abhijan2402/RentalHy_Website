@@ -13,6 +13,7 @@ import {
   Row,
   Col,
   Checkbox,
+  TimePicker,
 } from "antd";
 import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import moment from "moment";
@@ -26,7 +27,7 @@ import {
 } from "@react-google-maps/api";
 import { useLocationCoord } from "../../contexts/LocationContext";
 import { getLatLngFromAddress } from "../../utils/utils";
-
+import dayjs from "dayjs";
 const { TextArea } = Input;
 const { RangePicker } = DatePicker;
 
@@ -76,7 +77,7 @@ const furnishingOptions = [
   { label: "Fan", value: "fan" },
   { label: "Lights", value: "lights" },
   { label: "Curtains", value: "curtains" },
-  { label: "AC", value: "ac" },
+  { label: "A/C", value: "ac" },
   { label: "Geyser (Hot water)", value: "geyser HotWater" },
   { label: "Basic appliances", value: "basic Appliances" },
   { label: "Limited storage space", value: "limited Storage" },
@@ -89,7 +90,8 @@ const standardPriceOptions = [
   { label: "Triple sharing/month", value: "triple_sharing_price" },
   { label: "4 sharing/month", value: "four_sharing_price" },
   { label: "Security Deposit", value: "security_deposit" },
-  { label: "Single room (Day/Month)", value: "single_room_price" },
+  { label: "Single room (Day)", value: "single_room_price_day" },
+  { label: "Single room (Month)", value: "single_room_price_month" },
 ];
 
 const standardPriceDormitoyOptions = [
@@ -101,6 +103,17 @@ const standardPriceDormitoyOptions = [
 const yesNoOptions = [
   { label: "Yes", value: "1" },
   { label: "No", value: "0" },
+];
+
+const TIME_FIELDS = [
+  "breakfast_timing",
+  "tea_toffee_timing",
+  "snacks_timing",
+  "lunch_timing",
+  "dinner_timing",
+  "gate_closing_timing",
+  "gate_opening_timing",
+  // add all other time fields here
 ];
 
 function cleanObject(obj) {
@@ -296,10 +309,19 @@ const AddHostels = ({ showModal, onClose }) => {
       message.error("Please upload at least one hall image.");
       return;
     }
+    // ✅ Handle custom floor (replace floor=other with custom_floor)
+    if (values.floor === "other" && values.custom_floor) {
+      values.floor = values.custom_floor; // replace with actual input
+    }
+    delete values.custom_floor;
 
     const formData = new FormData();
 
     Object.entries(values).forEach(([key, value]) => {
+      if (TIME_FIELDS.includes(key) && value) {
+        value = value.format("HH:mm");
+      }
+
       if (Array.isArray(value)) {
         value.forEach((item, index) => {
           // ✅ hostel_type & bathroom_type → plain values
@@ -461,6 +483,44 @@ const AddHostels = ({ showModal, onClose }) => {
             rules={[{ required: true, message: "Please enter description" }]}
           >
             <TextArea rows={4} placeholder="Enter hall description" />
+          </Form.Item>
+          {/* Which Floor */}
+          <Form.Item
+            label="Which Floor"
+            name="floor"
+            rules={[{ required: true, message: "Please select floor" }]}
+          >
+            <Radio.Group>
+              <Radio value="0">Ground (0)</Radio>
+              <Radio value="1">1</Radio>
+              <Radio value="2">2</Radio>
+              <Radio value="3">3</Radio>
+              <Radio value="4">4</Radio>
+              <Radio value="5">5</Radio>
+              <Radio value="6">6+</Radio>
+              <Radio value="other">Other</Radio>
+            </Radio.Group>
+          </Form.Item>
+
+          {/* Custom floor if "Other" is selected */}
+          <Form.Item
+            noStyle
+            shouldUpdate={(prev, curr) => prev.floor !== curr.floor}
+          >
+            {({ getFieldValue }) =>
+              getFieldValue("floor") === "other" ? (
+                <Form.Item
+                  label="Enter Floor Number"
+                  name="custom_floor"
+                  rules={[
+                    { required: true, message: "Please enter floor number" },
+                    { pattern: /^[0-9]+$/, message: "Only numbers allowed" },
+                  ]}
+                >
+                  <Input placeholder="Enter floor number (e.g., 7, 12, 20)" />
+                </Form.Item>
+              ) : null
+            }
           </Form.Item>
           <p className="font-bold text-[#7C0902]">Room Price</p>
           {/* Price Options with individual inputs*/}
@@ -639,6 +699,7 @@ const AddHostels = ({ showModal, onClose }) => {
             { label: "Security", name: "security" },
             { label: "RO Drinking Water", name: "ro_water" },
             { label: "Study Area", name: "study_area" },
+            { label: "Smoking Allowed", name: "smoking_allowed" },
           ].map(({ label, name }) => (
             <Form.Item key={name} label={label} name={name}>
               <Radio.Group options={yesNoOptions} />
@@ -660,43 +721,73 @@ const AddHostels = ({ showModal, onClose }) => {
           ))}
 
           {/* Timing */}
-          {/* Breakfast  */}
-          <Form.Item label="Breakfast Timing" name="breakfast_timing">
-            <Input
+          <p className="font-bold text-[#7C0902]">Set Timing</p>
+          <Form.Item
+            label="Breakfast Timing"
+            name="breakfast_timing"
+            // rules={[
+            //   { required: true, message: "Please select breakfast timing!" },
+            // ]}
+          >
+            <TimePicker
               style={{ width: "100%" }}
-              placeholder="Enter Breakfast Timing"
+              format="HH:mm" // 24-hour format, change to "hh:mm A" for 12-hour
+              placeholder="Select Breakfast Timing"
+              defaultOpenValue={dayjs("00:00", "HH:mm")}
             />
           </Form.Item>
           {/* Tea/Coffee Timing */}
           <Form.Item label="Tea/Coffee Timing" name="tea_toffee_timing">
-            <Input
+            <TimePicker
               style={{ width: "100%" }}
-              placeholder="Enter Tea/Coffee Timing"
+              format="HH:mm"
+              placeholder="Select Tea/Coffee Timing"
+              defaultOpenValue={dayjs("00:00", "HH:mm")}
             />
           </Form.Item>
           {/* Lunch Timing */}
           <Form.Item label="Lunch Timing" name="lunch_timing">
-            <Input style={{ width: "100%" }} placeholder="Enter Lunch Timing" />
+            <TimePicker
+              style={{ width: "100%" }}
+              format="HH:mm"
+              placeholder="Select Lunch Timing"
+              defaultOpenValue={dayjs("00:00", "HH:mm")}
+            />
           </Form.Item>
           {/* Snacks Timing */}
           <Form.Item label="Snacks Timing" name="snacks_timing">
-            <Input
+            <TimePicker
               style={{ width: "100%" }}
-              placeholder="Enter Snacks Timing"
+              format="HH:mm"
+              placeholder="Select Snacks Timing"
+              defaultOpenValue={dayjs("00:00", "HH:mm")}
             />
           </Form.Item>
           {/* Dinner Timing */}
           <Form.Item label="Dinner Timing" name="dinner_timing">
-            <Input
+            <TimePicker
               style={{ width: "100%" }}
-              placeholder="Enter Dinner Timing"
+              format="HH:mm"
+              placeholder="Select Dinner Timing"
+              defaultOpenValue={dayjs("00:00", "HH:mm")}
             />
           </Form.Item>
           {/* Gate Closing Timing */}
           <Form.Item label="Gate Closing Timing" name="gate_closing_timing">
-            <Input
+            <TimePicker
               style={{ width: "100%" }}
-              placeholder="Enter Gate Closing Timing"
+              format="HH:mm"
+              placeholder="Select Gate Closing Timing"
+              defaultOpenValue={dayjs("00:00", "HH:mm")}
+            />
+          </Form.Item>
+          {/* Gate Open Timing */}
+          <Form.Item label="Gate Open Timing" name="gate_opening_timing">
+            <TimePicker
+              style={{ width: "100%" }}
+              format="HH:mm"
+              placeholder="Select Gate Opening Timing"
+              defaultOpenValue={dayjs("00:00", "HH:mm")}
             />
           </Form.Item>
           {/* Document Required */}
@@ -715,12 +806,21 @@ const AddHostels = ({ showModal, onClose }) => {
             <TextArea rows={2} placeholder="Enter Rules & Policies." />
           </Form.Item>
           {/* smoking policy */}
-          <Form.Item
+          {[
+            { label: "Smoking Allowed", name: "smoking_allowed" },
+            { label: "Alcohol Allowed", name: "alcohol" },
+            { label: "Pets Allowed", name: "pets_allowed" },
+          ].map(({ label, name }) => (
+            <Form.Item key={name} label={label} name={name}>
+              <Radio.Group options={yesNoOptions} />
+            </Form.Item>
+          ))}
+          {/* <Form.Item
             label="Smoking & Alcohol Policy"
             name="smoking_alcohol_policy"
           >
             <TextArea rows={2} placeholder="Enter Rules & Policies." />
-          </Form.Item>
+          </Form.Item> */}
           {/* Deposit policy */}
           <Form.Item
             label="Deposit & Refund Policies"

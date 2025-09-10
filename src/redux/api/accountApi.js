@@ -20,16 +20,30 @@ export const accountApi = createApi({
       providesTags: ["account"],
     }),
 
-    // Save / Update Account
+    // Save
     saveAccount: builder.mutation({
-      query: (formdata) => ({
+      query: (formData) => ({
         url: "account/store",
         method: "POST",
-        body: formdata,
+        body: formData,
+      }),
+      invalidatesTags: ["account"],
+    }),
+
+    //  Update Account
+    updateAccount: builder.mutation({
+      query: ({ id, formData }) => ({
+        url: `account/update/${id}`,
+        method: "POST",
+        body: formData,
       }),
       invalidatesTags: ["account"],
     }),
   }),
 });
 
-export const { useGetAccountListQuery, useSaveAccountMutation } = accountApi;
+export const {
+  useGetAccountListQuery,
+  useSaveAccountMutation,
+  useUpdateAccountMutation,
+} = accountApi;

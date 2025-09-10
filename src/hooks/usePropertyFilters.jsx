@@ -8,8 +8,10 @@ export function usePropertyFilters() {
   const [filters, setFilters] = useState({
     bhk: [],
     propertyType: [],
+    floor: [],
     roomSize: { min: "", max: "" },
     priceRange: [],
+    commercialSpace: [],
     furnishing: [],
     availability: [],
     bathrooms: [],
@@ -39,6 +41,8 @@ export function usePropertyFilters() {
     parking: filters.parking,
     furnishing_status: filters.furnishing, // 👈 fixed mismatch
     availability: filters.availability,
+    commercial_space: filters.commercialSpace,
+    floor: filters.floor,
     bathrooms: filters.bathrooms,
     min_price: filters.priceRange?.[0] || "",
     max_price: filters.priceRange?.[1] || "",
@@ -146,6 +150,9 @@ export function usePropertyFilters() {
         case "Property Type":
           reset.propertyType = [];
           break;
+        case "floor":
+          reset.floor = [];
+          break;
         case "Room Size":
           reset.roomSize = { min: "", max: "" };
           break;
@@ -154,6 +161,9 @@ export function usePropertyFilters() {
           break;
         case "Furnishing":
           reset.furnishing = [];
+          break;
+        case "Commercial Space":
+          reset.commercialSpace = [];
           break;
         case "Availability":
           reset.availability = [];

@@ -12,7 +12,9 @@ import {
 import {
   useGetAccountListQuery,
   useSaveAccountMutation,
+  useUpdateAccountMutation,
 } from "../redux/api/accountApi";
+import { toast } from "react-toastify";
 
 const Account = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -20,11 +22,11 @@ const Account = () => {
 
   // Fetch account using RTK Query
   const { data: accountData, isLoading } = useGetAccountListQuery();
-  const [saveAccount, { isLoading: isUpdating }] = useSaveAccountMutation();
+  const [saveAccount, { isLoading: isSaving }] = useSaveAccountMutation();
+  const [updateAccount, { isLoading: isUpdating }] = useUpdateAccountMutation();
 
   // Correctly get the first account if API returns array
   const account = accountData?.data?.[0] || null;
-
   useEffect(() => {
     // Whenever modal opens, populate form with current account values
     if (isModalOpen && account) {
@@ -33,18 +35,34 @@ const Account = () => {
   }, [isModalOpen, account, form]);
 
   const handleUpdate = async (values) => {
+    console.log(values);
     try {
-      // Send values as JSON, no need for FormData unless backend strictly requires it
-      await saveAccount(values).unwrap();
-      message.success("Account updated successfully");
-      setIsModalOpen(false);
+      const formData = new FormData();
+      Object.keys(values).forEach((key) => {
+        if (Array.isArray(values[key])) {
+          values[key].forEach((val) => formData.append(`${key}[]`, val));
+        } else {
+          formData.append(key, values[key]);
+        }
+      });
+
+      if (accountData?.length === 0) {
+        await saveAccount(formData).unwrap();
+        toast.success("Account added successfully");
+        setIsModalOpen(false);
+      } else {
+        const id = account?.id || "";
+        await updateAccount({ id, formData }).unwrap();
+        toast.success("Account updated successfully");
+        setIsModalOpen(false);
+      }
     } catch (error) {
-      message.error("Failed to update account");
+      toast.error("Failed to update account");
       console.error(error);
     }
   };
 
-//   if (isLoading) return <Spin />;
+  //   if (isLoading) return <Spin />;
 
   return (
     <Card title="Bank Account Details" bordered>
@@ -66,7 +84,7 @@ const Account = () => {
         </Descriptions.Item>
       </Descriptions>
 
-      <div className="mt-4 text-right">
+      <div className="mt-2 text-right">
         <Button type="primary" onClick={() => setIsModalOpen(true)}>
           Update Details
         </Button>

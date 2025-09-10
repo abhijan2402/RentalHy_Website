@@ -132,21 +132,21 @@ export default function PropertyDetails({ property, error, isLoading }) {
 
     return (
       <div className="flex flex-col lg:flex-row lg:gap-4 px-4 py-8 max-w-6xl mx-auto">
-        <div className=" flex-1">
+        <div className="w-full max-w-[660px] border p-4 rounded-md">
           {/* Image Slider */}
-          <div className="mb-6 relative">
+          <div className="mb-6 relative   ">
             <Slider {...sliderSettings}>
               {property?.images.map((img, idx) => (
                 <img
                   key={idx}
                   src={img?.image_url}
                   alt={property?.title}
-                  className="w-full h-[400px] object-cover rounded-lg"
+                  className="w-full h-full object-cover rounded-lg"
                   draggable="false"
                 />
               ))}
             </Slider>
-            <span className="absolute top-2 left-2 bg-white/80 text-xs px-3 py-1 rounded shadow font-bold text-gray-700 flex items-center gap-1">
+            <span className="absolute top-2 left-2 bg-white/100 text-xs px-3 py-1 rounded shadow font-bold text-gray-700 flex items-center gap-1">
               <FaMapMarkerAlt className="text-red-500" />
               {property?.location}
             </span>

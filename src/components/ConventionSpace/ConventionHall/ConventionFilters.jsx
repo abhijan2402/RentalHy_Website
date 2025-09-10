@@ -38,7 +38,7 @@ const Chip = ({ label, selected, onClick }) => (
   </button>
 );
 
-const timeOfOccasionOptions = ["Daytime", "Nighttime", "24 Hours"];
+const timeOfOccasionOptions = ["Daytime", "Nighttime", "Full day"];
 
 export default function ConventionFilters({
   isOpen,
@@ -89,20 +89,13 @@ export default function ConventionFilters({
             </button>
           </div>
           <div className="overflow-y-auto px-4" style={{ flexGrow: 1 }}>
-            {/* Seating Capacity Range Slider */}
-            <FilterSection
-              title="Seating Capacity"
-              open={sections.seatingCapacity}
-              setOpen={(v) =>
-                setSections((p) => ({ ...p, seatingCapacity: v }))
-              }
-            />
+            {/* Seating Capacity Slider */}
             <Slider
               range
-              min={1000}
-              max={1000000}
-              step={1000}
-              value={pendingFilters.seatingCapacity}
+              min={0}
+              max={500000} // add max
+              step={100}
+              value={pendingFilters.seatingCapacity || [0, 500000]} // fallback
               onChange={(range) => handleRangeChange("seatingCapacity", range)}
               trackStyle={{ backgroundColor: PRIMARY_COLOR }}
               handleStyle={[
@@ -111,9 +104,14 @@ export default function ConventionFilters({
               ]}
             />
             <div className="flex justify-between text-black text-sm mt-2">
-              <span>{pendingFilters.seatingCapacity[0]}</span>
-              <span>{pendingFilters.seatingCapacity[1]}+</span>
+              <span>{pendingFilters.seatingCapacity?.[0] || 0}</span>
+              <span>
+                {pendingFilters.seatingCapacity?.[1] > 0
+                  ? pendingFilters.seatingCapacity[1]
+                  : "500000+"}
+              </span>
             </div>
+
             {/* // Add Yes/No toggles for each feature: */}
             {Object.entries(filters.yesNoToggles).map(([key, label]) => (
               <Form.Item

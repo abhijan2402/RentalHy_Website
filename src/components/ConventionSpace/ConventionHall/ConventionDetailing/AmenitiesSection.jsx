@@ -21,13 +21,13 @@ export const AmenitiesSection = ({ property }) => {
       <p className="text-sm text-gray-500 italic mb-4">
         <span className="text-lg font-medium text-[#7C0902]">Note:</span> Only
         the amenities that are{" "}
-        <span className="font-bold text-green-600 px-1">Available</span> 
-         are shown below. If nothing is listed, this property does not provide
+        <span className="font-bold text-green-600 px-1">Available</span>
+        are shown below. If nothing is listed, this property does not provide
         any amenities.
       </p>
 
       {amenities.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
           {amenities.map(([key], idx) => (
             <motion.div
               key={idx}

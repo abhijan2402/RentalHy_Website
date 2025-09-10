@@ -34,8 +34,8 @@ export default function ConventionHall() {
   } = useConventionFilters();
 
   const handleApplyFilters = () => {
-    applyFilters(); // commit staged filters
-    setOpenFilters(false); // close modal // Optionally trigger API call here with filters or pendingFilters // console.log("Filters applied:", filters);
+    applyFilters();
+    setOpenFilters(false);
   };
 
   return (
@@ -46,7 +46,7 @@ export default function ConventionHall() {
         <div className="flex-1">
           <h1 className="text-2xl sm:text-2xl md:text-2xl font-bold text-gray-800">
             Explore
-            <span className="text-[#7C0902]">Convention/Functions Halls</span>
+            <span className="text-[#7C0902]"> Convention/Functions Halls</span>
           </h1>
 
           <p className="mt-1 text-[#7C0902] text-[14px] sm:text-[13px] md:text-[14px]">

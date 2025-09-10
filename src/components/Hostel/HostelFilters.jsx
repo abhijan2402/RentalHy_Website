@@ -43,7 +43,7 @@ const roomTypes = ["Single", "Double", "Triple", "4", "Dormitory"];
 const genders = ["Male", "Female", "Co-living"];
 const facilities = [
   "WiFi",
-  "AC",
+  "A/C",
   "Laundry_service",
   "Housekeeping",
   "Hot_water",

@@ -2,15 +2,14 @@ import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Breadcrumb from "../components/Breadcrumb";
 import { useAddPropertyViewMutation } from "../redux/api/propertyApi";
-import ConventionHallDetails from "../components/ConventionSpace/ConventionHall/ConventionHallDetails";
-import { useGetconventionDetailsQuery } from "../redux/api/conventionApi";
 import HostelDetails from "../components/Hostel/HostelDetails";
+import { useGetHostelDetailsQuery } from "../redux/api/hostelApi";
 
 export default function HostelDetailsPage() {
   const { id } = useParams();
 
   // Fetch property details from API
-  const { data: property, isLoading, error } = useGetconventionDetailsQuery(id);
+  const { data: property, isLoading, error } = useGetHostelDetailsQuery(id);
   console.log(property);
 
   // Add view mutation

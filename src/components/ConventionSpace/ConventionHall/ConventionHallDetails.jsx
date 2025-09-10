@@ -113,82 +113,84 @@ export default function ConventionHallDetails({ property, error, isLoading }) {
     }
 
     return (
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Title */}
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            {capitalizeFirstLetter(property?.title)}
-          </h1>
-          <div className="mt-auto w-40">
-            <a
-              onClick={() => alert("stilll to implement fucntionality")}
-              className="w-full block text-center cursor-pointer bg-[#7C0902] text-white px-5 py-2 rounded-lg font-semibold text-sm shadow hover:bg-[#600601] transition-colors"
-            >
-              Book Now
-            </a>
+      <div className="flex flex-col lg:flex-row lg:gap-4 px-4 py-8 max-w-6xl mx-auto">
+        <div className="w-full max-w-[660px] border p-4 rounded-md">
+          {/* Image Slider */}
+          <div className="mb-6 relative">
+            <Slider {...sliderSettings}>
+              {imagesToShow.map((img, idx) => (
+                <img
+                  key={idx}
+                  src={img?.image_path}
+                  alt={property?.title}
+                  className="w-full h-full object-contain rounded-lg"
+                  draggable="false"
+                />
+              ))}
+            </Slider>
+            <span className="absolute top-2 left-2 bg-white/100 text-xs px-3 py-1 rounded shadow font-bold text-gray-700 flex items-center gap-1">
+              <FaMapMarkerAlt className="text-red-500" />
+              {location}
+            </span>
+            {/* Wishlist button and verification as before */}
           </div>
+          {/* Title */}
+          <div className="flex justify-between items-center">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              {capitalizeFirstLetter(property?.title)}
+            </h1>
+            <div className="mt-auto w-40">
+              <a
+                onClick={() => alert("stilll to implement fucntionality")}
+                className="w-full block text-center cursor-pointer bg-[#7C0902] text-white px-5 py-2 rounded-lg font-semibold text-sm shadow hover:bg-[#600601] transition-colors"
+              >
+                Book Now
+              </a>
+            </div>
+          </div>
+
+          {/* Hall Type */}
+          <div className="mb-2">
+            <span className="text-2xl font-semibold text-[#7C0902]">
+              {capitalizeFirstLetter(property?.hall_type)}
+            </span>
+            <span className="text-gray-600 px-1 text-[12px] font-medium">
+              Seating Capacity {property?.seating_capacity}
+            </span>
+          </div>
+
+          {/* Address */}
+          <p className="text-gray-500 mb-4">{location}</p>
+
+          {/* Description */}
+          <div className="mb-6">
+            <h2 className="text-lg font-bold text-black mb-2">Description</h2>
+            <p className="text-gray-700">
+              {showMore
+                ? property?.description
+                : `${property?.description?.slice(0, 200)}...`}
+            </p>
+            {property?.description?.length > 200 && (
+              <button
+                onClick={() => setShowMore(!showMore)}
+                className="mt-2 text-[#7C0902] font-medium hover:underline"
+              >
+                {showMore ? "Show Less" : "Show More"}
+              </button>
+            )}
+          </div>
+
+          {/* Pricing */}
+          <PricesSection property={property} />
+
+          {/* Amenities */}
+          <AmenitiesSection property={property} />
         </div>
-
-        {/* Hall Type */}
-        <div className="mb-2">
-          <span className="text-2xl font-semibold text-[#7C0902]">
-            {capitalizeFirstLetter(property?.hall_type)}
-          </span>
-          <span className="text-gray-600 px-1 text-[12px] font-medium">
-            Seating Capacity {property?.seating_capacity}
-          </span>
-        </div>
-
-        {/* Address */}
-        <p className="text-gray-500 mb-4">{location}</p>
-
-        {/* Image Slider */}
-        <div className="mb-6 relative">
-          <Slider {...sliderSettings}>
-            {imagesToShow.map((img, idx) => (
-              <img
-                key={idx}
-                src={img?.image_path}
-                alt={property?.title}
-                className="w-full h-[400px] object-cover rounded-lg"
-                draggable="false"
-              />
-            ))}
-          </Slider>
-          <span className="absolute top-2 left-2 bg-white/80 text-xs px-3 py-1 rounded shadow font-bold text-gray-700 flex items-center gap-1">
-            <FaMapMarkerAlt className="text-red-500" />
-            {location}
-          </span>
-          {/* Wishlist button and verification as before */}
-        </div>
-
-        {/* Description */}
-        <div className="mb-6">
-          <h2 className="text-lg font-bold text-black mb-2">Description</h2>
-          <p className="text-gray-700">
-            {showMore
-              ? property?.description
-              : `${property?.description?.slice(0, 200)}...`}
-          </p>
-          {property?.description?.length > 200 && (
-            <button
-              onClick={() => setShowMore(!showMore)}
-              className="mt-2 text-[#7C0902] font-medium hover:underline"
-            >
-              {showMore ? "Show Less" : "Show More"}
-            </button>
-          )}
-        </div>
-
-        {/* Pricing */}
-        <PricesSection property={property} />
-
-        {/* Amenities */}
-        <AmenitiesSection property={property} />
-
-        {/* Map Section */}
-        <div className="mb-10">
-          <PropertyMap lat={property?.lat} lng={property?.long} />
+        <div className=" w-full lg:w-[400px] xl:w-[500px]  mt-0 lg:mt-0">
+          {/* Map Section */}
+          <div className="sticky top-24">
+            <PropertyMap lat={property?.lat} lng={property?.long} />
+          </div>
         </div>
       </div>
     );

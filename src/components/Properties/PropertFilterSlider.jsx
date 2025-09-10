@@ -12,6 +12,7 @@ const tabs = [
   "Property Type",
   "Preferred Tenant Type",
   "Price",
+  "Commercial Space",
   "Furnishing",
   "Availability",
   "Bathrooms",
@@ -141,6 +142,35 @@ export default function PropertFilterSlider({
               <span className="text-black">₹{filters.priceRange[1]}</span>
             </div>
           </>
+        );
+
+      case "Commercial Space":
+        return (
+          <div className="flex gap-2 flex-wrap">
+            {[
+              "Shop",
+              "Office",
+              "Showroom",
+              "Hotel",
+              "Warehouse",
+              "Godown",
+              "Factory",
+              "Industrial Building",
+              "Coworking Space",
+              "Restaurant",
+              "Banquet Hall",
+              "Cold Storage",
+              "Any Other",
+            ].map((type) => (
+              <ToggleBox
+                key={type}
+                active={filters.commercialSpace.includes(type)}
+                onClick={() => handleCheckboxChange("commercialSpace", type)}
+              >
+                {type}
+              </ToggleBox>
+            ))}
+          </div>
         );
 
       case "Furnishing":

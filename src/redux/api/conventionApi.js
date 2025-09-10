@@ -75,7 +75,7 @@ export const conventionApi = createApi({
         const formData = filtersToFormData(filterPayload);
 
         return {
-          url: `hall_listing?page=${pageno}`,
+          url: `farm_listing?page=${pageno}`,
           method: "POST",
           body: formData,
         };
@@ -86,7 +86,7 @@ export const conventionApi = createApi({
     // 6.  Upload Resort/Farm
     addResortFarm: builder.mutation({
       query: (formdata) => ({
-        url: `hall_add/hall/resort`,
+        url: `hall_add/farm`,
         method: "POST",
         body: formdata,
       }),

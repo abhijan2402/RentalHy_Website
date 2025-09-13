@@ -62,7 +62,7 @@ export const FeedbackForm = ({ hostelId }) => {
         toast.error("Something went wrong please try again later");
       });
 
-      setAdditionalFeedback("");
+    setAdditionalFeedback("");
   };
 
   return (

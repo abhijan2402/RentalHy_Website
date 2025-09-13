@@ -75,7 +75,7 @@ export default function Navbar() {
           </div>
 
           {/* Nav Items */}
-          <ul className="hidden md:flex gap-2 items-center flex-1 justify-center">
+          <ul className="hidden md:flex custom:hidden gap-2 items-center flex-1 justify-center">
             {navItems.map((item) => (
               <li
                 key={item.name}

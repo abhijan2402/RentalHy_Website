@@ -263,66 +263,59 @@ const AddConventionHall = ({ showModal, onClose }) => {
   // Disable dates that are already selected
   const disabledDate = (current) => {
     if (!current) return false;
-    return selectedDates.some((date) => date.isSame(current, "day"));
+    return selectedDates.some(({ date }) => date.isSame(current, "day"));
   };
 
   // On date pick, toggle selection
   const onDateChange = (date) => {
     if (!date) return;
     setSelectedDates((prev) => {
-      const found = prev.find((d) => d.isSame(date, "day"));
+      const foundIndex = prev.findIndex((d) => d.date.isSame(date, "day"));
       let newDates;
-      if (found) {
-        // Remove date if already selected (toggle off)
-        newDates = prev.filter((d) => !d.isSame(date, "day"));
+      if (foundIndex >= 0) {
+        // Date already exists, toggle off (remove)
+        newDates = prev.filter((d) => !d.date.isSame(date, "day"));
       } else {
-        // Add new selected date
-        newDates = [...prev, date];
+        // Add new date with default option: full
+        newDates = [...prev, { date, option: "full" }];
       }
-      // Update form field value as array of strings
+
+      // Update form with formatted strings including option
       form.setFieldsValue({
-        unavailableDates: newDates.map((d) => d.format("YYYY-MM-DD")),
+        unavailableDates: newDates.map(({ date, option }) => ({
+          date: date.format("YYYY-MM-DD"),
+          option,
+        })),
       });
       return newDates;
     });
-
-    // Add this selection to existing ranges (allow multi select)
-    // Check if range or single date
-    let newEntry;
-    if (dates.length === 2) {
-      newEntry = { start: dates[0], end: dates[1] };
-    } else {
-      newEntry = { start: dates, end: null };
-    }
-
-    setUnavailableDatesRanges((prev) => [...prev, newEntry]);
-
-    // Save flattened moments array in form for validation/submission if needed
-    const allDates = [...unavailableDatesRanges, newEntry].flatMap(
-      ({ start, end }) => {
-        if (end) {
-          const range = [];
-          let day = moment(start);
-          while (day.isSameOrBefore(end, "day")) {
-            range.push(day.clone());
-            day = day.add(1, "day");
-          }
-          return range;
-        }
-        return [start];
-      }
-    );
-
-    form.setFieldsValue({ unavailableDates: allDates });
   };
 
   const removeDate = (dateToRemove) => {
     setSelectedDates((prev) => {
-      const newDates = prev.filter((d) => !d.isSame(dateToRemove, "day"));
+      const newDates = prev.filter((d) => !d.date.isSame(dateToRemove, "day"));
       form.setFieldsValue({
-        unavailableDates: newDates.map((d) => d.format("YYYY-MM-DD")),
+        unavailableDates: newDates.map(({ date, option }) => ({
+          date: date.format("YYYY-MM-DD"),
+          option,
+        })),
       });
       return newDates;
+    });
+  };
+
+  const appendDatesToFormData = (formData, dates) => {
+    const mapOption = {
+      full: "full_day",
+      day: "day",
+      night: "night",
+    };
+
+    dates.forEach(({ date, option }) => {
+      const mDate = moment(date, "YYYY-MM-DD");
+      const key = `dates[${mDate.format("DD/MM/YYYY")}]`;
+      const value = mapOption[option] || "full_day";
+      formData.append(key, value);
     });
   };
 
@@ -429,7 +422,7 @@ const AddConventionHall = ({ showModal, onClose }) => {
       }
     });
 
-    formData.append("dates", JSON.stringify(values?.unavailableDates || []));
+    appendDatesToFormData(formData, values.unavailableDates || []);
 
     if (coords) {
       formData.append("lat", coords.lat.toString());
@@ -839,16 +832,43 @@ const AddConventionHall = ({ showModal, onClose }) => {
               <b>Selected Unavailable Dates:</b>
               <ul>
                 {selectedDates
-                  .sort((a, b) => a.valueOf() - b.valueOf())
-                  .map((date, i) => (
-                    <li key={i} className="flex justify-between">
-                      {date.format("YYYY-MM-DD")}{" "}
+                  .sort((a, b) => a.date.valueOf() - b.date.valueOf())
+                  .map(({ date, option }, i) => (
+                    <li key={i} className="flex justify-between items-center">
+                      <span>{date.format("YYYY-MM-DD")}</span>
+                      <select
+                        value={option}
+                        onChange={(e) => {
+                          const newOption = e.target.value;
+                          setSelectedDates((prev) => {
+                            const updated = prev.map((d) =>
+                              d.date.isSame(date, "day")
+                                ? { ...d, option: newOption }
+                                : d
+                            );
+                            form.setFieldsValue({
+                              unavailableDates: updated.map(
+                                ({ date, option }) => ({
+                                  date: date.format("YYYY-MM-DD"),
+                                  option,
+                                })
+                              ),
+                            });
+                            return updated;
+                          });
+                        }}
+                        style={{ marginLeft: 8 }}
+                      >
+                        <option value="full">Full Day</option>
+                        <option value="day">Day</option>
+                        <option value="night">Night</option>
+                      </select>
                       <Button
                         type="link"
                         danger
                         size="small"
                         onClick={() => removeDate(date)}
-                        style={{ padding: 0 }}
+                        style={{ padding: 0, marginLeft: 8 }}
                       >
                         Remove
                       </Button>

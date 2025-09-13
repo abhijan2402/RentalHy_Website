@@ -97,7 +97,7 @@ export default function HostelList({
         >
           <TbDatabaseOff size={50} />
           <p className="text-lg font-medium">
-            No Convention/Fucniton Hall found
+            No Hostels found
           </p>
         </motion.div>
       );

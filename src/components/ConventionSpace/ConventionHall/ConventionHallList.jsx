@@ -229,7 +229,7 @@ export default function ConventionHallList({
   return (
     <div className="flex-1 bg-gray-50 min-h-screen px-0">
       {/* Search and Sort */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-2 items-center w-full">
+      <div className="flex flex-col md:flex-row gap-3 mb-2 items-center w-full">
         {/* Search with dynamic button inside */}
         <div className="relative w-full sm:flex-1">
           <input
@@ -250,7 +250,7 @@ export default function ConventionHallList({
           </button>
         </div>
         {/* Sorting */}
-        <div className="relative w-full sm:w-auto">
+        <div className="relative w-full md:w-auto">
           <select
             className="w-full appearance-none border border-gray-300 rounded-lg px-4 py-2 text-sm text-gray-700 bg-white focus:ring-1 focus:ring-[#7C0902] focus:border-[#7C0902] outline-none pr-8"
             value={sort}

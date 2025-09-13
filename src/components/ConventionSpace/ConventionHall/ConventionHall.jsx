@@ -41,7 +41,7 @@ export default function ConventionHall() {
   return (
     <>
       {/* Heading + Filters Open Btn */}
-      <div className=" mx-auto flex flex-col md:flex-row md:justify-between md:items-center text-left gap-0 px-4 sm:px-4 mt-6 md:px-6">
+      <div className=" mx-auto flex flex-col lg:flex-row lg:justify-between lg:items-center text-left gap-2 lg:gap-2 md:gap-4 px-4 sm:px-4 mt-6 md:px-6">
         {/* Left side heading */}
         <div className="flex-1">
           <h1 className="text-2xl sm:text-2xl md:text-2xl font-bold text-gray-800">
@@ -54,7 +54,7 @@ export default function ConventionHall() {
           </p>
         </div>
         {/* Right side: Button */}
-        <div className="w-full md:w-auto flex justify-start md:justify-end">
+        <div className="w-full md:w-auto flex justify-start md:justify-start ">
           <IconButtons />
         </div>
       </div>

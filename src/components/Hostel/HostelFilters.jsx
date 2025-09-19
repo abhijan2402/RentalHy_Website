@@ -118,10 +118,10 @@ export default function HostelFilters({
               {" "}
               <Slider
                 range
-                min={100}
-                max={25000}
+                min={0}
+                max={500000} // add max
                 step={100}
-                value={pendingFilters.priceRange}
+                value={pendingFilters.priceRange || [0, 500000]}
                 onChange={(range) => handleRangeChange("priceRange", range)}
                 trackStyle={{ backgroundColor: PRIMARY_COLOR }}
                 handleStyle={[

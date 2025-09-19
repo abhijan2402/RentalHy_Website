@@ -36,7 +36,7 @@ export default function PropertFilterSlider({
       <button
         type="button"
         onClick={onClick}
-        className={`px-4 py-2 rounded-lg border
+        className={`px-4 py-2 rounded-lg border 
         ${
           active
             ? "bg-[#7C0902] text-white border-[#7C0902]"
@@ -72,7 +72,7 @@ export default function PropertFilterSlider({
       case "Property Type":
         return (
           <div className="flex gap-2 flex-wrap">
-            {["Apartment", "Flat", "Villa"].map((type) => (
+            {["Apartment", "Flat", "Villa", "Duplex", "Tiled House", "Roof Sheets", "Independent House"].map((type) => (
               <ToggleBox
                 key={type}
                 active={filters.propertyType.includes(type)}
@@ -125,9 +125,9 @@ export default function PropertFilterSlider({
             <Slider
               range
               min={0}
-              max={500000}
+              max={5000000}
               step={1000}
-              defaultValue={[5000, 200000]}
+              // defaultValue={[5000, 200000]}
               value={filters.priceRange}
               onChange={handlePriceChange}
               trackStyle={{ backgroundColor: PRIMARY_COLOR }}
@@ -322,8 +322,12 @@ export default function PropertFilterSlider({
         {tabs.map((tab) => (
           <button
             key={tab}
-            className={`whitespace-nowrap px-4 py-2 text-[14px] text-black border rounded 
-        ${activeTab === tab ? "bg-[#7C0902] text-white" : "bg-gray-100"}
+            className={`whitespace-nowrap px-4 py-1 text-[13px] text-black border rounded  
+        ${
+          activeTab === tab
+            ? "bg-[#7C0902] text-white"
+            : "bg-red-50 border-red-200"
+        }
         md:flex-1 md:text-center`}
             onClick={() => setActiveTab(tab)}
           >
@@ -359,7 +363,7 @@ export default function PropertFilterSlider({
             </div>
 
             {/* Filter Content */}
-            <div className="space-y-2 flex-grow overflow-y-auto">
+            <div className="space-y-2 flex-grow px-5 overflow-y-auto">
               {renderFilterContent(activeTab)}
             </div>
 
@@ -372,7 +376,7 @@ export default function PropertFilterSlider({
                   setActiveTab(null);
                 }}
               >
-                Cancel
+                Reset
               </button>
               <button
                 className="px-4 py-2 bg-[#7C0902] text-[14px] text-white rounded hover:bg-[#a01002] transition"

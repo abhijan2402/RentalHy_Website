@@ -25,6 +25,7 @@ import {
   Autocomplete,
   useJsApiLoader,
 } from "@react-google-maps/api";
+import { MdOutlineMyLocation } from "react-icons/md";
 
 const containerStyle = {
   width: "100%",
@@ -136,28 +137,24 @@ const AddFarmHouse = ({ showModal, onClose }) => {
   // Detect user location on load
   useEffect(() => {
     if (isLoaded && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const pos = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          };
-          setMarkerPos(pos);
-          setMapCenter(pos);
-          // form.setFieldsValue({ lat: pos.lat, long: pos.lng });
-
-          const geocoder = new window.google.maps.Geocoder();
-          geocoder.geocode({ location: pos }, (results, status) => {
-            if (status === "OK" && results[0]) {
-              form.setFieldsValue({ location: results[0].formatted_address });
-              setSearchText(results[0].formatted_address);
-            }
-          });
-        },
-        (err) => console.warn("Geolocation denied/unavailable:", err.message)
-      );
+      const loc = { lat: latitude, lng: longitude };
+      setDefaultCenter(loc);
+      setMarkerPos(loc);
+      setMapCenter(loc);
+      setSearchText(`${area || ""} ${city || ""}`.trim() || "");
     }
   }, [isLoaded]);
+
+  // Replace your handleRecenter with this:
+  const handleRecenter = () => {
+    if (isLoaded && navigator.geolocation) {
+      const loc = { lat: latitude, lng: longitude };
+      setDefaultCenter(loc);
+      setMarkerPos(loc);
+      setMapCenter(loc);
+      setSearchText(`${area || ""} ${city || ""}`.trim() || "");
+    }
+  };
 
   // ✅ Autocomplete select
   const handlePlaceChanged = () => {
@@ -583,23 +580,52 @@ const AddFarmHouse = ({ showModal, onClose }) => {
             )}
           </Form.Item>
 
-          {/* Map */}
-          {isLoaded && (
-            <GoogleMap
-              mapContainerStyle={containerStyle}
-              center={mapCenter}
-              zoom={15}
-              onClick={handleMapClick}
+          {/* Map + Recenter Button */}
+          <div className="relative">
+            {isLoaded && (
+              <GoogleMap
+                mapContainerStyle={containerStyle}
+                center={mapCenter}
+                zoom={15}
+                onClick={handleMapClick}
+              >
+                {markerPos && (
+                  <MarkerF
+                    position={markerPos}
+                    draggable
+                    onDragEnd={handleMarkerDragEnd}
+                  />
+                )}
+              </GoogleMap>
+            )}
+
+            {/* ✅ Custom recenter button */}
+            <button
+              type="button"
+              onClick={handleRecenter}
+              style={{
+                position: "absolute",
+                top: 10,
+                right: 60,
+                zIndex: 9999,
+                width: "38px",
+                height: "38px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                borderRadius: "50%",
+                background: "#fff",
+                border: "1px solid #ccc",
+                boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
+                cursor: "pointer",
+              }}
             >
-              {markerPos && (
-                <MarkerF
-                  position={markerPos}
-                  draggable
-                  onDragEnd={handleMarkerDragEnd}
-                />
-              )}
-            </GoogleMap>
-          )}
+              <MdOutlineMyLocation
+                className="w-5 h-5 text-red-800"
+                aria-hidden="true"
+              />
+            </button>
+          </div>
 
           {/* Price Options with individual inputs*/}
           <Form.Item

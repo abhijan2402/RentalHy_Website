@@ -18,7 +18,7 @@ export default function PropertyDetails({ property, error, isLoading }) {
   const [showMore, setShowMore] = useState(false);
   const [addWhishlist] = useAddToWishlistMutation();
   const [removeWhishlist] = useRemoveToWishlistMutation();
-  console.log(property);
+  // console.log(property);
   // Slider settings
   const sliderSettings = {
     dots: true,
@@ -68,7 +68,7 @@ export default function PropertyDetails({ property, error, isLoading }) {
           .catch((err) => {
             toast.error(err?.data?.message);
           });
-        console.log("Removed from wishlist:", property.id);
+        // console.log("Removed from wishlist:", property.id);
       } else {
         // Add to wishlist
         await addWhishlist(property.id)
@@ -81,7 +81,7 @@ export default function PropertyDetails({ property, error, isLoading }) {
           .catch((err) => {
             toast.error(err?.data?.message || "Something went worng!");
           });
-        console.log("Added to wishlist:", property.id);
+        // console.log("Added to wishlist:", property.id);
       }
     } catch (error) {
       console.error("Wishlist toggle error:", error);

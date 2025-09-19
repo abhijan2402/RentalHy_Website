@@ -112,10 +112,10 @@ export default function ConventionFilters({
             />
             <Slider
               range
-              min={1000}
-              max={1000000}
-              step={1000}
-              value={pendingFilters.priceRange}
+              min={0}
+              max={500000} // add max
+              step={100}
+              value={pendingFilters.priceRange || [0, 500000]}
               onChange={(range) => handleRangeChange("priceRange", range)}
               trackStyle={{ backgroundColor: PRIMARY_COLOR }}
               handleStyle={[

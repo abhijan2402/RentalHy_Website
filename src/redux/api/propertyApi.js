@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 function filtersToFormData(filters) {
-  console.log(filters);
+  // console.log(filters);
   const formData = new FormData();
   for (const key in filters) {
     if (!filters.hasOwnProperty(key)) continue;
@@ -34,10 +34,10 @@ export const propertyApi = createApi({
     getProperties: builder.query({
       query: ({ filterPayload, pageno }) => {
         const formData = filtersToFormData(filterPayload);
-        console.group(pageno, filterPayload);
-        for (let pair of formData.entries()) {
-          console.log(pair[0] + ": " + pair[1]);
-        }
+        // console.group(pageno, filterPayload);
+        // for (let pair of formData.entries()) {
+        //   console.log(pair[0] + ": " + pair[1]);
+        // }
 
         return {
           url: `properties?page=${pageno}`,

@@ -7,10 +7,10 @@ import { Form, Radio } from "antd";
 const PRIMARY_COLOR = "#7C0902";
 
 const FilterSection = ({ title, open, setOpen, children }) => (
-  <div className="border-b border-gray-200 pb-3">
+  <div className=" border-gray-200">
     <button
       onClick={() => setOpen(!open)}
-      className="w-full flex justify-between items-center py-2 font-semibold text-gray-700 hover:text-[#7C0902] transition-colors"
+      className="w-full flex justify-between items-center py-0 font-semibold text-gray-700 hover:text-[#7C0902] transition-colors"
     >
       {title} {open ? <FiChevronUp size={20} /> : <FiChevronDown size={20} />}
     </button>
@@ -38,7 +38,7 @@ const Chip = ({ label, selected, onClick }) => (
   </button>
 );
 
-const timeOfOccasionOptions = ["Daytime", "Nighttime", "Full day"];
+const timeOfOccasionOptions = ["Daytime", "Night time", "Full day"];
 
 export default function ConventionFilters({
   isOpen,
@@ -136,7 +136,7 @@ export default function ConventionFilters({
               open={sections.timeOfOccasion}
               setOpen={(v) => setSections((p) => ({ ...p, timeOfOccasion: v }))}
             />
-            <div className="flex gap-2 flex-wrap">
+            <div className="flex gap-2 mb-4 flex-wrap">
               {timeOfOccasionOptions.map((opt) => (
                 <Chip
                   key={opt}

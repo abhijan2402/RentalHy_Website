@@ -221,7 +221,7 @@ const BookConventionSpace = ({
             />
           </Form.Item>
 
-          {[
+          {/* {[
             { label: "Catering Needed", name: "catering_needed" },
             { label: "Chef Needed", name: "chef_needed" },
             { label: "Photographers Required", name: "photograper_needed" },
@@ -231,7 +231,7 @@ const BookConventionSpace = ({
             <Form.Item key={name} label={label} name={name}>
               <Radio.Group options={yesNoOptions} />
             </Form.Item>
-          ))}
+          ))} */}
 
           <Form.Item label="Comment (Optional)" name="comment">
             <TextArea rows={2} placeholder="Enter comment here..." />

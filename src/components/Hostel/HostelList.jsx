@@ -96,9 +96,7 @@ export default function HostelList({
           className="flex flex-col items-center justify-center h-[60vh] text-gray-500 gap-3"
         >
           <TbDatabaseOff size={50} />
-          <p className="text-lg font-medium">
-            No Hostels found
-          </p>
+          <p className="text-lg font-medium">No Hostels found</p>
         </motion.div>
       );
     }
@@ -166,20 +164,7 @@ export default function HostelList({
                     </p>
                   </div>
 
-                  {/* Button at bottom */}
-
-                  <div className="mt-auto w-full">
-                    <a
-                      onClick={() =>
-                        !user
-                          ? navigate("/signin")
-                          : alert("stilll to implement fucntionality")
-                      }
-                      className="w-full block text-center cursor-pointer bg-[#7C0902] text-white px-5 py-2 rounded-lg font-semibold text-sm shadow hover:bg-[#600601] transition-colors"
-                    >
-                      Book Now
-                    </a>
-                  </div>
+                
                 </div>
               </div>
             );

@@ -10,7 +10,7 @@ export function usePropertyFilters() {
     propertyType: [],
     floor: [],
     roomSize: { min: "", max: "" },
-    priceRange: [],
+    priceRange: [0, 5000000],
     commercialSpace: [],
     furnishing: [],
     availability: [],
@@ -50,6 +50,7 @@ export function usePropertyFilters() {
     max_area: filters.roomSize?.max || "",
     sort_by: sort || "",
     per_page: perpage || "",
+    property_type: filters.propertyType,
   };
   // console.log(filterPayload);
 
@@ -86,7 +87,7 @@ export function usePropertyFilters() {
         ? arr.filter((v) => v !== value)
         : [...arr, value];
       const newFilters = { ...prev, [key]: updated };
-      console.log(newFilters);
+      // console.log(newFilters);
       return newFilters;
     });
   };
@@ -95,7 +96,7 @@ export function usePropertyFilters() {
     setFilters((prev) => {
       const updated = { ...prev[key], [field]: value };
       const newFilters = { ...prev, [key]: updated };
-      console.log(newFilters);
+      // console.log(newFilters);
       return newFilters;
     });
   };
@@ -103,7 +104,7 @@ export function usePropertyFilters() {
   const handlePriceChange = (range) => {
     setFilters((prev) => {
       const newFilters = { ...prev, priceRange: range };
-      console.log(newFilters);
+      // console.log(newFilters);
       return newFilters;
     });
   };
@@ -157,7 +158,7 @@ export function usePropertyFilters() {
           reset.roomSize = { min: "", max: "" };
           break;
         case "Price":
-          reset.priceRange = [5000, 50000];
+          reset.priceRange = [1000, 5000000];
           break;
         case "Furnishing":
           reset.furnishing = [];
@@ -186,7 +187,7 @@ export function usePropertyFilters() {
         default:
           break;
       }
-      console.log("Reset:", reset);
+      // console.log("Reset:", reset);
       return reset;
     });
   };

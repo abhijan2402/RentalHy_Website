@@ -24,7 +24,7 @@ const sliderSettings = {
 export default function PropertyAnalytics() {
   const navigate = useNavigate();
   const { data, isLoading, error } = useGetMyPropertiesQuery();
-  console.log(data?.data);
+  // console.log(data?.data);
   const renderState = () => {
     if (isLoading) {
       return (

@@ -59,7 +59,7 @@ export default function PropertyFilters({
       bhk: [],
       propertyType: [],
       roomSize: { min: "", max: "" },
-      priceRange: [],
+      priceRange: [1000, 5000000],
       furnishing: [],
       availability: [],
       bathrooms: [],
@@ -134,7 +134,15 @@ export default function PropertyFilters({
               open={sections.propertyType}
               setOpen={(v) => setSections((p) => ({ ...p, propertyType: v }))}
             >
-              {["Apartment", "Flat", "Villa"].map((type) => (
+              {[
+                "Apartment",
+                "Flat",
+                "Villa",
+                "Duplex",
+                "Tiled House",
+                "Roof Sheets",
+                "Independent House",
+              ].map((type) => (
                 <label
                   key={type}
                   className="flex text-black items-center gap-2"
@@ -232,6 +240,8 @@ export default function PropertyFilters({
             </FilterSection>
 
             {/* Price Range */}
+            <div className="px-4">
+
             <FilterSection
               title="Price Range"
               open={sections.priceRange}
@@ -240,7 +250,7 @@ export default function PropertyFilters({
               <Slider
                 range
                 min={0}
-                max={100000}
+                max={5000000}
                 step={1000}
                 value={filters.priceRange}
                 onChange={handlePriceChange}
@@ -252,9 +262,11 @@ export default function PropertyFilters({
               />
               <div className="flex justify-between text-black text-sm mt-2">
                 <span>₹{filters.priceRange[0]}</span>
-                <span className="text-black">₹{filters.priceRange[1]}</span>
+                <span className="text-black">₹{filters.priceRange[1]} +</span>
               </div>
             </FilterSection>
+            </div>
+
             {/* Furnishing */}
             <FilterSection
               title="Furnishing Status"

@@ -15,7 +15,7 @@ export function AuthProvider({ children }) {
   const [userId, setUserId] = useState(null);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
-  console.log(user);
+  // console.log(user);
 
   // Signup mutations
   const [

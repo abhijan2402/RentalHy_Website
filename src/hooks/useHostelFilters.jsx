@@ -4,7 +4,7 @@ import { useGetHostelListQuery } from "../redux/api/hostelApi";
 export function useHostelFilters(initialValues) {
   // ------- Categories matching the image -------
   const defaultFilters = {
-    priceRange: [],
+    priceRange: [0, 500000],
     roomTypes: [],
     genders: [],
     facilities: [],
@@ -14,7 +14,7 @@ export function useHostelFilters(initialValues) {
   };
   const [filters, setFilters] = useState(initialValues || defaultFilters); // ------- Local staging of filters before apply -------
 
-  console.log(filters);
+  // console.log(filters);
 
   const [pendingFilters, setPendingFilters] = useState(filters);
   const [search, setSearch] = useState("");

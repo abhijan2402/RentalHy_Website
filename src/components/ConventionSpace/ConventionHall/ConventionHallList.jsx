@@ -67,7 +67,6 @@ export default function ConventionHallList({
     setOpenBookingModal(true);
   };
 
-  console.log(conventionList);
   const renderState = () => {
     if (isLoading) {
       return (

@@ -40,7 +40,7 @@ export default function ProfilePage() {
 
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(user?.avatar || null);
-  console.log(imageFile);
+  // console.log(imageFile);
   useEffect(() => {
     if (user) {
       form.setFieldsValue({
@@ -61,7 +61,7 @@ export default function ProfilePage() {
       formData.append("phone_number", values.phone);
 
       const res = await updateProfile(formData).unwrap();
-      console.log(res);
+      // console.log(res);
       if (res && res.message) {
         toast.success("Profile updated successfully");
         setEditOpen(false);

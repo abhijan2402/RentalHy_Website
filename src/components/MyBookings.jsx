@@ -57,8 +57,8 @@ const MyBookings = () => {
     },
     {
       title: "Status",
-      dataIndex: "status",
-      key: "status",
+      dataIndex: "order_status",
+      key: "order_status",
       render: (status) => (
         <Tag
           color={
@@ -135,14 +135,14 @@ const MyBookings = () => {
             <Descriptions.Item label="Status">
               <Tag
                 color={
-                  selectedBooking.status === "success"
+                  selectedBooking.order_status === "success"
                     ? "green"
-                    : selectedBooking.status === "pending"
+                    : selectedBooking.order_status === "pending"
                     ? "orange"
                     : "red"
                 }
               >
-                {selectedBooking.status}
+                {selectedBooking.order_status}
               </Tag>
             </Descriptions.Item>
             <Descriptions.Item label="Catering Needed">

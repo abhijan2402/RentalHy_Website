@@ -21,7 +21,7 @@ function filtersToFormData(filters = {}) {
 export const conventionApi = createApi({
   reducerPath: "conventionApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://hotpink-rook-901841.hostingersite.com/public/api/",
+    baseUrl: import.meta.env.VITE_BASE_URL,
     prepareHeaders: (headers) => {
       const token = localStorage.getItem("authToken");
       if (token) {

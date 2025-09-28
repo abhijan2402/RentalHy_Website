@@ -9,6 +9,7 @@ import { paymentApi } from "../api/paymnetApi";
 import { bookingsApi } from "../api/bookingsApi";
 import { accountApi } from "../api/accountApi";
 import { feedbackApi } from "../api/feedbackApi";
+import { cmsApi } from "../api/cmsApi";
 
 export const store = configureStore({
   reducer: {
@@ -22,6 +23,7 @@ export const store = configureStore({
     [bookingsApi.reducerPath]: bookingsApi.reducer,
     [accountApi.reducerPath]: accountApi.reducer,
     [feedbackApi.reducerPath]: feedbackApi.reducer,
+    [cmsApi.reducerPath]: cmsApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
@@ -34,5 +36,6 @@ export const store = configureStore({
       .concat(paymentApi.middleware)
       .concat(bookingsApi.middleware)
       .concat(accountApi.middleware)
+      .concat(cmsApi.middleware)
       .concat(feedbackApi.middleware),
 });

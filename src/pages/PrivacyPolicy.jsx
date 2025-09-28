@@ -1,181 +1,79 @@
 import React from "react";
+import { useGetcmsPrivacyQuery } from "../redux/api/cmsApi";
+import { Spin, Alert } from "antd";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function PrivacyPolicy() {
+  const { data, isLoading, isError } = useGetcmsPrivacyQuery();
+  const htmlContent = data?.data?.content || "";
+
   return (
-    <section className="py-28 px-4 bg-gradient-to-br from-[#f5f9ff] to-[#e6f0ff] text-gray-800">
-      <div className="max-w-5xl mx-auto">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-10 text-[#012A56]">
+    <section className="py-16 mt-10 px-2 sm:py-20 sm:px-4 md:py-28 md:px-6 bg-gradient-to-br from-[#f5f9ff] to-[#e6f0ff] text-gray-800 min-h-[60vh]">
+      <div className="mx-auto w-full max-w-[90vw] sm:max-w-2xl md:max-w-3xl lg:max-w-4xl xl:max-w-5xl">
+        <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-6 sm:mb-10 text-[#012A56] break-words">
           Privacy Policy
         </h1>
 
-        <div className="space-y-8 text-base sm:text-lg leading-relaxed text-gray-700">
-          <p>
-            At <strong>Codantra Technologies</strong>, we are committed to
-            protecting your privacy and ensuring that your personal information
-            is handled in a safe and responsible manner. This Privacy Policy
-            explains how we collect, use, disclose, and protect your information
-            when you visit our website or use our services.
-          </p>
+        {/* Loading State */}
+        <AnimatePresence>
+          {isLoading && (
+            <motion.div
+              key="loading"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="flex justify-center items-center h-[50vh] py-20"
+              aria-live="polite"
+              aria-busy="true"
+            >
+              <Spin tip="Loading Privacy Policy..." />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-          <section>
-            <h2 className="text-2xl font-semibold text-[#012A56] mb-2">
-              1. Information We Collect
-            </h2>
-            <p>We may collect the following types of information:</p>
+        {/* Error State */}
+        {!isLoading && isError && (
+          <Alert
+            message="Error"
+            description="Failed to load the Privacy Policy. Please try again later."
+            type="error"
+            showIcon
+            className="my-10 h-[50vh]"
+          />
+        )}
 
-            <h3 className="font-medium text-[#012A56] mt-4">
-              a. Personal Information
-            </h3>
-            <ul className="list-disc ml-6">
-              <li>Name</li>
-              <li>Email address</li>
-              <li>Phone number</li>
-              <li>Company name</li>
-              <li>IP address</li>
-              <li>Any other information voluntarily provided by you</li>
-            </ul>
-
-            <h3 className="font-medium text-[#012A56] mt-4">
-              b. Non-Personal Information
-            </h3>
-            <ul className="list-disc ml-6">
-              <li>Browser type</li>
-              <li>Operating system</li>
-              <li>Time and date of access</li>
-              <li>Pages visited</li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold text-[#012A56]">
-              2. How We Use Your Information
-            </h2>
-            <ul className="list-disc ml-6">
-              <li>To provide and maintain our services</li>
-              <li>To improve user experience and website functionality</li>
-              <li>
-                To communicate with you (e.g., send updates, respond to
-                inquiries)
-              </li>
-              <li>
-                To send newsletters or marketing communications (if opted-in)
-              </li>
-              <li>To analyze website traffic and trends</li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold text-[#012A56]">
-              3. Sharing Your Information
-            </h2>
-            <p>
-              We do not sell, trade, or rent your personal information to third
-              parties. However, we may share your data with:
-            </p>
-            <ul className="list-disc ml-6">
-              <li>
-                Trusted third-party service providers who assist us in operating
-                our website or conducting business
-              </li>
-              <li>Legal authorities when required by law</li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold text-[#012A56]">
-              4. Cookies and Tracking Technologies
-            </h2>
-            <p>
-              Our website may use cookies and similar technologies to enhance
-              your browsing experience. Cookies help us understand user behavior
-              and preferences. You can modify your browser settings to decline
-              cookies if you prefer.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold text-[#012A56]">
-              5. Data Security
-            </h2>
-            <p>
-              We implement appropriate security measures to protect your
-              personal data from unauthorized access, alteration, disclosure, or
-              destruction. However, no method of transmission over the Internet
-              is completely secure.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold text-[#012A56]">
-              6. Your Rights
-            </h2>
-            <ul className="list-disc ml-6">
-              <li>Access the personal data we hold about you</li>
-              <li>Request corrections or updates to your information</li>
-              <li>Withdraw your consent (where applicable)</li>
-              <li>
-                Request deletion of your data (subject to legal obligations)
-              </li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold text-[#012A56]">
-              7. Third-Party Links
-            </h2>
-            <p>
-              Our website may contain links to other sites. We are not
-              responsible for the privacy practices of those sites. We encourage
-              you to read their privacy policies when you leave our website.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold text-[#012A56]">
-              8. Children’s Privacy
-            </h2>
-            <p>
-              Our services are not intended for individuals under the age of 13.
-              We do not knowingly collect personal information from children.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold text-[#012A56]">
-              9. Changes to This Privacy Policy
-            </h2>
-            <p>
-              We may update this Privacy Policy from time to time. We encourage
-              you to review it periodically. Changes will be posted on this page
-              with an updated effective date.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold text-[#012A56]">
-              10. Contact Us
-            </h2>
-            <p>
-              If you have any questions about this Privacy Policy or your
-              personal data, please contact us at:
-            </p>
-            <p className="mt-2">
-              <strong>Codantra Technologies</strong>
-              <br />
-              Email:{" "}
-              <a
-                href="mailto:support@codantratech.com"
-                className="text-blue-600 underline"
-              >
-                support@codantratech.com
-              </a>
-              <br />
-              Phone: +91-9782488408, +91-7976114618
-              <br />
-              109-A Bajrangdeep colony, Jagatpura, Jaipur, 302022
-            </p>
-          </section>
-        </div>
+        {/* Content */}
+        {!isLoading && !isError && (
+          <div
+            className="space-y-6 sm:space-y-8 text-[16px] sm:text-lg leading-relaxed text-gray-700 prose lg:prose-xl max-w-none overflow-x-auto"
+            style={{ wordBreak: "break-word" }}
+            dangerouslySetInnerHTML={{
+              __html: htmlContent
+                .replace(/&lt;/g, "<")
+                .replace(/&gt;/g, ">")
+                .replace(/(<br\s*\/?>)+/g, "<br />")
+                .replace(
+                  /(<h1>)/g,
+                  '<h1 class="text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-bold text-[#012A56] mb-4 break-words">'
+                )
+                .replace(
+                  /(<h2>)/g,
+                  '<h2 class="text-lg sm:text-2xl font-semibold text-[#012A56] mb-3 break-words">'
+                )
+                .replace(
+                  /(<h3>)/g,
+                  '<h3 class="text-base sm:text-xl font-medium text-[#1558b3] mb-2 break-words">'
+                )
+                .replace(/(<ul>)/g, '<ul class="list-disc ml-5">')
+                .replace(/(<li>)/g, '<li class="mb-1">')
+                .replace(/(<p>)/g, '<p class="mb-3">')
+                .replace(
+                  /<table\b/g,
+                  '<table style="display: block; overflow-x: auto; width: 100%;"'
+                ),
+            }}
+          />
+        )}
       </div>
     </section>
   );

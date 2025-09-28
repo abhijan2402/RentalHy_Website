@@ -1,224 +1,79 @@
 import React from "react";
+import { useGetcmsQuery } from "../redux/api/cmsApi";
+import { Spin, Alert } from "antd";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function TermsAndConditions() {
+  const { data, isLoading, isError } = useGetcmsQuery();
+  const htmlContent = data?.data?.content || "";
+
   return (
-    <section className="py-28 px-4 bg-gradient-to-br from-[#f5f9ff] to-[#e6f0ff] text-gray-800">
-      <div className="max-w-5xl mx-auto">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-10 text-[#012A56]">
+    <section className="py-16 px-2 sm:py-20 sm:px-4 md:py-28 md:px-6 bg-gradient-to-br from-[#f5f9ff] to-[#e6f0ff] text-gray-800 min-h-[60vh]">
+      <div className="mx-auto w-full max-w-[90vw] sm:max-w-2xl md:max-w-3xl lg:max-w-4xl xl:max-w-5xl">
+        <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-6 sm:mb-10 text-[#012A56] break-words">
           Terms & Conditions
         </h1>
 
-        <div className="space-y-8 text-base sm:text-lg leading-relaxed text-gray-700">
-          <p>
-            These Terms & Conditions govern your use of the website and services
-            of <strong>Codantra Technologies</strong>. By accessing or using our
-            website, you agree to these Terms. If you do not agree with any part
-            of these Terms, please do not use our services.
-          </p>
+        {/* Loading State */}
+        <AnimatePresence>
+          {isLoading && (
+            <motion.div
+              key="loading"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="flex justify-center items-center py-20"
+              aria-live="polite"
+              aria-busy="true"
+            >
+              <Spin tip="Loading Terms & Conditions..." />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-          <section>
-            <h2 className="text-2xl font-semibold text-[#012A56]">
-              1. Acceptance of Terms
-            </h2>
-            <p>
-              By accessing or using the website and services of{" "}
-              <strong>Codantra Technologies</strong> (“Company”, “we”, “us” or
-              “our”), you agree to be bound by these Terms & Conditions
-              (“Terms”).
-            </p>
-          </section>
+        {/* Error State */}
+        {!isLoading && isError && (
+          <Alert
+            message="Error"
+            description="Failed to load the Terms & Conditions. Please try again later."
+            type="error"
+            showIcon
+            className="my-10"
+          />
+        )}
 
-          <section>
-            <h2 className="text-2xl font-semibold text-[#012A56]">
-              2. Definitions
-            </h2>
-            <ul className="list-disc ml-6">
-              <li>
-                <strong>Services:</strong> All products, applications, software,
-                and services provided by the Company.
-              </li>
-              <li>
-                <strong>User:</strong> Any person or entity who accesses or uses
-                the Services.
-              </li>
-              <li>
-                <strong>Content:</strong> All text, images, graphics, code, and
-                other materials available on the website.
-              </li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold text-[#012A56]">
-              3. Use of Services
-            </h2>
-            <ul className="list-disc ml-6">
-              <li>
-                <strong>Eligibility:</strong> You must be at least 18 years old
-                to use our Services.
-              </li>
-              <li>
-                <strong>Account Registration:</strong> Some features may require
-                registration. You agree to provide accurate and current
-                information.
-              </li>
-              <li>
-                <strong>Prohibited Conduct:</strong> You agree not to:
-                <ul className="list-disc ml-6 mt-2">
-                  <li>Violate any applicable laws</li>
-                  <li>Infringe intellectual property or privacy rights</li>
-                  <li>Transmit harmful code (viruses, malware)</li>
-                  <li>
-                    Engage in deceptive practices like spamming or phishing
-                  </li>
-                </ul>
-              </li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold text-[#012A56]">
-              4. Intellectual Property
-            </h2>
-            <ul className="list-disc ml-6">
-              <li>
-                <strong>Ownership:</strong> All content and rights are owned by
-                the Company or its licensors.
-              </li>
-              <li>
-                <strong>License:</strong> We grant a limited, non-transferable
-                license to use the Services.
-              </li>
-              <li>
-                <strong>Restrictions:</strong> You may not reproduce, modify, or
-                publicly display content without permission.
-              </li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold text-[#012A56]">
-              5. Payment and Fees
-            </h2>
-            <ul className="list-disc ml-6">
-              <li>
-                <strong>Billing:</strong> You agree to pay all applicable fees.
-              </li>
-              <li>
-                <strong>Refunds & Cancellations:</strong> Governed by our
-                separate refund policy or purchase terms.
-              </li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold text-[#012A56]">
-              6. Disclaimer of Warranties
-            </h2>
-            <ul className="list-disc ml-6">
-              <li>
-                <strong>As-Is:</strong> Services are provided without warranties
-                of any kind.
-              </li>
-              <li>
-                <strong>No Guarantee:</strong> We do not guarantee uninterrupted
-                or error-free services.
-              </li>
-              <li>
-                <strong>Third-Party Links:</strong> We are not responsible for
-                external content or sites.
-              </li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold text-[#012A56]">
-              7. Limitation of Liability
-            </h2>
-            <p>
-              To the fullest extent permitted by law, we are not liable for
-              indirect, incidental, or consequential damages, including data
-              loss or business interruption.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold text-[#012A56]">
-              8. Indemnification
-            </h2>
-            <p>
-              You agree to indemnify and hold harmless{" "}
-              <strong>Codantra Technologies</strong>
-              from any claims or liabilities arising from your use of the
-              Services or violation of these Terms.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold text-[#012A56]">
-              9. Termination
-            </h2>
-            <p>
-              We reserve the right to suspend or terminate access at any time
-              without notice for violating these Terms or engaging in harmful
-              behavior.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold text-[#012A56]">
-              10. Governing Law & Dispute Resolution
-            </h2>
-            <p>
-              These Terms shall be governed by the laws of India. Any disputes
-              shall be resolved exclusively in the courts of Jaipur, Rajasthan,
-              India.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold text-[#012A56]">
-              11. Changes to Terms
-            </h2>
-            <p>
-              We may update these Terms at any time. Updates will be posted on
-              this page with the revised date: <strong>09-07-2025</strong>.
-              Continued use of our services after changes constitutes
-              acceptance.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold text-[#012A56]">
-              12. Severability
-            </h2>
-            <p>
-              If any part of these Terms is deemed invalid, the remaining parts
-              will remain in full force and effect.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold text-[#012A56]">
-              13. Contact Information
-            </h2>
-            <p className="mt-2">
-              <strong>Codantra Technologies</strong>
-              <br />
-              Email:{" "}
-              <a
-                href="mailto:contact@codantratech.com"
-                className="text-blue-600 underline"
-              >
-                contact@codantratech.com
-              </a>
-              <br />
-              Phone: +91-9782488408, +91-7976114618
-              <br />
-              109-A Bajrangdeep colony, Jagatpura, Jaipur, 302022
-            </p>
-          </section>
-        </div>
+        {/* Content */}
+        {!isLoading && !isError && (
+          <div
+            className="space-y-6 sm:space-y-8 text-[16px] sm:text-lg leading-relaxed text-gray-700 prose lg:prose-xl max-w-none overflow-x-auto"
+            style={{ wordBreak: "break-word" }}
+            dangerouslySetInnerHTML={{
+              __html: htmlContent
+                .replace(/&lt;/g, "<")
+                .replace(/&gt;/g, ">")
+                .replace(/(<br\s*\/?>)+/g, "<br />")
+                .replace(
+                  /(<h1>)/g,
+                  '<h1 class="text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-bold text-[#012A56] mb-4 break-words">'
+                )
+                .replace(
+                  /(<h2>)/g,
+                  '<h2 class="text-lg sm:text-2xl font-semibold text-[#012A56] mb-3 break-words">'
+                )
+                .replace(
+                  /(<h3>)/g,
+                  '<h3 class="text-base sm:text-xl font-medium text-[#1558b3] mb-2 break-words">'
+                )
+                .replace(/(<ul>)/g, '<ul class="list-disc ml-5">')
+                .replace(/(<li>)/g, '<li class="mb-1">')
+                .replace(/(<p>)/g, '<p class="mb-3">')
+                .replace(
+                  /<table\b/g,
+                  '<table style="display: block; overflow-x: auto; width: 100%;"'
+                ),
+            }}
+          />
+        )}
       </div>
     </section>
   );

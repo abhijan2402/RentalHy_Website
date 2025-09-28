@@ -44,16 +44,23 @@ export default function AboutPage() {
             About Us
           </h1>
           <p className="text-gray-700 text-lg mb-6 leading-relaxed">
-            At TO-LET INDIA, we believe finding your dream property should be
-            simple, transparent, and stress-free. Our platform connects buyers,
-            renters, and owners with trusted agents and verified listings,
-            combining industry expertise with cutting-edge technology. From
-            luxury apartments to family homes and commercial spaces, we make
-            property discovery effortless with accurate details, high-quality
-            images, and personalized recommendations. Backed by a dedicated
-            support team, we are committed to delivering a secure, efficient,
-            and enjoyable experience for every customer. Whether you're
-            searching, selling, or investing — your journey starts here with us.
+            To-Let India is a rental platform designed to simplify and enhance
+            the way people find, list, and book rental properties across India.
+            Our free app and website provide seamless access to a wide range of
+            rentals including residential homes, hostels, convention and
+            function halls, resorts, and farmhouses. We empower property owners
+            and customers with a user-friendly, rental-free listing experience
+            and streamlined booking options, including advance payments for
+            event spaces and all type of venues. Founded with the vision to
+            create an inclusive, transparent, and efficient rental marketplace,
+            To-Let India brings together technology and customer-centric design
+            to facilitate trusted connections between tenants, hosts, and venue
+            owners. Our platform prioritizes user privacy and data security
+            while ensuring compliance with India’s legal framework and global
+            data protection standards. We are committed to continuous
+            innovation, reliable service, and fostering a vibrant community
+            where every user can discover the perfect rental solution with
+            confidence and ease.
           </p>
 
           {/* Contact Info */}
@@ -66,7 +73,7 @@ export default function AboutPage() {
                   href="tel:+919876543210"
                   className="text-gray-600 hover:text-[#7C0902] transition"
                 >
-                  +91 98765 43210
+                  +91 9014988451
                 </a>
               </div>
             </div>
@@ -75,10 +82,11 @@ export default function AboutPage() {
               <div>
                 <p className="font-semibold text-gray-800">Email Us</p>
                 <a
-                  href="mailto:support@property.com"
+                  href="mailto:sridharmudhiraj@to-letindia.com
+"
                   className="text-gray-600 hover:text-[#7C0902] transition"
                 >
-                  support@property.com
+                  sridharmudhiraj@to-letindia.com
                 </a>
               </div>
             </div>

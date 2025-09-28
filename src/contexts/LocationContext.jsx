@@ -16,7 +16,7 @@ const LocationContext = createContext({
 export function LocationProvider({ children }) {
   const [location, setLocation] = useState(defaultLocation);
 
-  console.log(location)
+  // console.log(location)
 
   useEffect(() => {
     if (!navigator.geolocation) {

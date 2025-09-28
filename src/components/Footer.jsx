@@ -20,11 +20,12 @@ export default function Footer() {
             and customer-first approach.
           </p>
           <div className="text-sm">
-            📍 123 Skyline Avenue, Downtown City, 560001
+            📍 1-15, Turkapally Village, Shamirpet Mandal, Medchal District,
+            Telangana 500078
             <br />
-            📞 +91-9876543210
+            📞 +91-9014988451
             <br />
-            📧 info@stayproperties.com
+            📧 Chiralasridhar1919@gmail.com
           </div>
         </div>
 
@@ -45,7 +46,7 @@ export default function Footer() {
               Tickets
             </li>
             <li
-              onClick={() => navigate("/properties")}
+              onClick={() => navigate("/")}
               className="hover:text-gray-300 transition cursor-pointer"
             >
               Properties

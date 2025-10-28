@@ -337,123 +337,156 @@ const AddConventionHall = ({ showModal, onClose }) => {
   };
 
   const onFinish = async (values) => {
-    console.log(values);
+    try {
+      console.log(values);
 
-    let coords = null;
-    if (values.location) {
-      coords = await getLatLngFromAddress(values.location);
-    }
+      // ✅ Clean empty / undefined / null keys before processing
+      Object.keys(values).forEach((key) => {
+        const value = values[key];
+        if (
+          value === undefined ||
+          value === null ||
+          value === "" ||
+          (Array.isArray(value) && value.length === 0)
+        ) {
+          delete values[key];
+        }
+      });
 
-    console.log(coords);
+      let coords = null;
+      if (values.location) {
+        coords = await getLatLngFromAddress(values.location);
+      }
 
-    // Validate image uploads
-    if (!values.hallImages || !values.hallImages.length) {
-      toast.error("Please upload at least one hall image.");
-      return;
-    }
-    if (!values.kitchenImages || !values.kitchenImages.length) {
-      toast.error("Please upload at least one kitchen image.");
-      return;
-    }
-    if (!values.parkingImages || !values.parkingImages.length) {
-      toast.error("Please upload at least one parking image.");
-      return;
-    }
+      console.log(coords);
 
-    if (!values.brideImages || !values.brideImages.length) {
-      toast.error("Please upload at least one Bride/Groom Room image.");
-      return;
-    }
+      // ✅ Validate mandatory image uploads
+      if (!values.hallImages?.length) {
+        toast.error("Please upload at least one hall image.");
+        return;
+      }
+      if (!values.kitchenImages?.length) {
+        toast.error("Please upload at least one kitchen image.");
+        return;
+      }
+      if (!values.parkingImages?.length) {
+        toast.error("Please upload at least one parking image.");
+        return;
+      }
+      if (!values.brideImages?.length) {
+        toast.error("Please upload at least one Bride/Groom Room image.");
+        return;
+      }
 
-    // Prepare anyOtherPrices to simple array for submission
-    const preparedAnyOtherPrices = anyOtherPrices.map(({ name, price }) => ({
-      name,
-      price,
-    }));
+      // ✅ Prepare other dynamic values
+      const preparedAnyOtherPrices = anyOtherPrices.map(({ name, price }) => ({
+        name,
+        price,
+      }));
 
-    const formData = new FormData();
+      const formData = new FormData();
 
-    Object.entries(values).forEach(([key, value]) => {
-      if (Array.isArray(value)) {
-        value.forEach((item, index) => {
-          if (key === "hallImages") {
-            formData.append(
-              `hall_images[${index}]`,
-              item?.originFileObj ?? item
-            );
-          } else if (key === "kitchenImages") {
-            formData.append(
-              `kitchen_images[${index}]`,
-              item?.originFileObj ?? item
-            );
-          } else if (key === "brideImages") {
-            formData.append(
-              `bride_images[${index}]`,
-              item?.originFileObj ?? item
-            );
-          } else if (key === "parkingImages") {
-            formData.append(
-              `parking_images[${index}]`,
-              item?.originFileObj ?? item
-            );
+      // ✅ Append all form fields properly
+      Object.entries(values).forEach(([key, value]) => {
+        if (Array.isArray(value)) {
+          value.forEach((item, index) => {
+            if (key === "hallImages") {
+              formData.append(
+                `hall_images[${index}]`,
+                item?.originFileObj ?? item
+              );
+            } else if (key === "kitchenImages") {
+              formData.append(
+                `kitchen_images[${index}]`,
+                item?.originFileObj ?? item
+              );
+            } else if (key === "brideImages") {
+              formData.append(
+                `bride_images[${index}]`,
+                item?.originFileObj ?? item
+              );
+            } else if (key === "parkingImages") {
+              formData.append(
+                `parking_images[${index}]`,
+                item?.originFileObj ?? item
+              );
+            }
+          });
+        } else if (
+          key === "priceOptions" &&
+          typeof value === "object" &&
+          value !== null
+        ) {
+          Object.entries(value).forEach(([optionKey, optionValue]) => {
+            if (optionValue !== undefined && optionValue !== "") {
+              formData.append(optionKey, optionValue);
+            }
+          });
+        } else if (value !== null && value !== undefined && value !== "") {
+          formData.append(key, value);
+        }
+      });
+
+      // ✅ Append custom “other” pricing fields
+      preparedAnyOtherPrices.forEach((item) => {
+        if (item.name && item.price !== undefined && item.price !== "") {
+          formData.append(`other[${item.name}]`, item.price);
+        }
+      });
+
+      // ✅ Append unavailable dates
+      appendDatesToFormData(formData, values.unavailableDates || []);
+
+      // ✅ Append coordinates and type
+      if (coords) {
+        formData.append("lat", coords.lat.toString());
+        formData.append("long", coords.lng.toString());
+      }
+      formData.append("type", "hall");
+
+      // Debugging: log all FormData entries
+      for (let pair of formData.entries()) {
+        console.log(pair[0] + ": ", pair[1]);
+      }
+
+      // ✅ API Call
+      const response = await addConvention(formData).unwrap();
+      toast.success(
+        response?.message || "Convention hall created successfully"
+      );
+      console.log(response);
+
+      // ✅ Reset Form & States
+      form.resetFields();
+      setHallImages([]);
+      setKitchenImages([]);
+      setParkingImages([]);
+      setAnyOtherPrices([]);
+      setUnavailableDatesRanges([]);
+      onClose();
+    } catch (error) {
+      console.error("API Error:", error);
+
+      // ✅ If backend returns field-specific validation errors
+      if (error?.data?.errors && typeof error.data.errors === "object") {
+        const allErrors = error.data.errors;
+
+        Object.entries(allErrors).forEach(([field, messages]) => {
+          if (Array.isArray(messages)) {
+            messages.forEach((msg) => toast.error(`${field}: ${msg}`));
+          } else {
+            toast.error(`${field}: ${messages}`);
           }
         });
-      } else if (
-        key === "priceOptions" &&
-        typeof value === "object" &&
-        value !== null
-      ) {
-        Object.entries(value).forEach(([optionKey, optionValue]) => {
-          if (optionValue !== undefined) {
-            formData.append(optionKey, optionValue);
-          }
-        });
-      } else if (value !== null && value !== undefined) {
-        formData.append(key, value);
-      }
-    });
-
-    preparedAnyOtherPrices.forEach((item) => {
-      if (item.name && item.price !== undefined) {
-        formData.append(`other[${item.name}]`, item.price);
-      }
-    });
-
-    appendDatesToFormData(formData, values.unavailableDates || []);
-
-    if (coords) {
-      formData.append("lat", coords.lat.toString());
-      formData.append("long", coords.lng.toString());
-    }
-
-    // Debug: log all FormData values
-    for (let pair of formData.entries()) {
-      console.log(pair[0] + ": ", pair[1]);
-    }
-
-    await addConvention(formData)
-      .unwrap()
-      .then((response) => {
-        toast.success(
-          response?.message || "Convention hall created successfully"
-        );
-        console.log(response);
-      })
-      .catch((error) => {
+      } else {
+        // Generic fallback for network/server errors
         const errMsg =
           error?.data?.message ||
           error?.error ||
           "Failed to add Hall. Please try again.";
         toast.error(errMsg);
-      });
-
-    form.resetFields();
-    setHallImages([]);
-    setKitchenImages([]);
-    setParkingImages([]);
-    setAnyOtherPrices([]);
-    setUnavailableDatesRanges([]);
-    onClose();
+      }
+    }
   };
 
   return (
@@ -648,36 +681,35 @@ const AddConventionHall = ({ showModal, onClose }) => {
             <TextArea rows={2} placeholder="Enter contact details" />
           </Form.Item>
 
-
-                  {/* Location Picker */}
-                  <Form.Item
-                    label="Location"
-                    name="location"
-                    rules={[{ required: true, message: "Please select location" }]}
-                  >
-                    {isLoaded ? (
-                      <Autocomplete
-                        onLoad={(ac) => (autocompleteRef.current = ac)}
-                        onPlaceChanged={handlePlaceChanged}
-                      >
-                        <Input
-                          placeholder="Search location"
-                          value={searchText}
-                          onChange={(e) => {
-                            setSearchText(e.target.value);
-                            form.setFieldsValue({
-                              location: e.target.value,
-                              lat: null,
-                              long: null,
-                            });
-                          }}
-                          allowClear
-                        />
-                      </Autocomplete>
-                    ) : (
-                      <Input placeholder="Loading Google Maps..." disabled />
-                    )}
-                  </Form.Item>
+          {/* Location Picker */}
+          <Form.Item
+            label="Location"
+            name="location"
+            rules={[{ required: true, message: "Please select location" }]}
+          >
+            {isLoaded ? (
+              <Autocomplete
+                onLoad={(ac) => (autocompleteRef.current = ac)}
+                onPlaceChanged={handlePlaceChanged}
+              >
+                <Input
+                  placeholder="Search location"
+                  value={searchText}
+                  onChange={(e) => {
+                    setSearchText(e.target.value);
+                    form.setFieldsValue({
+                      location: e.target.value,
+                      lat: null,
+                      long: null,
+                    });
+                  }}
+                  allowClear
+                />
+              </Autocomplete>
+            ) : (
+              <Input placeholder="Loading Google Maps..." disabled />
+            )}
+          </Form.Item>
 
           {/* Map + Recenter Button */}
           <div className="relative">

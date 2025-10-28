@@ -3,7 +3,7 @@ import { useGetResortFarmPropertiesQuery } from "../redux/api/conventionApi";
 
 export function useFarmFilters(initialValues) {
   const defaultFilters = {
-    priceRange: [1000, 5000000],
+    priceRange: [0, 0],
     yesNoToggles: {
       swimmingPool: "",
       ac_available: "",
@@ -45,12 +45,12 @@ export function useFarmFilters(initialValues) {
   };
 
   // Fetch data
-    const { data, isLoading, error } = useGetResortFarmPropertiesQuery({
-      filterPayload,
-      pageno,
-    });
+  const { data, isLoading, error } = useGetResortFarmPropertiesQuery({
+    filterPayload,
+    pageno,
+  });
 
-    // console.log(data);
+  // console.log(data);
 
   // Chip multi-select toggle
   const toggleFilterValue = (category, value) => {
@@ -103,7 +103,6 @@ export function useFarmFilters(initialValues) {
   const handleSortChange = (e) => {
     setSort(e.target.value);
   };
-
 
   return {
     data,

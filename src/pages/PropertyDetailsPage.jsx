@@ -38,7 +38,13 @@ export default function PropertyDetailsPage() {
 
   return (
     <div className="mt-[100px]">
-      <Breadcrumb propertyTitle={"Property details"} />
+      <Breadcrumb
+        breadcrumbItems={[
+          { title: "Home", to: "/" },
+          { title: "Property", to: "/" },
+          { title: "Property details" },
+        ]}
+      />
       <PropertyDetails
         property={property?.data}
         isLoading={isLoading}

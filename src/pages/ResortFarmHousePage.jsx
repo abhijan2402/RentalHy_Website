@@ -7,7 +7,12 @@ const ResortFarmHousePage = () => {
 
   return (
     <div className="w-full max-w-6xl mx-auto mt-[120px]">
-      <Breadcrumb propertyTitle={"Resort/Farm House"} />
+      <Breadcrumb
+        breadcrumbItems={[
+          { title: "Home", to: "/" },
+          { title: "Resort/Farm House", to: "/farm-resort" },
+        ]}
+      />
       {/* Tab buttons */}
       <div className="flex px-6 gap-2 mb-4 border-b border-white">
         <button
@@ -23,9 +28,7 @@ const ResortFarmHousePage = () => {
       </div>
 
       {/* Tab content */}
-      <div>
-        {activeTab === "farmhouse" && <FarmHouse />}
-      </div>
+      <div>{activeTab === "farmhouse" && <FarmHouse />}</div>
     </div>
   );
 };

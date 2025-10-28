@@ -124,8 +124,19 @@ export default function ConventionFilters({
               ]}
             />
             <div className="flex justify-between text-black text-sm mt-2">
-              <span>₹{pendingFilters.priceRange[0]}</span>
-              <span>₹{pendingFilters.priceRange[1]}+</span>
+              <span>
+                ₹
+                {pendingFilters.priceRange?.[0] === 0
+                  ? 1000
+                  : pendingFilters.priceRange?.[0]}
+              </span>
+              <span>
+                ₹
+                {pendingFilters.priceRange?.[1] === 0
+                  ? 500000
+                  : pendingFilters.priceRange?.[1]}
+                +
+              </span>
             </div>
           </div>
           {/* Footer */}

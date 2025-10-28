@@ -35,10 +35,17 @@ export default function HostelDetailsPage() {
   }, []);
 
   return (
-    <div className="mt-[100px]">
-      <Breadcrumb propertyTitle={"Hostel details"} />
+    <div className="mt-[120px]">
+      <Breadcrumb
+        breadcrumbItems={[
+          { title: "Home", to: "/" },
+          { title: "Hostel", to: "/hostel" },
+          { title: "Hostel details" },
+        ]}
+      />
       <HostelDetails
         property={property?.data}
+        reviews={property?.review_stats}
         isLoading={isLoading}
         error={error}
       />

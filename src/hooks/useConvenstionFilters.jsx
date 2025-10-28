@@ -3,8 +3,8 @@ import { useGetConventionPropertiesQuery } from "../redux/api/conventionApi";
 
 export function useConventionFilters(initialValues) {
   const defaultFilters = {
-    priceRange: [1000, 1000000],
-    seatingCapacity: [0, 500000],
+    priceRange: [0, 0],
+    seatingCapacity: [0, 0],
 
     yesNoToggles: {
       valetParking: "",

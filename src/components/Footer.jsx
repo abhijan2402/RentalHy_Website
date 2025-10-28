@@ -40,7 +40,7 @@ export default function Footer() {
               Home
             </li>
             <li
-              onClick={() => navigate("/tickets")}
+              onClick={() => navigate("/support")}
               className="hover:text-gray-300 transition cursor-pointer"
             >
               Tickets

@@ -90,12 +90,12 @@ export default function ConventionFilters({
           </div>
           <div className="overflow-y-auto px-4" style={{ flexGrow: 1 }}>
             {/* Seating Capacity Slider */}
-            <Slider
+            {/* <Slider
               range
               min={0}
-              max={500000} // add max
+              max={500000} 
               step={100}
-              value={pendingFilters.seatingCapacity || [0, 500000]} // fallback
+              value={pendingFilters.seatingCapacity || [0, 500000]} 
               onChange={(range) => handleRangeChange("seatingCapacity", range)}
               trackStyle={{ backgroundColor: PRIMARY_COLOR }}
               handleStyle={[
@@ -110,7 +110,7 @@ export default function ConventionFilters({
                   ? pendingFilters.seatingCapacity[1]
                   : "500000+"}
               </span>
-            </div>
+            </div> */}
 
             {/* // Add Yes/No toggles for each feature: */}
             {Object.entries(filters.yesNoToggles).map(([key, label]) => (
@@ -148,7 +148,7 @@ export default function ConventionFilters({
             </div>
             {/* // Price range slider (updated min max) */}
             <FilterSection
-              title="Price (per month)"
+              title="Price"
               open={sections.priceRange}
               setOpen={(v) => setSections((p) => ({ ...p, priceRange: v }))}
             />
@@ -166,8 +166,19 @@ export default function ConventionFilters({
               ]}
             />
             <div className="flex justify-between text-black text-sm mt-2">
-              <span>₹{pendingFilters.priceRange[0]}</span>
-              <span>₹{pendingFilters.priceRange[1]}+</span>
+              <span>
+                ₹
+                {pendingFilters.priceRange?.[0] === 0
+                  ? 1000
+                  : pendingFilters.priceRange?.[0]}
+              </span>
+              <span>
+                ₹
+                {pendingFilters.priceRange?.[1] === 0
+                  ? 500000
+                  : pendingFilters.priceRange?.[1]}
+                +
+              </span>
             </div>
           </div>
           {/* Footer */}

@@ -70,10 +70,10 @@ export default function AboutPage() {
               <div>
                 <p className="font-semibold text-gray-800">Call Us</p>
                 <a
-                  href="tel:+919876543210"
+                  href="tel:+917674036244"
                   className="text-gray-600 hover:text-[#7C0902] transition"
                 >
-                  +91 9014988451
+                  +91 7674036244
                 </a>
               </div>
             </div>
@@ -82,11 +82,11 @@ export default function AboutPage() {
               <div>
                 <p className="font-semibold text-gray-800">Email Us</p>
                 <a
-                  href="mailto:sridharmudhiraj@to-letindia.com
+                  href="mailto:Sridharmudhiraj@To-letindia.com
 "
                   className="text-gray-600 hover:text-[#7C0902] transition"
                 >
-                  sridharmudhiraj@to-letindia.com
+                  Sridharmudhiraj@To-letindia.com
                 </a>
               </div>
             </div>

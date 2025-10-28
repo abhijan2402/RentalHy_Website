@@ -24,7 +24,6 @@ export const feedbackApi = createApi({
         for (let [key, value] of formdata.entries()) {
           console.log(key, value);
         }
-
         return {
           url: "hostels/submit-review",
           method: "POST",

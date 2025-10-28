@@ -24,7 +24,7 @@ import PricesSection from "../ConventionSpace/ConventionHall/ConventionDetailing
 import { AmenitiesSection } from "../ConventionSpace/ConventionHall/ConventionDetailing/AmenitiesSection";
 import { FeedbackForm } from "./FeedbackForm";
 
-export default function HostelDetails({ property, error, isLoading }) {
+export default function HostelDetails({ property, error, isLoading, reviews }) {
   const [showMore, setShowMore] = useState(false);
   const [addWhishlist] = useAddToWishlistMutation();
   const [removeWhishlist] = useRemoveToWishlistMutation();
@@ -142,14 +142,14 @@ export default function HostelDetails({ property, error, isLoading }) {
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               {capitalizeFirstLetter(property?.title)}
             </h1>
-            <div className="mt-auto w-40">
+            {/* <div className="mt-auto w-40">
               <a
                 onClick={() => alert("stilll to implement fucntionality")}
                 className="w-full block text-center cursor-pointer bg-[#7C0902] text-white px-5 py-2 rounded-lg font-semibold text-sm shadow hover:bg-[#600601] transition-colors"
               >
                 Book Now
               </a>
-            </div>
+            </div> */}
           </div>
 
           {/* Hall Type */}
@@ -193,7 +193,7 @@ export default function HostelDetails({ property, error, isLoading }) {
           {/* Map Section */}
           <div className="sticky top-24">
             <PropertyMap lat={property?.lat} lng={property?.long} />
-            <FeedbackForm hostelId={property?.id} />
+            <FeedbackForm hostelId={property?.id} reviews={reviews} />
           </div>
         </div>
       </div>

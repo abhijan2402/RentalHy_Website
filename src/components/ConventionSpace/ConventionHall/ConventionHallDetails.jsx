@@ -21,6 +21,7 @@ import {
 import noimg from "/noimg.jpg";
 import { AmenitiesSection } from "./ConventionDetailing/AmenitiesSection";
 import PricesSection from "./ConventionDetailing/PricesSection";
+import BookConventionSpace from "./BookConventionSpace/BookConventionSpace";
 
 export default function ConventionHallDetails({ property, error, isLoading }) {
   const [showMore, setShowMore] = useState(false);
@@ -76,6 +77,13 @@ export default function ConventionHallDetails({ property, error, isLoading }) {
     } catch (error) {
       console.error("Wishlist toggle error:", error);
     }
+  };
+
+  const [property_id, setProperty_id] = useState(null);
+  const [openBookingModal, setOpenBookingModal] = useState(false);
+  const handelBooking = (id) => {
+    setProperty_id(id);
+    setOpenBookingModal(true);
   };
 
   //   Get Address
@@ -141,7 +149,7 @@ export default function ConventionHallDetails({ property, error, isLoading }) {
             </h1>
             <div className="mt-auto w-40">
               <a
-                onClick={() => alert("stilll to implement fucntionality")}
+                onClick={() => handelBooking(property?.id)}
                 className="w-full block text-center cursor-pointer bg-[#7C0902] text-white px-5 py-2 rounded-lg font-semibold text-sm shadow hover:bg-[#600601] transition-colors"
               >
                 Book Now
@@ -195,5 +203,15 @@ export default function ConventionHallDetails({ property, error, isLoading }) {
       </div>
     );
   };
-  return <>{renderState()}</>;
+  return (
+    <>
+      {renderState()} {/* Booking Modal */}
+      <BookConventionSpace
+        openBookingModal={openBookingModal}
+        onClose={() => setOpenBookingModal(false)}
+        property_id={property_id}
+        head_title={"Convention/Function Hall"}
+      />
+    </>
+  );
 }

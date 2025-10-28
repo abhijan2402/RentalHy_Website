@@ -80,8 +80,11 @@ export default function PropertyAnalytics() {
               <div className="flex items-center gap-2">
                 <FaHome className="text-gray-400" />
                 <span className="font-medium text-black">{property.title}</span>
-                <span className="ml-auto text-sm text-gray-500 flex items-center gap-2">
-                  <CiLocationOn color="red" /> {property.location}
+              </div>
+              <div className="flex  gap-2">
+                <CiLocationOn color="red" />
+                <span className="ml-auto text-[12px] text-gray-500 flex items-center gap-2">
+                  {property.location}
                 </span>
               </div>
               <div className="flex items-center gap-4 mt-2">
@@ -96,18 +99,31 @@ export default function PropertyAnalytics() {
               <div className="py-4">
                 <Slider {...sliderSettings}>
                   {(property.images ?? []).map((img, idx) => (
-                    <img
-                      key={idx}
-                      src={img?.image_path || "/placeholder.jpg"}
-                      alt={property.title}
-                      className="w-full h-56 object-cover"
-                      draggable="false"
-                      onClick={() =>
-                        !user
-                          ? navigate("/signin")
-                          : navigate(`/propertydetails/${property.id}`)
-                      }
-                    />
+                    <div key={idx} className="w-full">
+                      <img
+                        src={img?.image_path || "/placeholder.jpg"}
+                        alt={property.title}
+                        draggable="false"
+                        onClick={() =>
+                          !user
+                            ? navigate("/signin")
+                            : navigate(`/propertydetails/${property.id}`)
+                        }
+                        className="
+            w-full
+            h-auto
+            object-cover
+            rounded-lg
+            cursor-pointer
+            transition-transform
+            duration-300
+            hover:scale-[1.02]
+            sm:h-48
+            md:h-56
+            lg:h-64
+          "
+                      />
+                    </div>
                   ))}
                 </Slider>
               </div>
@@ -119,9 +135,7 @@ export default function PropertyAnalytics() {
   };
   return (
     <div>
-      <h3 className="text-xl font-bold mb-4 text-[#7C0902]">
-        My Property 
-      </h3>
+      <h3 className="text-xl font-bold mb-4 text-[#7C0902]">My Property</h3>
       {renderState()}
     </div>
   );

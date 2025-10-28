@@ -296,85 +296,107 @@ const AddHostels = ({ showModal, onClose }) => {
   };
 
   const onFinish = async (values) => {
-    // Validate mandatory uploads
-    let coords = null;
-    if (values.location) {
-      coords = await getLatLngFromAddress(values.location);
-    }
-    console.log(coords, values?.map_link);
-    if (!values.images || values.images.length === 0) {
-      message.error("Please upload at least one hall image.");
-      return;
-    }
-    // ✅ Handle custom floor (replace floor=other with custom_floor)
-    if (values.floor === "other" && values.custom_floor) {
-      values.floor = values.custom_floor; // replace with actual input
-    }
-    delete values.custom_floor;
+    try {
+      // ✅ Remove empty, null, or undefined values before anything else
+      Object.keys(values).forEach((key) => {
+        const value = values[key];
+        if (
+          value === undefined ||
+          value === null ||
+          value === "" ||
+          (Array.isArray(value) && value.length === 0)
+        ) {
+          delete values[key];
+        }
+      });
 
-    const formData = new FormData();
-
-    Object.entries(values).forEach(([key, value]) => {
-      if (TIME_FIELDS.includes(key) && value) {
-        value = value.format("HH:mm");
+      // Validate mandatory uploads
+      let coords = null;
+      if (values.location) {
+        coords = await getLatLngFromAddress(values.location);
       }
 
-      if (Array.isArray(value)) {
-        value.forEach((item, index) => {
-          // ✅ hostel_type & bathroom_type → plain values
-          if (key === "hostel_type" || key === "bathroom_type") {
-            formData.append(key, item);
-          }
-          // ✅ images → raw file with indexed keys like images[0], images[1]
-          else if (key === "images") {
-            formData.append(`images[${index}]`, item?.originFileObj ?? item);
-          }
-          // ✅ menu_images → raw file with indexed keys
-          else if (key === "menu_images") {
-            formData.append(
-              `menu_images[${index}]`,
-              item?.originFileObj ?? item
-            );
-          }
-          // ✅ other array fields → indexed keys
-          else {
-            formData.append(`${key}[${index}]`, item);
+      if (!values.images || values.images.length === 0) {
+        message.error("Please upload at least one hall image.");
+        return;
+      }
+
+      // ✅ Handle custom floor logic
+      if (values.floor === "other" && values.custom_floor) {
+        values.floor = values.custom_floor;
+      }
+      delete values.custom_floor;
+
+      const formData = new FormData();
+
+      Object.entries(values).forEach(([key, value]) => {
+        if (TIME_FIELDS.includes(key) && value) {
+          value = value.format("HH:mm");
+        }
+
+        if (Array.isArray(value)) {
+          value.forEach((item, index) => {
+            if (key === "bathroom_type") {
+              formData.append(key, item);
+            } else if (key === "images") {
+              formData.append(`images[${index}]`, item?.originFileObj ?? item);
+            } else if (key === "menu_images") {
+              formData.append(
+                `menu_images[${index}]`,
+                item?.originFileObj ?? item
+              );
+            } else {
+              formData.append(`${key}[${index}]`, item);
+            }
+          });
+        } else if (value !== null && value !== undefined) {
+          formData.append(key, value);
+        }
+      });
+
+      if (coords) {
+        formData.append("lat", coords.lat.toString());
+        formData.append("long", coords.lng.toString());
+      }
+
+      // Debug: Log all FormData values
+      for (let pair of formData.entries()) {
+        console.log(pair[0] + ": ", pair[1]);
+      }
+
+      // ✅ API Call
+      const response = await addHostel(formData).unwrap();
+      toast.success("Hostel added successfully!");
+      console.log(response);
+
+      form.resetFields();
+      setHostelImgae([]);
+      setMenuImages([]);
+      onClose();
+    } catch (error) {
+      console.error("API Error:", error);
+
+      // ✅ If validation errors exist
+      if (error?.data?.errors && typeof error.data.errors === "object") {
+        const allErrors = error.data.errors;
+
+        // Combine and render all error messages
+        Object.entries(allErrors).forEach(([field, messages]) => {
+          if (Array.isArray(messages)) {
+            messages.forEach((msg) => toast.error(`${field}: ${msg}`));
+          } else {
+            toast.error(`${field}: ${messages}`);
           }
         });
-      } else if (value !== null && value !== undefined) {
-        formData.append(key, value);
-      }
-    });
-
-    if (coords) {
-      formData.append("lat", coords.lat.toString());
-      formData.append("long", coords.lng.toString());
-    }
-
-    // Debug: log all FormData values
-    for (let pair of formData.entries()) {
-      console.log(pair[0] + ": ", pair[1]);
-    }
-
-    await addHostel(formData)
-      .unwrap()
-      .then((response) => {
-        toast.success("Hostel added successfully!");
-        console.log(response);
-      })
-      .catch((error) => {
+      } else {
+        // Generic error fallback
         const errMsg =
           error?.data?.message ||
           error?.error ||
           "Failed to add hostel. Please try again.";
         toast.error(errMsg);
-      });
-
-    // Reset logic if needed
-    form.resetFields();
-    setHostelImgae([]);
-    setMenuImages([]);
-    onClose();
+      }
+    }
   };
 
   return (
@@ -383,7 +405,7 @@ const AddHostels = ({ showModal, onClose }) => {
       open={showModal}
       onCancel={onClose}
       onOk={() => form.submit()}
-      okText="Upload Hall"
+      okText="Upload Hostel"
       okButtonProps={{
         style: { backgroundColor: "#7C0902", borderColor: "#7C0902" },
         disabled: isLoading,
@@ -695,9 +717,26 @@ const AddHostels = ({ showModal, onClose }) => {
             </Input.Group>
           </Form.Item>
           {/* Hostel Types */}
-          <Form.Item label="Hostel Type" name="hostel_type">
-            <Checkbox.Group options={hostelTypeOptions} />
+          {/* Hostel Type */}
+          <Form.Item
+            label="Hostel Type"
+            name="hostel_type"
+            rules={[
+              {
+                required: true,
+                message: "Please select at least one hostel type",
+              },
+            ]}
+          >
+            <Checkbox.Group
+              options={[
+                { label: "Male Hostel", value: "male" },
+                { label: "Female Hostel", value: "female" },
+                { label: "Co-living Hostel", value: "co-living" },
+              ]}
+            />
           </Form.Item>
+
           {/* Furnishing Status */}
           <Form.Item
             label="Furnishing Status & Features"
@@ -712,7 +751,7 @@ const AddHostels = ({ showModal, onClose }) => {
           {/* Yes/No toggles for amenities */}
           {[
             { label: "Wifi", name: "wifi" },
-            { label: "Ac/Non-AC", name: "ac" },
+            { label: "A/C", name: "ac" },
             { label: "Laundry Service", name: "laundry_service" },
             { label: "Housekeeping", name: "housekeeping" },
             { label: "Hot Water / Geyser", name: "hot_water" },
@@ -860,6 +899,7 @@ const AddHostels = ({ showModal, onClose }) => {
             name="menu_images"
             valuePropName="fileList"
             getValueFromEvent={normFile}
+            rules={[{ required: true, message: "Please Add Hostel Menu" }]}
           >
             <Upload
               listType="picture-card"

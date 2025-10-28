@@ -68,7 +68,7 @@ const AddPropertyModal = ({ showModal, onClose }) => {
     lng: 78.9629,
   });
 
-  console.log(defaultCenter, city, area);
+  // console.log(defaultCenter, city, area);
 
   useEffect(() => {
     if (latitude != null && longitude != null) {
@@ -88,7 +88,7 @@ const AddPropertyModal = ({ showModal, onClose }) => {
 
   const autocompleteRef = useRef(null);
 
-  console.log(map);
+  // console.log(map);
 
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script", // ✅ use same id everywhere
@@ -202,10 +202,10 @@ const AddPropertyModal = ({ showModal, onClose }) => {
   };
 
   const onFinish = async (values) => {
+    console.log(values);
     try {
       if (!values.images || values.images.length === 0) {
         toast.error("Please upload at least one property image.");
-
         return;
       }
 
@@ -223,9 +223,19 @@ const AddPropertyModal = ({ showModal, onClose }) => {
         );
       }
 
-      // ✅ Handle custom floor (replace floor=other with custom_floor)
-      if (values.floor === "other" && values.custom_floor) {
-        values.floor = values.custom_floor; // replace with actual input
+      // ✅ Handle custom floor (replace "other" with input)
+      if (Array.isArray(values.floor)) {
+        if (values.floor.includes("other") && values.custom_floor) {
+          const customFloors = values.custom_floor
+            .split(",")
+            .map((f) => f.trim())
+            .filter((f) => f !== "");
+
+          values.floor = [
+            ...values.floor.filter((f) => f !== "other"),
+            ...customFloors,
+          ];
+        }
       }
 
       // ✅ Handle custom property type
@@ -233,14 +243,24 @@ const AddPropertyModal = ({ showModal, onClose }) => {
         values.property_type = customPropertyType;
       }
 
-      // 🧹 Remove unwanted keys BEFORE appending
+      // 🧹 Remove unwanted or empty keys
+      Object.keys(values).forEach((key) => {
+        if (
+          values[key] === undefined ||
+          values[key] === null ||
+          values[key] === "" ||
+          (Array.isArray(values[key]) && values[key].length === 0)
+        ) {
+          delete values[key];
+        }
+      });
+
       delete values.custom_floor;
       delete values.custom_commercial_space;
 
-      // ✅ Prepare formData
+      // ✅ Prepare FormData
       const formData = new FormData();
 
-      // Geocode
       let coords = null;
       if (values.location) {
         coords = await getLatLngFromAddress(values.location);
@@ -255,82 +275,52 @@ const AddPropertyModal = ({ showModal, onClose }) => {
         formData.append("amenities", JSON.stringify(amenityObj));
       }
 
-      // Loop through values
+      // Append all form fields
       Object.entries(values).forEach(([key, value]) => {
         if (key === "images" || key === "amenities") return;
 
         if (Array.isArray(value)) {
-          if (key === "availability" || key === "advance") {
-            const firstValid = value.find((v) =>
-              (key === "availability"
-                ? validAvailabilityOptions
-                : validAdvanceOptions
-              ).includes(v)
-            );
-            if (!firstValid) throw new Error(`Invalid ${key} selected`);
-            formData.append(key, firstValid);
-          } else {
-            value.forEach((val, idx) => {
-              formData.append(`${key}[${idx}]`, val);
-            });
-          }
+          value.forEach((val, idx) => {
+            formData.append(`${key}[${idx}]`, val);
+          });
         } else {
-          if (
-            key === "availability" &&
-            !validAvailabilityOptions.includes(value)
-          ) {
-            throw new Error("Invalid availability selected");
-          }
-          if (key === "advance" && !validAdvanceOptions.includes(value)) {
-            throw new Error("Invalid advance selected");
-          }
-          if (key === "price" || key === "area_sqft") {
-            formData.append(key, value?.toString() || "");
-          } else {
-            formData.append(key, value);
-          }
+          formData.append(key, value);
         }
       });
 
-      // Lat/Long
+      if (values.images && Array.isArray(values.images)) {
+        values.images.forEach((file, idx) => {
+          const actualFile = file.originFileObj || file; // AntD Upload file object
+          formData.append(`images[${idx}]`, actualFile);
+        });
+      }
+
+      // Add coordinates if available
       if (coords) {
         formData.append("lat", coords.lat.toString());
         formData.append("long", coords.lng.toString());
       }
 
-      // values.images.forEach((fileObj, idx) => {
-      //   const file = fileObj.originFileObj || fileObj;
-
-      //   formData.append(`images[${idx}]`, file);
-      // });
-
-      // Debug log
-      const dataObj = {};
-      for (const [key, value] of formData.entries()) {
-        dataObj[key] = value;
-      }
-      // console.log("🚀 Final Data Sent:", dataObj);
-
+      // ✅ Submit to API
       await addProperty(formData)
         .unwrap()
         .then((response) => {
           toast.success(response?.message || "Property created successfully");
-          // console.log(response);
         })
         .catch((error) => {
-          const errMsg =
+          toast.error(
             error?.data?.message ||
-            error?.error ||
-            "Failed to add Property. Please try again.";
-          toast.error(errMsg);
-          // console.log(errMsg);
+              error?.error ||
+              "Failed to add property. Please try again."
+          );
         });
+
+      // Reset form
       form.resetFields();
       setFileList([]);
       onClose();
     } catch (error) {
       toast.error(error.message || "Failed to add property. Please try again.");
-      // console.log(error.message);
     }
   };
 
@@ -623,22 +613,24 @@ const AddPropertyModal = ({ showModal, onClose }) => {
           }
         </Form.Item>
 
-        {/* Which Floor */}
+        {/* Which Floor (multi-select) */}
         <Form.Item
           label="Which Floor"
           name="floor"
-          rules={[{ required: true, message: "Please select floor" }]}
+          rules={[
+            { required: true, message: "Please select at least one floor" },
+          ]}
         >
-          <Radio.Group>
-            <Radio value="0">Ground (0)</Radio>
-            <Radio value="1">1</Radio>
-            <Radio value="2">2</Radio>
-            <Radio value="3">3</Radio>
-            <Radio value="4">4</Radio>
-            <Radio value="5">5</Radio>
-            <Radio value="6">6+</Radio>
-            <Radio value="other">Other</Radio>
-          </Radio.Group>
+          <Checkbox.Group>
+            <Checkbox value="0">Ground (0)</Checkbox>
+            <Checkbox value="1">1</Checkbox>
+            <Checkbox value="2">2</Checkbox>
+            <Checkbox value="3">3</Checkbox>
+            <Checkbox value="4">4</Checkbox>
+            <Checkbox value="5">5</Checkbox>
+            <Checkbox value="6">6+</Checkbox>
+            <Checkbox value="other">Other</Checkbox>
+          </Checkbox.Group>
         </Form.Item>
 
         {/* Custom floor if "Other" is selected */}
@@ -647,16 +639,22 @@ const AddPropertyModal = ({ showModal, onClose }) => {
           shouldUpdate={(prev, curr) => prev.floor !== curr.floor}
         >
           {({ getFieldValue }) =>
-            getFieldValue("floor") === "other" ? (
+            getFieldValue("floor")?.includes("other") ? (
               <Form.Item
-                label="Enter Floor Number"
+                label="Enter Custom Floor Number(s)"
                 name="custom_floor"
                 rules={[
-                  { required: true, message: "Please enter floor number" },
-                  { pattern: /^[0-9]+$/, message: "Only numbers allowed" },
+                  {
+                    required: true,
+                    message: "Please enter custom floor number(s)",
+                  },
+                  {
+                    pattern: /^[0-9,\s]+$/,
+                    message: "Only numbers separated by commas",
+                  },
                 ]}
               >
-                <Input placeholder="Enter floor number (e.g., 7, 12, 20)" />
+                <Input placeholder="e.g., 7, 8, 12" />
               </Form.Item>
             ) : null
           }

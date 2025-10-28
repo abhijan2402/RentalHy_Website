@@ -4,8 +4,11 @@ import Breadcrumb from "../components/Breadcrumb";
 import { useAddPropertyViewMutation } from "../redux/api/propertyApi";
 import ConventionHallDetails from "../components/ConventionSpace/ConventionHall/ConventionHallDetails";
 import { useGetconventionDetailsQuery } from "../redux/api/conventionApi";
+import { useNavbar } from "../contexts/NavbarContext";
 
 export default function ConventionDetailsPage() {
+  const { activeMain } = useNavbar();
+  console.log(activeMain);
   const { id } = useParams();
 
   // Fetch property details from API
@@ -34,9 +37,17 @@ export default function ConventionDetailsPage() {
     }
   }, []);
 
+  const nav = activeMain === "Resort/Farm House" ? "/farm-resort" : "/convention";
+
   return (
-    <div className="mt-[100px]">
-      <Breadcrumb propertyTitle={"Convention Hall details"} />
+    <div className="mt-[120px]">
+      <Breadcrumb
+        breadcrumbItems={[
+          { title: "Home", to: "/" },
+          { title: `${activeMain}`, to: `${nav}` },
+          { title: `${property?.data?.title} details` },
+        ]}
+      />
       <ConventionHallDetails
         property={property?.data}
         isLoading={isLoading}

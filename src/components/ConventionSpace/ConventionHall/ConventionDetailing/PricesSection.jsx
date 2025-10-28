@@ -6,15 +6,11 @@ const formatLabel = (key) => {
 };
 
 const PricesSection = ({ property }) => {
-  // Extract dynamic price-like fields
   const priceFields = Object.entries(property || {}).filter(([key, value]) => {
-    // Skip booleans (true/false)
     if (typeof value === "boolean") return false;
 
-    // Check if value looks like a number/price
     const isNumber = !isNaN(value) && value !== null && value !== "";
 
-    // Skip irrelevant IDs and coords
     const excludedKeys = [
       "id",
       "user_id",
@@ -22,11 +18,19 @@ const PricesSection = ({ property }) => {
       "long",
       "seating_capacity",
       "images",
-      "contact_number"
+      "contact_number",
     ];
 
     return isNumber && !excludedKeys.includes(key);
   });
+
+  // Helper: decide icon/unit
+  const getUnit = (key) => {
+    if (key === "room_size_min" || key === "room_size_max") {
+      return "sq"; // or "sq ft", "sq m" according to context
+    }
+    return "₹";
+  };
 
   return (
     <div className="mb-8">
@@ -36,15 +40,18 @@ const PricesSection = ({ property }) => {
         is the list of available pricing options for this property.
       </p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-2">
         {priceFields.map(([key, value], idx) => (
           <div
             key={idx}
-            className="p-2 rounded-xl flex justify-between items-center border bg-blue-50 border-blue-300 text-blue-800 shadow-sm"
+            className="p-4 rounded-xl flex justify-between items-center border bg-blue-50 border-blue-300 text-blue-800 shadow-sm"
           >
-            <p className="text-[12px] font-medium text-black">{formatLabel(key)}</p>
-            <p className="text-[12px] font-bold text-black">
-              ₹ {parseFloat(value).toLocaleString()}
+            <p className="text-[11px] font-medium text-black">
+              {formatLabel(key)}
+            </p>
+            <p className="text-[11px] font-bold text-black">
+              {parseFloat(value).toLocaleString()}{" "}
+              {getUnit(key)}
             </p>
           </div>
         ))}
@@ -52,5 +59,6 @@ const PricesSection = ({ property }) => {
     </div>
   );
 };
+
 
 export default PricesSection;

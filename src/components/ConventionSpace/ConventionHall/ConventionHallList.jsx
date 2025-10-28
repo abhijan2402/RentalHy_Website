@@ -42,6 +42,7 @@ export default function ConventionHallList({
   setPageNo,
   isLoading,
   error,
+  
 }) {
   const navigate = useNavigate();
   const { user } = useAuth();

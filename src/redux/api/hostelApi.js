@@ -58,6 +58,21 @@ export const hostelApi = createApi({
       }),
       invalidatesTags: ["hostel"],
     }),
+
+    //4. Get My Hostel Mangement
+    getMyHostelList: builder.query({
+      query: () => "my-list/hostels",
+      providesTags: ["hostel"],
+    }),
+    // 5. Edit My Hostel Capacity
+    editMyHostelCapacity: builder.mutation({
+      query: ({ body, id }) => ({
+        url: `hostel-update/${id}`,
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["hostel"],
+    }),
   }),
 });
 
@@ -65,4 +80,6 @@ export const {
   useGetHostelListQuery,
   useGetHostelDetailsQuery,
   useAddHostelMutation,
+  useEditMyHostelCapacityMutation,
+  useGetMyHostelListQuery,
 } = hostelApi;

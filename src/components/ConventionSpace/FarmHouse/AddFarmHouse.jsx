@@ -391,6 +391,7 @@ const AddFarmHouse = ({ showModal, onClose }) => {
       formData.append("lat", coords.lat.toString());
       formData.append("long", coords.lng.toString());
     }
+    formData.append("type", "farm");
 
     // Debug: log all FormData values
     for (let pair of formData.entries()) {

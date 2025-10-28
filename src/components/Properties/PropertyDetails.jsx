@@ -88,6 +88,10 @@ export default function PropertyDetails({ property, error, isLoading }) {
     }
   };
 
+  const handleClick = () => {
+    window.location.href = `tel:${property?.user?.phone_number}`;
+  };
+
   const renderState = () => {
     if (isLoading) {
       return (
@@ -360,10 +364,9 @@ export default function PropertyDetails({ property, error, isLoading }) {
               {/* Button */}
               <div className="mt-5">
                 <button
-                  onClick={() =>
-                    alert("Contact form or call can be implemented here")
-                  }
+                  onClick={handleClick}
                   className="w-full bg-[#7C0902] text-white px-5 py-2.5 rounded-lg font-semibold shadow hover:bg-[#600601] transition-colors"
+                  type="button"
                 >
                   Contact Landlord
                 </button>

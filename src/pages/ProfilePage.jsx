@@ -23,6 +23,7 @@ import {
 import MyBookings from "../components/MyBookings";
 import Bookings from "../components/Bookings";
 import Account from "../components/Account";
+import HostelManagement from "../components/Hostel/HostelManagement";
 
 const { TabPane } = Tabs;
 
@@ -176,10 +177,13 @@ export default function ProfilePage() {
           <TabPane tab="My Property" key="myProperty">
             <PropertyAnalytics />
           </TabPane>
+          <TabPane tab="Hostel Management" key="hostel">
+            <HostelManagement />
+          </TabPane>
           <TabPane tab="My Bookings" key="myBookings">
             <MyBookings />
           </TabPane>
-          <TabPane tab="Bookings" key="bookings">
+          <TabPane tab="Convention/Hall Orders" key="bookings">
             <Bookings />
           </TabPane>
           <TabPane tab="Account" key="account">

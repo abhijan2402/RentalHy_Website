@@ -8,7 +8,12 @@ const ConventionPage = () => {
 
   return (
     <div className="w-full max-w-6xl mx-auto mt-[120px]">
-       <Breadcrumb propertyTitle={"Convention Space"} />
+      <Breadcrumb
+        breadcrumbItems={[
+          { title: "Home", to: "/" },
+          { title: "Convention/Function Hall", to: "/convention" },
+        ]}
+      />
       {/* Tab buttons */}
       <div className="flex px-6 gap-2 mb-4 border-b border-white">
         <button
@@ -22,14 +27,10 @@ const ConventionPage = () => {
           <FaBuilding className="inline mr-2" />
           Convention Halls
         </button>
-        
       </div>
 
       {/* Tab content */}
-      <div>
-        {activeTab === "conventionhall" && <ConventionHall />}
-      
-      </div>
+      <div>{activeTab === "conventionhall" && <ConventionHall />}</div>
     </div>
   );
 };

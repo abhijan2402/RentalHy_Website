@@ -3,12 +3,13 @@ import { FaThumbsUp } from "react-icons/fa";
 import { useAuth } from "../../contexts/AuthContext";
 import { toast } from "react-toastify";
 import { useSubmitFeedbackMutation } from "../../redux/api/feedbackApi";
+import { useParams } from "react-router-dom";
 
 // Feedback keys from your schema
 const FEEDBACK_FIELDS = [
-  { key: "food_good", label: "Food is good?" },
+  { key: "food", label: "Food is good?" },
   { key: "room_clean", label: "Room Cleanliness is good?" },
-  { key: "staff_good", label: "Staff is good?" },
+  { key: "staff", label: "Staff is good?" },
   { key: "safe_stay", label: "Safe to stay?" },
 ];
 
@@ -17,7 +18,9 @@ const defaultFeedbackState = FEEDBACK_FIELDS.reduce(
   {}
 );
 
-export const FeedbackForm = ({ hostelId }) => {
+export const FeedbackForm = ({ hostelId, reviews }) => {
+  const { id } = useParams();
+  console.log(reviews);
   const { user } = useAuth();
   const [submitFeedback, { isLoading: Submiting }] =
     useSubmitFeedbackMutation();
@@ -36,22 +39,18 @@ export const FeedbackForm = ({ hostelId }) => {
 
     const payload = {
       hostel_id: hostelId,
-      food_good: feedback.food_good,
+      food_good: feedback.food,
       room_clean: feedback.room_clean,
-      staff_good: feedback.staff_good,
+      staff_good: feedback.staff,
       safe_stay: feedback.safe_stay,
       additional_feedback: additionalFeedback,
       user_id: user?.id,
     };
-    console.log(payload);
+
     const formdata = new FormData();
     Object.entries(payload).forEach(([key, value]) => {
       formdata.append(key, String(value));
     });
-
-    for (let [key, value] of formdata.entries()) {
-      console.log(key, value);
-    }
 
     await submitFeedback(formdata)
       .unwrap()
@@ -77,9 +76,12 @@ export const FeedbackForm = ({ hostelId }) => {
             <span style={{ flex: 1, color: "black", fontSize: "14px" }}>
               {label}
             </span>
+
+            {/* Display dynamic count from reviews, fallback to 0 */}
             <span style={{ marginRight: 10, color: "#7C0902" }}>
-              {feedback[key]}
+              {reviews?.[`${key}_thumbs_up`] || 0}
             </span>
+
             <FaThumbsUp
               size={20}
               onClick={() => handleToggle(key)}
@@ -134,3 +136,4 @@ export const FeedbackForm = ({ hostelId }) => {
     </div>
   );
 };
+

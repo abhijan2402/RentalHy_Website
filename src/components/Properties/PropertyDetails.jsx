@@ -13,8 +13,10 @@ import {
   useRemoveToWishlistMutation,
 } from "../../redux/api/propertyApi";
 import PropertyMap from "../PropertyMap";
+import { useNavigate } from "react-router-dom";
 
 export default function PropertyDetails({ property, error, isLoading }) {
+  const navigate = useNavigate();
   const [showMore, setShowMore] = useState(false);
   const [addWhishlist] = useAddToWishlistMutation();
   const [removeWhishlist] = useRemoveToWishlistMutation();
@@ -318,7 +320,7 @@ export default function PropertyDetails({ property, error, isLoading }) {
             <div className="p-6 border rounded-lg shadow-sm mb-8 bg-white">
               <div className="flex justify-between items-center">
                 <h2 className="text-lg font-bold mb-4 border-b pb-2 text-gray-800">
-                  Contact Landlord
+                  Contact Details
                 </h2>
                 {/* Posted Date */}
                 <p className="text-sm text-gray-400 mb-6">
@@ -364,11 +366,11 @@ export default function PropertyDetails({ property, error, isLoading }) {
               {/* Button */}
               <div className="mt-5">
                 <button
-                  onClick={handleClick}
+                  onClick={() => navigate(`/chat/${property?.user_id}`)}
                   className="w-full bg-[#7C0902] text-white px-5 py-2.5 rounded-lg font-semibold shadow hover:bg-[#600601] transition-colors"
                   type="button"
                 >
-                  Contact Landlord
+                  Contact In Chat
                 </button>
               </div>
             </div>

@@ -156,7 +156,7 @@ export default function Signup() {
   return (
     <div className="min-h-screen flex bg-white">
       <div className="w-full md:w-1/2 flex flex-col justify-center px-8 py-12 max-w-xl mx-auto">
-        <nav className="mb-8 flex items-center text-sm text-gray-500 space-x-1">
+        <nav className="mb-2 flex items-center text-sm text-gray-500 space-x-1">
           <Link to="/" className="hover:text-[#7C0902]">
             Home
           </Link>
@@ -179,7 +179,7 @@ export default function Signup() {
           <h2 className="text-2xl md:text-3xl font-extrabold mb-6 text-[#7C0902]">
             Create Your Account
           </h2>
-          <form onSubmit={handleCompleteSubmit} className="space-y-5">
+          <form onSubmit={handleCompleteSubmit} className="space-y-2">
             {/* Email & Send OTP */}
             <div>
               <label className="block mb-1 text-gray-700 font-medium">

@@ -1,27 +1,79 @@
 import React, { useState } from "react";
-import { useGetBookingsQuery } from "../redux/api/bookingsApi";
+import {
+  useGetBookingsQuery,
+  useAcceptBookingsMutation,
+  useRejectBookingsMutation,
+} from "../redux/api/bookingsApi";
 import {
   Table,
-  Typography,
-  Spin,
   Tag,
   Modal,
   Descriptions,
   Button,
   Space,
+  Input,
+  message,
 } from "antd";
 
-const { Title } = Typography;
+const { TextArea } = Input;
 
 const Bookings = () => {
-  const { data: Bookings, isLoading, error } = useGetBookingsQuery();
-  console.log(Bookings)
+  const { data: Bookings, isFetching, refetch } = useGetBookingsQuery();
   const bookings = Bookings?.data?.data || [];
 
   const [selectedBooking, setSelectedBooking] = useState(null);
+  const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
+  const [rejectReason, setRejectReason] = useState("No reason provided");
+  const [rejectId, setRejectId] = useState(null);
 
-  //   if (isLoading) return <Spin fullscreen />;
-  //   if (error) return <p>Something went wrong...</p>;
+  const [acceptBooking, { isLoading: isAccepting }] =
+    useAcceptBookingsMutation();
+  const [rejectBooking, { isLoading: isRejecting }] =
+    useRejectBookingsMutation();
+
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 5,
+  });
+
+  // Accept booking handler
+  const handleAccept = async (id) => {
+    try {
+      await acceptBooking(id).unwrap();
+      message.success("Booking accepted successfully");
+      refetch();
+    } catch (err) {
+      console.error(err);
+      message.error("Failed to accept booking");
+    }
+  };
+
+  // Open reject modal
+  const openRejectModal = (id) => {
+    setRejectId(id);
+    setRejectReason("No reason provided");
+    setIsRejectModalOpen(true);
+  };
+
+  // Reject booking handler
+  const handleRejectSubmit = async () => {
+    try {
+      // Create FormData for rejection reason
+      const formdata = new FormData();
+      formdata.append("reason", rejectReason || "No reason provided");
+
+      await rejectBooking({ formdata, id: rejectId }).unwrap();
+
+      message.success("Booking rejected");
+      setIsRejectModalOpen(false);
+      setRejectId(null);
+
+      refetch();
+    } catch (err) {
+      console.error(err);
+      message.error("Failed to reject booking");
+    }
+  };
 
   const columns = [
     {
@@ -82,24 +134,42 @@ const Bookings = () => {
           <Button type="link" onClick={() => setSelectedBooking(record)}>
             View Details
           </Button>
+          <Button
+            type="primary"
+            danger
+            loading={isRejecting && rejectId === record.id}
+            onClick={() => openRejectModal(record.id)}
+          >
+            Reject
+          </Button>
+          <Button
+            type="default"
+            loading={isAccepting}
+            onClick={() => handleAccept(record.id)}
+          >
+            Accept
+          </Button>
         </Space>
       ),
     },
   ];
 
   return (
-    <div className="">
-      {/* <Title level={3} style={{ textAlign: "center", marginBottom: 20 }}>
-        My Bookings
-      </Title> */}
-
+    <div>
       <Table
         columns={columns}
         dataSource={bookings}
         rowKey="id"
-        pagination={{ pageSize: 5 }}
+        pagination={{
+          current: pagination.current,
+          pageSize: pagination.pageSize,
+          onChange: (page, pageSize) =>
+            setPagination({ current: page, pageSize }),
+          showSizeChanger: true,
+        }}
         bordered
-        scroll={{ x: "max-content" }} // 👈 enables horizontal scroll
+        scroll={{ x: "max-content" }}
+        loading={isFetching}
       />
 
       {/* Booking Detail Modal */}
@@ -176,6 +246,23 @@ const Bookings = () => {
             </Descriptions.Item>
           </Descriptions>
         )}
+      </Modal>
+
+      {/* Reject Reason Modal */}
+      <Modal
+        title="Reject Booking"
+        open={isRejectModalOpen}
+        onOk={handleRejectSubmit}
+        onCancel={() => setIsRejectModalOpen(false)}
+        confirmLoading={isRejecting}
+        okText="Submit"
+      >
+        <TextArea
+          rows={4}
+          value={rejectReason}
+          onChange={(e) => setRejectReason(e.target.value)}
+          placeholder="Enter rejection reason"
+        />
       </Modal>
     </div>
   );

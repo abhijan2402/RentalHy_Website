@@ -61,7 +61,7 @@ export default function HostelList({
     }
   }, [data]);
 
-  console.log(data?.data);
+  // console.log(data?.data);
 
   const renderState = () => {
     if (isLoading) {
@@ -143,28 +143,41 @@ export default function HostelList({
                     </h3>
                   </div>
 
-                  <p className="font-medium text-sm px-2 py-1 text-gray-600 truncate">
-                    {property.description}
+                  <p className="font-medium text-sm px-0 py-1 text-gray-600 truncate">
+                    {property.location}
                   </p>
 
                   <div className="flex gap-4">
                     <p className="text-xs text-gray-500 mb-2">
-                      <span className="text-black font-medium"> Type: </span>
-                      {capitalizeFirstLetter(property.hostel_type)}
+                      <span className="text-black font-medium">Type: </span>
+                      {Array.isArray(property.hostel_type)
+                        ? property.hostel_type.map((type, index) => (
+                            <span key={index}>
+                              {capitalizeFirstLetter(type)}
+                              {index < property.hostel_type.length - 1
+                                ? ", "
+                                : ""}
+                            </span>
+                          ))
+                        : capitalizeFirstLetter(property.hostel_type)}
                     </p>
+
                     <p className="text-xs text-gray-500 mb-2">
                       <span className="text-black font-medium">Contact: </span>
                       {property.contact_number}
                     </p>
                   </div>
 
+                  <p className="font-medium text-sm px-0 py-1 text-gray-600 truncate">
+                    ₹{property.min_price || "NA"} - ₹
+                    {property.max_price || "NA"}
+                  </p>
+
                   <div className="flex justify-between">
                     <p className="text-xs text-gray-400 mb-2">
                       Posted: {convertToIST(property.created_at)}
                     </p>
                   </div>
-
-                
                 </div>
               </div>
             );

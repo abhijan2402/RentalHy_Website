@@ -24,6 +24,7 @@ import MyBookings from "../components/MyBookings";
 import Bookings from "../components/Bookings";
 import Account from "../components/Account";
 import HostelManagement from "../components/Hostel/HostelManagement";
+import ChatList from "../components/ChatList";
 
 const { TabPane } = Tabs;
 
@@ -188,6 +189,9 @@ export default function ProfilePage() {
           </TabPane>
           <TabPane tab="Account" key="account">
             <Account />
+          </TabPane>
+          <TabPane tab="Chat" key="chat">
+            <ChatList />
           </TabPane>
           {/* <TabPane tab="Convention / Function Hall" key="conventionHall">
             <div className="flex border border-dashed border-[#7C0902] rounded text-[#7C0902] justify-center items-center h-[100px]">

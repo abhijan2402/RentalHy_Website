@@ -10,6 +10,7 @@ import { bookingsApi } from "../api/bookingsApi";
 import { accountApi } from "../api/accountApi";
 import { feedbackApi } from "../api/feedbackApi";
 import { cmsApi } from "../api/cmsApi";
+import { chatListApi } from "../api/chatApi";
 
 export const store = configureStore({
   reducer: {
@@ -24,6 +25,7 @@ export const store = configureStore({
     [accountApi.reducerPath]: accountApi.reducer,
     [feedbackApi.reducerPath]: feedbackApi.reducer,
     [cmsApi.reducerPath]: cmsApi.reducer,
+    [chatListApi.reducerPath]: chatListApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
@@ -37,5 +39,6 @@ export const store = configureStore({
       .concat(bookingsApi.middleware)
       .concat(accountApi.middleware)
       .concat(cmsApi.middleware)
-      .concat(feedbackApi.middleware),
+      .concat(feedbackApi.middleware)
+      .concat(chatListApi.middleware),
 });

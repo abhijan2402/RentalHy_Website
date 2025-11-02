@@ -70,7 +70,7 @@ export function AuthProvider({ children }) {
   const logout = () => {
     setUser(null);
     setUserId(null);
-    localStorage.removeItem("authToken");
+    localStorage.clear();
     navigate("/signin");
   };
 

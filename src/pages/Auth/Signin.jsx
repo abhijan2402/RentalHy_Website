@@ -204,6 +204,14 @@ export default function Signin() {
             )} */}
           </form>
 
+          <div className="flex justify-end">
+            <p className="mt-6 text-sm text-gray-600 text-center">
+              <Link to="/forgot-pass" className=" font-medium hover:underline">
+                Forgot Password?{" "}
+              </Link>
+            </p>
+          </div>
+
           <p className="mt-6 text-sm text-gray-600 text-center">
             Don’t have an account?{" "}
             <Link

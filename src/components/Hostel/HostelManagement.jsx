@@ -36,7 +36,7 @@ export default function PropertyAnalytics() {
 
   const handleEditClick = (property) => {
     setSelectedHostel(property);
-    setNewCapacity(property.occupancy_capacity || 0);
+    setNewCapacity(property.seating_capacity || 0);
     setIsModalOpen(true);
   };
 

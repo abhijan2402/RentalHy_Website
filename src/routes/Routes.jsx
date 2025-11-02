@@ -19,6 +19,8 @@ import ResortFarmHousePage from "../pages/ResortFarmHousePage";
 import Hostel from "../pages/Hostel";
 import ConventionDetailsPage from "../pages/ConventionDetailsPage";
 import HostelDetailsPage from "../pages/HostelDetailsPage";
+import Chat from "../pages/Chat";
+import ForgotPassword from "../pages/Auth/ForgotPassword";
 
 export default function AppRoutes() {
   return (
@@ -26,6 +28,7 @@ export default function AppRoutes() {
       {/* Public Routes */}
       <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
+        <Route path="/chat/:id" element={<Chat />} />
         <Route path="/propertydetails/:id" element={<PropertyDetailsPage />} />
 
         <Route path="/convention" element={<ConventionPage />} />
@@ -66,6 +69,7 @@ export default function AppRoutes() {
       {/* Auth Routes */}
       <Route path="/signin" element={<Signin />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/forgot-pass" element={<ForgotPassword />} />
 
       <Route path="*" element={<NotFound />} />
     </Routes>

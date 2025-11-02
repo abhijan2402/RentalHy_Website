@@ -69,6 +69,47 @@ export const authApi = createApi({
         })(),
       }),
     }),
+
+    // Forgot Password
+    forgotPassword: builder.mutation({
+      query: (email) => ({
+        url: "forgot-password",
+        method: "POST",
+        body: (() => {
+          const formData = new FormData();
+          formData.append("email", email);
+          return formData;
+        })(),
+      }),
+    }),
+
+    // Verify Password Email
+    verifyForgotPassword: builder.mutation({
+      query: ({ email, otp }) => ({
+        url: "verify-reset-otp",
+        method: "POST",
+        body: (() => {
+          const formData = new FormData();
+          formData.append("email", email);
+          formData.append("otp", otp);
+          return formData;
+        })(),
+      }),
+    }),
+    // Reset Password
+    resetForgotPassword: builder.mutation({
+      query: ({ email, otp, newPassword }) => ({
+        url: "reset-password",
+        method: "POST",
+        body: (() => {
+          const formData = new FormData();
+          formData.append("email", email);
+          formData.append("otp", otp);
+          formData.append("new_password", newPassword);
+          return formData;
+        })(),
+      }),
+    }),
   }),
 });
 
@@ -77,4 +118,7 @@ export const {
   useVerifyEmailMutation,
   useCompleteSignupMutation,
   useLoginMutation,
+  useForgotPasswordMutation,
+  useVerifyForgotPasswordMutation,
+  useResetForgotPasswordMutation,
 } = authApi;

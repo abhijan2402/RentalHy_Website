@@ -18,9 +18,12 @@ export const feedbackApi = createApi({
       query: () => "support/issues",
       providesTags: ["feedbackkkk"],
     }),
+    getHostelReviewList: builder.query({
+      query: () => "support/issues",
+      providesTags: ["feedback"],
+    }),
     submitFeedback: builder.mutation({
       query: (formdata) => {
-        // Debug: log FormData entries here
         for (let [key, value] of formdata.entries()) {
           console.log(key, value);
         }
@@ -35,4 +38,4 @@ export const feedbackApi = createApi({
   }),
 });
 
-export const { useGetTicketListQuery, useSubmitFeedbackMutation } = feedbackApi;
+export const { useGetTicketListQuery, useSubmitFeedbackMutation, useGetHostelReviewListQuery } = feedbackApi;

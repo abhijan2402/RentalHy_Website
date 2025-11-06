@@ -25,6 +25,7 @@ import Bookings from "../components/Bookings";
 import Account from "../components/Account";
 import HostelManagement from "../components/Hostel/HostelManagement";
 import ChatList from "../components/ChatList";
+import HostelReviewList from "../components/HostelReviewList";
 
 const { TabPane } = Tabs;
 
@@ -180,6 +181,9 @@ export default function ProfilePage() {
           </TabPane>
           <TabPane tab="Hostel Management" key="hostel">
             <HostelManagement />
+          </TabPane>
+          <TabPane tab="Hostel Review List" key="hostelReview">
+            <HostelReviewList />
           </TabPane>
           <TabPane tab="My Bookings" key="myBookings">
             <MyBookings />

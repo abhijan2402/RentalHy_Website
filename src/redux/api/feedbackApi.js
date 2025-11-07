@@ -19,7 +19,7 @@ export const feedbackApi = createApi({
       providesTags: ["feedbackkkk"],
     }),
     getHostelReviewList: builder.query({
-      query: () => "support/issues",
+      query: () => "get-hostel-review-list",
       providesTags: ["feedback"],
     }),
     submitFeedback: builder.mutation({

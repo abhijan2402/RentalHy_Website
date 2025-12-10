@@ -28,7 +28,7 @@ export default function ConventionHallDetails({ property, error, isLoading }) {
   const [addWhishlist] = useAddToWishlistMutation();
   const [removeWhishlist] = useRemoveToWishlistMutation();
   const [location, setLocation] = useState("");
-  console.log(property);
+  // console.log(property);
   // Slider settings
   const sliderSettings = {
     dots: true,

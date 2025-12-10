@@ -1,4 +1,3 @@
-// Utility: format API keys into readable labels
 const formatLabel = (key) => {
   return key
     .replace(/_/g, " ") // replace underscores with spaces
@@ -18,7 +17,6 @@ const PricesSection = ({ property }) => {
       "long",
       "seating_capacity",
       "images",
-      "contact_number",
     ];
 
     return isNumber && !excludedKeys.includes(key);
@@ -26,9 +24,14 @@ const PricesSection = ({ property }) => {
 
   // Helper: decide icon/unit
   const getUnit = (key) => {
-    if (key === "room_size_min" || key === "room_size_max") {
-      return "sq"; // or "sq ft", "sq m" according to context
+    if (key === "contact_number" || key === "alternate_contact_number") {
+      return "";
     }
+
+    if (key === "room_size_min" || key === "room_size_max") {
+      return "sq";
+    }
+
     return "₹";
   };
 
@@ -50,8 +53,7 @@ const PricesSection = ({ property }) => {
               {formatLabel(key)}
             </p>
             <p className="text-[11px] font-bold text-black">
-              {parseFloat(value).toLocaleString()}{" "}
-              {getUnit(key)}
+              {value} {getUnit(key)}
             </p>
           </div>
         ))}
@@ -59,6 +61,5 @@ const PricesSection = ({ property }) => {
     </div>
   );
 };
-
 
 export default PricesSection;

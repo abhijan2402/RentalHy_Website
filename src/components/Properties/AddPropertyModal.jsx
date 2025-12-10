@@ -76,7 +76,7 @@ const AddPropertyModal = ({ showModal, onClose }) => {
     }
   }, [latitude, longitude]);
 
-  const [addProperty, { isLoading }] = useAddPropertyMutation();
+  const [addProperty, { isLoading, error }] = useAddPropertyMutation();
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
   const [map, setMap] = useState(null);
@@ -201,6 +201,29 @@ const AddPropertyModal = ({ showModal, onClose }) => {
     setFileList(newFileList.slice(0, 5)); // limit max 5 images
   };
 
+  const handleServerValidationErrors = (errors) => {
+    const fieldErrors = [];
+
+    Object.entries(errors || {}).forEach(([field, messages]) => {
+      // "images.0" -> ["images", 0]
+      const namePath = field
+        .split(".")
+        .map((part) => (isNaN(Number(part)) ? part : Number(part)));
+
+      fieldErrors.push({
+        name: namePath,
+        errors: messages,
+      });
+
+      // Toast each error message
+      messages.forEach((msg) => toast.error(msg));
+    });
+
+    if (fieldErrors.length) {
+      form.setFields(fieldErrors);
+    }
+  };
+
   const onFinish = async (values) => {
     console.log(values);
     try {
@@ -307,22 +330,28 @@ const AddPropertyModal = ({ showModal, onClose }) => {
         .then((response) => {
           toast.success(response?.message || "Property created successfully");
         })
-        .catch((error) => {
-          toast.error(
-            error?.data?.message ||
-              error?.error ||
-              "Failed to add property. Please try again."
-          );
-        });
+       
 
       // Reset form
       form.resetFields();
       setFileList([]);
       onClose();
     } catch (error) {
-      toast.error(error.message || "Failed to add property. Please try again.");
+      console.log(error);
+      const apiError = error?.data || error;
+      if (apiError?.errors) {
+        handleServerValidationErrors(apiError.errors);
+      } else {
+        toast.error(
+          apiError?.message ||
+            apiError?.error ||
+            "Failed to add property. Please try again."
+        );
+      }
     }
   };
+
+  console.log(error);
 
   return (
     <Modal

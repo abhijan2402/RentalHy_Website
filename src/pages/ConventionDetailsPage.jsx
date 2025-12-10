@@ -8,12 +8,12 @@ import { useNavbar } from "../contexts/NavbarContext";
 
 export default function ConventionDetailsPage() {
   const { activeMain } = useNavbar();
-  console.log(activeMain);
+  // console.log(activeMain);
   const { id } = useParams();
 
   // Fetch property details from API
   const { data: property, isLoading, error } = useGetconventionDetailsQuery(id);
-  console.log(property);
+  // console.log(property);
 
   // Add view mutation
   const [addPropertyView] = useAddPropertyViewMutation();

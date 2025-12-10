@@ -899,7 +899,7 @@ const AddHostels = ({ showModal, onClose }) => {
             name="menu_images"
             valuePropName="fileList"
             getValueFromEvent={normFile}
-            rules={[{ required: true, message: "Please Add Hostel Menu" }]}
+            // rules={[{ required: true, message: "Please Add Hostel Menu" }]}
           >
             <Upload
               listType="picture-card"
